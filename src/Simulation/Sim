@@ -1,0 +1,126 @@
+public class Sim{
+
+    private DHimluate m_dhimulate = null;
+    private double attributesInfluence = 1;
+    private double distanceStudentInfluence = 1;
+    private double distanceLocationInfluence = 1;
+    private double directionInfluence = 1;
+    private double studentInfluence = 1;
+    private double locationInfluence = 1;
+    private double timelineInfluence = 1;
+    private double studentsPrioMAX = 0.0;
+    private double locationPrioMAX = 0.0;
+
+    public Sim(DHimluate dhimluate){
+        m_dhimulate = dhimluate;
+    }
+
+    public void simAllStudents(){
+        Student elem;
+        for(Iterator<Student> it = m_dhimulate.getStudentsList().Iterator(); it.hasNext(); elem = it.next()){
+            this.simStudent(elem);
+        }
+    }
+
+
+    private bool simStudent(Student currentstudent){
+        //check the status flag
+        switch(currentstudent.getStatus()){
+            //moving around
+            case Status.Moving:
+                //analyse surrounding students
+                this.prioritizeStudents(currentstudent);
+
+                //analyse locations
+                this.prioritizeLocations(currentstudent);
+
+                //react to Surroundings
+                this.reactTo
+
+                //move the Student
+                currentstudent.setX(currentstudent.getX()+currentstudent.getVX());
+                currentstudent.setY(currentstudent.getY()+currentstudent.getVY());
+                break;
+            //inside location
+            case Status.Static
+
+                //handle the attributes
+
+                //interact
+        }
+
+
+    }
+
+    private leaveLocation(){
+        Timeline timeline = m_dhimulate.getTimeline();
+    }
+
+
+    private prioritizeAllLocations(Student referencestudent){
+        prioritizeLocation(m_dhimulate.getDisco());
+        prioritizeLocation(m_dhimulate.getBib());
+        prioritizeLocation(m_dhimulate.getUni());
+        prioritizeLocation(m_dhimulate.getHome());
+    }
+
+    private prioritizeLocation(Student referencestudent, Location location){
+        double distance = getDistance(referenceStudent.getX(),referenceStudent.getY(),location.getX(),location.getY());
+        Timeline timeline = m_dhimulate.getTimeline();
+        double timelineprio = location.getTimelinePrio(timeline.getStatus());
+
+        location.setPriority(distanceLocationInfluence * distance + timelineprio * timelineInfluence);
+        if(location.getPriority() > locationPrioMAX){
+            locationPrioMAX = location.getPriority();
+        }
+    }
+
+    private double getDistance(double x1,double y1, double x2,double y2){
+        double dX = x1-x2;
+        double dY = y1-y2;
+        return Math.sqr(dX*dX + dY*dY);
+    }
+
+    private void prioritizeStudents(Student referenceStudent){
+        List<Student> prioritizedList = new LinkedList<Student>();
+        //iterate through all students and compare attributes
+        Student elem;
+        double attributesdifference = 0.0;
+        double distance = 0.0;
+        double dX = 0.0;
+        double dY = 0.0;
+        double distanceV = 0.0;
+        double dVX = 0.0;
+        double dVY = 0.0;
+        double priority = 0.0;
+        studentsPrioMAX = 0.0;
+        for(Iterator<Student> it = m_dhimulate.getStudentsList().Iterator(); it.hasNext(); elem = it.next()){
+
+            //exit if its the student we are comparing to
+            if(elem.id == referenceStudent.id){
+                continue;
+            }
+
+            //compare attributes
+            attributesdifference = 0.0;
+            attributesdifference+=Math.abs(elem.getTeamSkill()-referenceStudent.getTeamSkill());
+            attributesdifference+=Math.abs(elem.getLearning()-referenceStudent.getLearning());
+            attributesdifference+=Math.abs(elem.getPartying()-referenceStudent.getPartying());
+            attributesdifference+=Math.abs(elem.getDrinking()-referenceStudent.getDrinking());
+            attributesdifference+=Math.abs(elem.getTeambuilding()-referenceStudent.getTeambuilding());
+
+            //compare position
+            distance = getDistance(elem.getX(),elem.getY(), referenceStudent.getX(),referenceStudent.getY())
+
+            //compare Direction
+            distanceV = getDistance(elem.getVX(),elem.getVY(), referenceStudent.getVX(), referenceStudent.getVY())
+
+            //combine those
+            elem.setPriority(attributesdifference * attributesInfluence + distance * distanceStudentInfluence + distanceV * directionInfluence);
+
+            if(elem.getPriority() > studentsPrioMAX){
+                studentsPrioMAX = elem.getPriority();
+            }
+        }
+    }
+}
