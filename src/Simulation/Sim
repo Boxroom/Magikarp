@@ -28,26 +28,30 @@ public class Sim{
 
 
     private bool simStudent(Student currentstudent){
+        //analyse students
+        this.prioritizeStudents(currentstudent);
+
+        //analyse locations
+        this.prioritizeLocations(currentstudent);
+
+        //adjust attributes
+        this.adjustAttributs(currentstudent);
+
         //check the status flag
         switch(currentstudent.getStatus()){
+
             //moving around
             case Status.Moving:
-                //analyse students
-                this.prioritizeStudents(currentstudent);
-
-                //analyse locations
-                this.prioritizeLocations(currentstudent);
 
                 //adjust direction according to students and locations
                 this.adjustDirection(currentstudent);
 
-                //adjust attributes
-                this.adjustAttributs(currentstudent);
-
                 //move the Student
                 currentstudent.setX(currentstudent.getX()+currentstudent.getVX());
                 currentstudent.setY(currentstudent.getY()+currentstudent.getVY());
+
                 break;
+
             //inside location
             case Status.Static
 
