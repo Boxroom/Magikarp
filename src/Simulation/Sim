@@ -9,7 +9,11 @@ public class Sim{
     private double locationInfluence = 1;
     private double timelineInfluence = 1;
     private double studentsPrioMAX = 0.0;
-    private double locationPrioMAX = 0.0;
+    private double locationsPrioMAX = 0.0;
+    private double directioninfluencebystudents = 0.001;
+    private double directioninfluencebylocations = 0.005;
+    private double attributesinfluencebystudents = 0.00001;
+    private double attributesinfluencebylocations = 0.00005;
 
     public Sim(DHimluate dhimluate){
         m_dhimulate = dhimluate;
@@ -28,14 +32,17 @@ public class Sim{
         switch(currentstudent.getStatus()){
             //moving around
             case Status.Moving:
-                //analyse surrounding students
+                //analyse students
                 this.prioritizeStudents(currentstudent);
 
                 //analyse locations
                 this.prioritizeLocations(currentstudent);
 
-                //react to Surroundings
-                this.reactTo
+                //adjust direction according to students and locations
+                this.adjustDirection(currentstudent);
+
+                //adjust attributes
+                this.adjustAttributs(currentstudent);
 
                 //move the Student
                 currentstudent.setX(currentstudent.getX()+currentstudent.getVX());
@@ -48,8 +55,77 @@ public class Sim{
 
                 //interact
         }
+    }
 
+    //adjusting attributes
+    private void adjustAttributs(Student currentstudent){
+        Student elem;
+        //from students
+        for(Iterator<Student> it = m_dhimulate.getStudentsList().Iterator(); it.hasNext(); elem = it.next()){
+            referenceStudent.getTeamSkill()+((elem.getTeamSkill()-referenceStudent.getTeamSkill())* (1-(elem.getPriority() / studentsPrioMAX)) * attributesinfluencebystudents);
+            referenceStudent.getLearning()+((elem.getLearning()-referenceStudent.getLearning())* (1-(elem.getPriority() / studentsPrioMAX))* attributesinfluencebystudents);
+            referenceStudent.getPartying()+((elem.getPartying()-referenceStudent.getPartying())* (1-(elem.getPriority() / studentsPrioMAX))* attributesinfluencebystudents);
+            referenceStudent.getDrinking()+((elem.getDrinking()-referenceStudent.getDrinking())* (1-(elem.getPriority() / studentsPrioMAX))* attributesinfluencebystudents);
+            referenceStudent.getTeambuilding()+((elem.getTeambuilding()-referenceStudent.getTeambuilding())* (1-(elem.getPriority() / studentsPrioMAX))* attributesinfluencebystudents);
+        }
 
+        //from locations
+        Location[] locations = new Location[4];
+        locations[0] = m_dhimulate.getDisco();
+        locations[1] = m_dhimulate.getBib();
+        locations[2] = m_dhimulate.getUni();
+        locations[3] = m_dhimulate.getHome();
+
+        for (int i = 0; i<4;i++){
+            referenceStudent.getTeamSkill()+((locations[i].getTeamSkill()-referenceStudent.getTeamSkill())* (1-(locations[i].getPriority() / studentsPrioMAX)) * attributesinfluencebylocations);
+            referenceStudent.getLearning()+((locations[i].getLearning()-referenceStudent.getLearning())* (1-(locations[i].getPriority() / studentsPrioMAX))* attributesinfluencebylocations);
+            referenceStudent.getPartying()+((locations[i].getPartying()-referenceStudent.getPartying())* (1-(locations[i].getPriority() / studentsPrioMAX))* attributesinfluencebylocations);
+            referenceStudent.getDrinking()+((locations[i].getDrinking()-referenceStudent.getDrinking())* (1-(locations[i].getPriority() / studentsPrioMAX))* attributesinfluencebylocations);
+            referenceStudent.getTeambuilding()+((locations[i].getTeambuilding()-referenceStudent.getTeambuilding())* (1-(locations[i].getPriority() / studentsPrioMAX))* attributesinfluencebylocations);
+        }
+    }
+
+    //adjusting direction
+    private void adjustDirection(Student referenceStudent){
+        //iterate through all students and locations and
+        Student elem;
+        double dX = 0.0;
+        double dY = 0.0;
+        double studentsdVX = 0.0;
+        double studentsdVY = 0.0;
+        double locationsdVX = 0.0;
+        double locationsdVY = 0.0;
+
+        //students
+        for(Iterator<Student> it = m_dhimulate.getStudentsList().Iterator(); it.hasNext(); elem = it.next()){
+            dX = elem.getX() - referenceStudent.getX();
+            dY = elem.getY() - referenceStudent.getY();
+
+            studentsdVX+=dX * (1-(elem.getPriority() / studentsPrioMAX));
+            studentsdVY+=dY * (1-(elem.getPriority() / studentsPrioMAX));
+        }
+
+        //locations
+        Location[] locations = new Location[4];
+        locations[0] = m_dhimulate.getDisco();
+        locations[1] = m_dhimulate.getBib();
+        locations[2] = m_dhimulate.getUni();
+        locations[3] = m_dhimulate.getHome();
+
+        for (int i = 0; i<4;i++){
+            dX = locations[i].getX() - referenceStudent.getX();
+            dY = locations[i].getY() - referenceStudent.getY();
+            locationsdVX+=dX * (1-(locations[i].getPriority() / locationsPrioMAX));
+            locationsdVY+=dY * (1-(locations[i].getPriority() / locationsPrioMAX));
+        }
+
+        dX = referenceStudent.getVX()+studentsdVX*directioninfluencebystudents + locationsdVX*directioninfluencebylocations;
+        dY = referenceStudent.getVY()+studentsdVY*directioninfluencebystudents + locationsdVY*directioninfluencebylocations;
+
+        double factor = Math.sqr( ( referenceStudent.getVMAX()*referenceStudent.getVMAX() ) / ( (dX*dX) + (dY*dY) ) );
+
+        referenceStudent.setVX(dX * factor);
+        referenceStudent.setVY(dY * factor);
     }
 
     private leaveLocation(){
@@ -70,8 +146,8 @@ public class Sim{
         double timelineprio = location.getTimelinePrio(timeline.getStatus());
 
         location.setPriority(distanceLocationInfluence * distance + timelineprio * timelineInfluence);
-        if(location.getPriority() > locationPrioMAX){
-            locationPrioMAX = location.getPriority();
+        if(location.getPriority() > locationsPrioMAX){
+            locationsPrioMAX = location.getPriority();
         }
     }
 
@@ -110,7 +186,11 @@ public class Sim{
             attributesdifference+=Math.abs(elem.getTeambuilding()-referenceStudent.getTeambuilding());
 
             //compare position
-            distance = getDistance(elem.getX(),elem.getY(), referenceStudent.getX(),referenceStudent.getY())
+            distance = getDistance(elem.getX(),elem.getY(), referenceStudent.getX(),referenceStudent.getY());
+
+            if(distance < studentsgap){
+                distance*=3;
+            }
 
             //compare Direction
             distanceV = getDistance(elem.getVX(),elem.getVY(), referenceStudent.getVX(), referenceStudent.getVY())
