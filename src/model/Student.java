@@ -1,12 +1,17 @@
+package model;
 
+
+/**
+ * @author Sebastian
+ */
 public class Student {
 	
 	private int totalNumber, condition, deathByAlc, fallThrough;
 	private int[] position = new int[2]; //Position
-	private int[] grades = new int[2]; //Noten, erstmal auf 2 festgelegt-->2Mal durch Prüfung fallen-->falltrough=1-->weg mit dem Student
+	private int[] grades = new int[2]; //Noten, erstmal auf 2 festgelegt-->2Mal durch PrÃ¼fung fallen-->falltrough=1-->weg mit dem Student
 	private String forename, name, matrikelnumber, course;
-	private double composition, teamSkill, learning, partying, drinking, teambuilding; /*double, damit die Attribute leicht in Prozent umgerechnet werden können
-																									für die Zusammensetzung der Studenten (30% Säufer, 20%Streber etc..)*/
+	private double composition, teamSkill, learning, partying, drinking, teambuilding; /*double, damit die Attribute leicht in Prozent umgerechnet werden kÃ¶nnen
+																									fÃ¼r die Zusammensetzung der Studenten (30% SÃ¤ufer, 20%Streber etc..)*/
 	/**
 	 * @return the totalNumber of students
 	 */
@@ -199,6 +204,4 @@ public class Student {
 	public void setTeambuilding(double teambuilding) {
 		this.teambuilding = teambuilding;
 	}
-
-
 }

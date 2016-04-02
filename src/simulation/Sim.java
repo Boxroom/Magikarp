@@ -1,3 +1,11 @@
+package simulation;
+
+import java.util.List;
+import model.Student;
+
+/**
+ * @author Jendrik, Nils
+ */
 public class Sim {
 
 	private Dhimluate m_dhimulate                 = null;
@@ -21,9 +29,9 @@ public class Sim {
 
 	public void simAllStudents() {
 		//komplette studentliste an simstudent übergeben, damit man die nicht immer wieder abfragen muss?
-		for (element:
-		m_dhimulate.getStudentsList()) {
-			this.simStudent(element);
+		List<Student> students = m_dhimulate.getStudentsList();
+		for (Student element : students) {
+			simStudent(element);
 		}
 	}
 
@@ -65,8 +73,8 @@ public class Sim {
 	//adjusting attributes
 	private void adjustAttributs(Student currentStudent) {
 		//from students
-		for (element:
-		m_dhimulate.getStudentsList()) {
+		List<Student> students = m_dhimulate.getStudentsList();
+		for (Student element : students) {
 			currentStudent.getTeamSkill() + ((element.getTeamSkill() - currentStudent.getTeamSkill()) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByStudents);
 			currentStudent.getLearning() + ((element.getLearning() - currentStudent.getLearning()) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByStudents);
 			currentStudent.getPartying() + ((element.getPartying() - currentStudent.getPartying()) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByStudents);
@@ -81,7 +89,7 @@ public class Sim {
 		locations[2] = m_dhimulate.getUni();
 		locations[3] = m_dhimulate.getHome();
 
-		for (location : locations) {
+		for (Location location : locations) {
 			currentStudent.getTeamSkill() + ((location.getTeamSkill() - currentStudent.getTeamSkill()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
 			currentStudent.getLearning() + ((location.getLearning() - currentStudent.getLearning()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
 			currentStudent.getPartying() + ((location.getPartying() - currentStudent.getPartying()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
@@ -101,8 +109,8 @@ public class Sim {
 		double locationsdVY = 0.0;
 
 		//students
-		for (element:
-		m_dhimulate.getStudentsList()) {
+		List<Student> students = m_dhimulate.getStudentsList();
+		for (Student element : students) {
 			dX = element.getX() - referenceStudent.getX();
 			dY = element.getY() - referenceStudent.getY();
 
@@ -117,7 +125,7 @@ public class Sim {
 		locations[2] = m_dhimulate.getUni();
 		locations[3] = m_dhimulate.getHome();
 
-		for (location : locations) {
+		for (Location location : locations) {
 			dX = location.getX() - referenceStudent.getX();
 			dY = location.getY() - referenceStudent.getY();
 			locationsdVX += dX * (1 - (location.getPriority() / locationsPrioMAX));
@@ -133,19 +141,19 @@ public class Sim {
 		referenceStudent.setVY(dY * factor);
 	}
 
-	private leaveLocation() {
+	private void leaveLocation() {
 		Timeline timeline = m_dhimulate.getTimeline();
 	}
 
 
-	private prioritizeAllLocations(Student referencestudent) {
+	private void prioritizeAllLocations(Student referencestudent) {
 		prioritizeLocation(m_dhimulate.getDisco());
 		prioritizeLocation(m_dhimulate.getBib());
 		prioritizeLocation(m_dhimulate.getUni());
 		prioritizeLocation(m_dhimulate.getHome());
 	}
 
-	private prioritizeLocation(Student referencestudent, Location location) {
+	private void prioritizeLocation(Student referencestudent, Location location) {
 		double distance = getDistance(referenceStudent.getX(), referenceStudent.getY(), location.getX(), location.getY());
 		Timeline timeline = m_dhimulate.getTimeline();
 		double timelinePrio = location.getTimelinePrio(timeline.getStatus());
@@ -174,8 +182,8 @@ public class Sim {
 		double dVY = 0.0;
 		double priority = 0.0;
 		studentsPrioMAX = 0.0;
-		for (element:
-			 m_dhimulate.getStudentsList()) {
+		List<Student> students = m_dhimulate.getStudentsList();
+		for (Student element : students) {
 
 			//exit if its the student we are comparing to
 			if (element.id == referenceStudent.id) {
