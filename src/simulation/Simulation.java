@@ -6,9 +6,11 @@ import model.Student;
 /**
  * @author Jendrik, Nils
  */
-public class Sim {
+public class Simulation {
 
-	private Dhimluate m_dhimulate                 = null;
+	List<Student> students;
+	List<Location> locations;
+
 	private double attributesInfluence            = 1;
 	private double distanceStudentInfluence       = 1;
 	private double distanceLocationInfluence      = 1;
@@ -23,18 +25,14 @@ public class Sim {
 	private double attributesInfluenceByStudents  = 0.00001;
 	private double attributesInfluenceByLocations = 0.00005;
 
-	public Sim(Dhimluate dhimluate) {
-		m_dhimulate = dhimluate;
-	}
 
-	public void simAllStudents() {
-		//komplette studentliste an simstudent übergeben, damit man die nicht immer wieder abfragen muss?
-		List<Student> students = m_dhimulate.getStudentsList();
+	public void simAllStudents(List<Student> students, List<Location> locations) {
+		this.students = students;
+		this.locations = locations;
 		for (Student element : students) {
 			simStudent(element);
 		}
 	}
-
 
 	private boolean simStudent(Student currentStudent) {
 		//analyse students
@@ -62,7 +60,7 @@ public class Sim {
 				break;
 
 			//inside location
-			case Status.Static
+			case Status.Static:
 
 				//handle the attributes
 
@@ -73,7 +71,6 @@ public class Sim {
 	//adjusting attributes
 	private void adjustAttributs(Student currentStudent) {
 		//from students
-		List<Student> students = m_dhimulate.getStudentsList();
 		for (Student element : students) {
 			currentStudent.getTeamSkill() + ((element.getTeamSkill() - currentStudent.getTeamSkill()) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByStudents);
 			currentStudent.getLearning() + ((element.getLearning() - currentStudent.getLearning()) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByStudents);
@@ -81,13 +78,6 @@ public class Sim {
 			currentStudent.getDrinking() + ((element.getDrinking() - currentStudent.getDrinking()) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByStudents);
 			currentStudent.getTeambuilding() + ((element.getTeambuilding() - currentStudent.getTeambuilding()) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByStudents);
 		}
-
-		//from locations
-		Location[] locations = new Location[4];
-		locations[0] = m_dhimulate.getDisco();
-		locations[1] = m_dhimulate.getBib();
-		locations[2] = m_dhimulate.getUni();
-		locations[3] = m_dhimulate.getHome();
 
 		for (Location location : locations) {
 			currentStudent.getTeamSkill() + ((location.getTeamSkill() - currentStudent.getTeamSkill()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
@@ -109,7 +99,6 @@ public class Sim {
 		double locationsdVY = 0.0;
 
 		//students
-		List<Student> students = m_dhimulate.getStudentsList();
 		for (Student element : students) {
 			dX = element.getX() - referenceStudent.getX();
 			dY = element.getY() - referenceStudent.getY();
@@ -118,13 +107,7 @@ public class Sim {
 			studentsdVY += dY * (1 - (element.getPriority() / studentsPrioMAX));
 		}
 
-		//locations //sollte in die dhimulate-klasse ausgelagert werden
-		Location[] locations = new Location[4];
-		locations[0] = m_dhimulate.getDisco();
-		locations[1] = m_dhimulate.getBib();
-		locations[2] = m_dhimulate.getUni();
-		locations[3] = m_dhimulate.getHome();
-
+		//locations
 		for (Location location : locations) {
 			dX = location.getX() - referenceStudent.getX();
 			dY = location.getY() - referenceStudent.getY();
@@ -182,7 +165,6 @@ public class Sim {
 		double dVY = 0.0;
 		double priority = 0.0;
 		studentsPrioMAX = 0.0;
-		List<Student> students = m_dhimulate.getStudentsList();
 		for (Student element : students) {
 
 			//exit if its the student we are comparing to
