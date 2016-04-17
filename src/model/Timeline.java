@@ -13,10 +13,6 @@ public class Timeline {
         return events;
     }
 
-    public void setEvents(final List<TimelineEvent> events) {
-        this.events = events;
-    }
-
     public void addEvent(final TimelineEvent event) {
         this.events.add(event);
     }

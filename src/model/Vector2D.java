@@ -1,7 +1,7 @@
 package model;
 
 /**
- * @author Nils
+ * @author Jendrik, Nils
  */
 public class Vector2D {
     public static final Vector2D X_AXIS = new Vector2D(1.0, 0.0);
