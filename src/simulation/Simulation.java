@@ -1,10 +1,11 @@
 package simulation;
 
+import java.util.LinkedList;
 import java.util.List;
-import model.Student;
+import model.*;
 
 /**
- * @author Jendrik, Nils
+ * @author Jendrik, nilsw
  */
 public class Simulation {
 
@@ -124,22 +125,18 @@ public class Simulation {
 		referenceStudent.setVY(dY * factor);
 	}
 
-	private void leaveLocation() {
-		Timeline timeline = m_dhimulate.getTimeline();
-	}
+    private void prioritizeAllLocations(Student referenceStudent) {
+        for (Location location : locations) {
+            prioritizeLocation(referenceStudent, location);
+        }
+    }
 
-
-	private void prioritizeAllLocations(Student referencestudent) {
-		prioritizeLocation(m_dhimulate.getDisco());
-		prioritizeLocation(m_dhimulate.getBib());
-		prioritizeLocation(m_dhimulate.getUni());
-		prioritizeLocation(m_dhimulate.getHome());
-	}
-
-	private void prioritizeLocation(Student referencestudent, Location location) {
-		double distance = getDistance(referenceStudent.getX(), referenceStudent.getY(), location.getX(), location.getY());
-		Timeline timeline = m_dhimulate.getTimeline();
-		double timelinePrio = location.getTimelinePrio(timeline.getStatus());
+    private void prioritizeLocation(Student referenceStudent, Location location) {
+        Vector2D sPos = referenceStudent.getPosition();
+        Vector2D lPos = location.getPosition();
+        double distance = sPos.getDistanceTo(lPos);
+        Timeline timeline = location.getTimeline();
+        double timelinePrio = location.getTimelinePrio(timeline.getStatus());
 
 		location.setPriority(distanceLocationInfluence * distance + timelinePrio * timelineInfluence);
 		if (location.getPriority() > locationsPrioMAX) {
@@ -147,23 +144,13 @@ public class Simulation {
 		}
 	}
 
-	private double getDistance(double x1, double y1, double x2, double y2) {
-		double dX = x1 - x2;
-		double dY = y1 - y2;
-		return Math.sqr(dX * dX + dY * dY);
-	}
-
 	private void prioritizeStudents(Student referenceStudent) {
 		List<Student> prioritizedList = new LinkedList<Student>();
 		//iterate through all students and compare attributes
 		double attributesDifference = 0.0;
-		double distance = 0.0;
-		double dX = 0.0;
-		double dY = 0.0;
-		double distanceV = 0.0;
-		double dVX = 0.0;
-		double dVY = 0.0;
-		double priority = 0.0;
+        double distance;
+        double direction;
+        double priority = 0.0;
 		studentsPrioMAX = 0.0;
 		for (Student element : students) {
 
@@ -181,17 +168,20 @@ public class Simulation {
 			attributesDifference += Math.abs(element.getTeambuilding() - referenceStudent.getTeambuilding());
 
 			//compare position
-			distance = getDistance(element.getX(), element.getY(), referenceStudent.getX(), referenceStudent.getY());
-
-			if (distance < studentsgap) {
+            Vector2D sPos = referenceStudent.getPosition();
+            Vector2D ePos = element.getPosition();
+            distance = sPos.getDistanceTo(ePos);
+            if (distance < studentsgap) {
 				distance *= 3;
 			}
 
 			//compare Direction
-			distanceV = getDistance(element.getVX(), element.getVY(), referenceStudent.getVX(), referenceStudent.getVY())
+            Vector2D sDir = referenceStudent.getDirection();
+            Vector2D eDir = element.getDirection();
+            direction = sDir.getDistanceTo(eDir);
 
 			//combine those
-			element.setPriority(attributesDifference * attributesInfluence + distance * distanceStudentInfluence + distanceV * directionInfluence);
+            element.setPriority(attributesDifference * attributesInfluence + distance * distanceStudentInfluence + direction * directionInfluence);
 
 			if (element.getPriority() > studentsPrioMAX) {
 				studentsPrioMAX = element.getPriority();
