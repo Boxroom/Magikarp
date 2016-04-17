@@ -6,21 +6,42 @@ package model;
  */
 public class Student {
 
+    private static int counter = 0;
+    private final int id;
+
     private Vector2D position;
     private Vector2D direction;
 
-    private int totalNumber, condition;
-    private boolean binged, failed;
+    private int     condition;
+    private boolean binged, failed, moving;
     private int[] grades = new int[2]; //grades, count of 2 for now -->fail 2 times -->failed=true-->student's gone
     private String forename, surname, enrolmentNumber, course;
-    private double composition, teamSkill, learning, partying, drinking, teambuilding; /*double, to represent the percentage of the students' composition (30% drinkers, 20% nerds etc.)*/
+    private double priority, composition, teamSkill, learning, partying, drinking, teambuilding; /*double, to represent the percentage of the students' composition (30% drinkers, 20% nerds etc.)*/
 
-    public int getTotalNumber() {
-        return totalNumber;
+    public Student() {
+        this.id = counter++;
     }
 
-    public void setTotalNumber(final int totalNumber) {
-        this.totalNumber = totalNumber;
+    /* following only getters and setters */
+
+    public double getPriority() {
+        return priority;
+    }
+
+    public void setPriority(final double priority) {
+        this.priority = priority;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean isMoving() {
+        return moving;
+    }
+
+    public void setMoving(final boolean moving) {
+        this.moving = moving;
     }
 
     public int getCondition() {

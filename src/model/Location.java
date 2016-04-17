@@ -9,6 +9,7 @@ public class Location {
     public Timeline timeline;
     public String   name;
     int[][] attributes;
+    private double priority;
 
     public Vector2D getPosition() {
         return position;
@@ -24,5 +25,13 @@ public class Location {
 
     public void setTimeline(final Timeline timeline) {
         this.timeline = timeline;
+    }
+
+    public double getPriority() {
+        return priority;
+    }
+
+    public void setPriority(final double priority) {
+        this.priority = priority;
     }
 }

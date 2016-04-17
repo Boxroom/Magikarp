@@ -56,13 +56,6 @@ public class Vector2D {
         mY = Math.cos(f);
     }
 
-    //multiplys the Vector2D with a constant factor
-    //the Vector2D is changed
-    public void scalarMultiplication2(double factor) {
-        mX *= factor;
-        mY *= factor;
-    }
-
     //calculates the distance between the Vector2D and another Vector2D (v). This assumes that the vectors represent points
     public double getDistanceTo(Vector2D v) {
         final Vector2D connectingVector = this.subtract(v);
@@ -114,5 +107,12 @@ public class Vector2D {
         result.mX = this.mX * factor;
         result.mY = this.mY * factor;
         return result;
+    }
+
+    //multiplies the Vector2D with a constant factor
+    //the Vector2D is changed
+    public void scalarMultiplication2(double factor) {
+        mX *= factor;
+        mY *= factor;
     }
 }
