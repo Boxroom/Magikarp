@@ -20,7 +20,7 @@
             <Separator orientation="VERTICAL" prefHeight="200.0" />
             <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0">
                <children>
-                  <Label text="Dhimulate">
+                  <Label text="Dhimulate.Dhimulate">
                      <font>
                         <Font size="21.0" />
                      </font>

@@ -2,6 +2,8 @@ package simulation;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import com.sun.org.glassfish.external.statistics.Stats;
 import model.*;
 
 /**
@@ -138,12 +140,16 @@ public class Simulation {
         }
 
         for (Location location : locations) {
-            currentStudent.getTeamSkill() + ((location.getTeamSkill() - currentStudent.getTeamSkill()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
-            currentStudent.getLearning() + ((location.getLearning() - currentStudent.getLearning()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
-            currentStudent.getPartying() + ((location.getPartying() - currentStudent.getPartying()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
-            currentStudent.getDrinking() + ((location.getDrinking() - currentStudent.getDrinking()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
-            currentStudent.getTeambuilding() + ((location.getTeambuilding() - currentStudent.getTeambuilding()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
+            currentStudent.setTeamSkill(currentStudent.getTeamSkill() + ((location.getTeamSkill() - currentStudent.getTeamSkill()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations));
+            currentStudent.setLearning(currentStudent.getLearning() + ((location.getLearning() - currentStudent.getLearning()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations));
+            currentStudent.setPartying(currentStudent.getPartying() + ((location.getPartying() - currentStudent.getPartying()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations));
+            currentStudent.setDrinking(currentStudent.getDrinking() + ((location.getDrinking() - currentStudent.getDrinking()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations));
+            currentStudent.setTeambuilding(currentStudent.getTeambuilding() + ((location.getTeambuilding() - currentStudent.getTeambuilding()) * (1 - (location.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations));
         }
+    }
+
+    private double getTime(){
+        return 0;
     }
 
     //adjusting direction
@@ -195,7 +201,7 @@ public class Simulation {
         Vector2D lPos = location.getPosition();
         double distance = sPos.getDistanceTo(lPos);
         Timeline timeline = location.getTimeline();
-        double timelinePrio = location.getTimelinePrio(timeline.getStatus());
+        double timelinePrio = location.getTimeline().getStatus(getTime());
 
         location.setPriority(distanceLocationInfluence * distance + timelinePrio * timelineInfluence);
         if (location.getPriority() > locationsPrioMAX) {

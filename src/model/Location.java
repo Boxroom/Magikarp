@@ -3,21 +3,13 @@ package model;
 /**
  * @author nilsw
  */
-public class Location {
+public class Location extends SimElem {
 
-    public Vector2D position;
-    public Timeline timeline;
-    public String   name;
-    int[][] attributes;
-    private double priority;
+    private Timeline timeline;
 
-    public Vector2D getPosition() {
-        return position;
-    }
+    private String   name;
 
-    public void setPosition(final Vector2D position) {
-        this.position = position;
-    }
+    public String getName(){return name;}
 
     public Timeline getTimeline() {
         return timeline;
@@ -27,11 +19,4 @@ public class Location {
         this.timeline = timeline;
     }
 
-    public double getPriority() {
-        return priority;
-    }
-
-    public void setPriority(final double priority) {
-        this.priority = priority;
-    }
 }
