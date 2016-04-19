@@ -105,12 +105,4 @@ public class Student extends SimElement {
     public void setCourse(final String course) {
         this.course = course;
     }
-
-    /*public double getComposition() {
-        return composition;
-    }
-
-    public void setComposition(final double composition) {
-        this.composition = composition;
-    }*/
 }

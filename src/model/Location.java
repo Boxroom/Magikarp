@@ -9,18 +9,6 @@ public class Location extends SimElement {
 
     private String name;
 
-    private Vector2D position;
-
-    private double[] attributes = new double[5];
-
-
-    public Vector2D getPosition() {
-        return position;
-    }
-
-    public void setPosition(final Vector2D position) {
-        this.position = position;
-    }
 
     public String getName() {
         return name;
