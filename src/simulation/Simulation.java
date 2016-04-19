@@ -124,21 +124,22 @@ public class Simulation {
     //adjusting attributes
     private void adjustAttributes(Student currentStudent) {
         double[] csAttr = currentStudent.getAttributes();
-
         for (Student student : students) {
-            adjAttr(csAttr, student);
+            csAttr = compareToOtherElement(csAttr, student);
         }
 
         for (Location location : locations) {
-            adjAttr(csAttr, location);
+            csAttr = compareToOtherElement(csAttr, location);
         }
+        currentStudent.setAttributes(csAttr);
     }
 
-    private void adjAttr(double[] csAttr, SimElement element) {
+    private double[] compareToOtherElement(double[] csAttr, SimElement element) {
         double[] locAttr = element.getAttributes();
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
             csAttr[i] += ((locAttr[i] - csAttr[i]) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
         }
+        return csAttr;
     }
 
     private double getTime() {

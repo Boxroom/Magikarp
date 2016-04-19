@@ -1,18 +1,13 @@
-package Dhimulate;
+package dhimulate;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import simulation.Simulation;
-import sun.plugin2.message.Serializer;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by mlg on 18.04.2016.
