@@ -194,7 +194,6 @@ public class Simulation {
         Vector2D sPos = referenceStudent.getPosition();
         Vector2D lPos = location.getPosition();
         double distance = sPos.getDistanceTo(lPos);
-        Timeline timeline = location.getTimeline();
         double time = getTime();
         Status timelinePrio = location.getTimeline().getStatus(time);
 
