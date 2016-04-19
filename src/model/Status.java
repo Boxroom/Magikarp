@@ -1,11 +1,27 @@
 package model;
 
 /**
- * Created by mlg on 18.04.2016.
+ * Created by nilsw
  */
-public class Status {
-    public static double  NoEvent = 1;
-    public static double  InEvent = 2;
-    public static double  B4Event = 3;
+public enum Status {
+    NO_EVENT,
+    IN_EVENT,
+    BEFORE_EVENT;
 
+
+    public static int toInteger(Status d) {
+        int r = 1;
+        switch (d) {
+            case NO_EVENT:
+                r = 1;
+                break;
+            case IN_EVENT:
+                r = 2;
+                break;
+            case BEFORE_EVENT:
+                r = 3;
+                break;
+        }
+        return r;
+    }
 }

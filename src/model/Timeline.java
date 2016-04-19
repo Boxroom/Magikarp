@@ -3,13 +3,13 @@ package model;
 import java.util.List;
 
 /**
- * @author nilsw
+ * @author nilsw, Jendrik
  */
 public class Timeline {
 
     private List<TimelineEvent> events;
 
-    private double b4range = 1000;
+    private double beforeRange = 1000;
 
     public List<TimelineEvent> getEvents() {
         return events;
@@ -23,14 +23,15 @@ public class Timeline {
         return this.events.remove(event);
     }
 
-    public double getStatus(double now){
-        for( TimelineEvent event : events ){
-            if(now > event.start && now < event.end ){
-                return Status.InEvent;
-            }else if( event.start - now < b4range ){
-                return Status.B4Event;
+    public Status getStatus(double now) {
+        for (TimelineEvent event : events) {
+            if (now > event.start && now < event.end) {
+                return Status.IN_EVENT;
+            }
+            else if (event.start - now < beforeRange) {
+                return Status.BEFORE_EVENT;
             }
         }
-        return Status.NoEvent;
+        return Status.NO_EVENT;
     }
 }

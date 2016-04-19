@@ -4,7 +4,7 @@ package model;
 /**
  * @author Sebastian, nilsw
  */
-public class Student extends SimElem{
+public class Student extends SimElement {
 
     private static int counter = 0;
     private final int id;
