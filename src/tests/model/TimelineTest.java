@@ -27,5 +27,8 @@ public class TimelineTest {
 
         result = timeline.getStatus(15000);
         Assert.assertEquals(Status.IN_EVENT, result);
+
+        result = timeline.getStatus(20001);
+        Assert.assertEquals(Status.NO_EVENT, result);
     }
 }

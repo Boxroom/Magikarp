@@ -31,11 +31,11 @@ public class Timeline {
     public Status getStatus(double now) {
         for (TimelineEvent event : events) {
             if (event.start <= now && now <= event.end) {
-                // if an event is running
+                // if the event is running
                 return Status.IN_EVENT;
             }
-            else if (event.start - now < beforeRange) {
-                // if we're right before an event
+            else if (event.start - beforeRange < now && now < event.start) {
+                // if we're right before the event
                 return Status.BEFORE_EVENT;
             }
         }
