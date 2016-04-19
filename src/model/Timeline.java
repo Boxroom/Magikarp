@@ -1,5 +1,6 @@
 package model;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -10,6 +11,10 @@ public class Timeline {
     private List<TimelineEvent> events;
 
     private double beforeRange = 1000;
+
+    public Timeline() {
+        this.events = new LinkedList<>();
+    }
 
     public List<TimelineEvent> getEvents() {
         return events;
@@ -25,10 +30,12 @@ public class Timeline {
 
     public Status getStatus(double now) {
         for (TimelineEvent event : events) {
-            if (now > event.start && now < event.end) {
+            if (event.start <= now && now <= event.end) {
+                // if an event is running
                 return Status.IN_EVENT;
             }
             else if (event.start - now < beforeRange) {
+                // if we're right before an event
                 return Status.BEFORE_EVENT;
             }
         }
