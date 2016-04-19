@@ -9,8 +9,8 @@ import model.*;
  */
 public class Simulation {
 
-    List<Student>  students;
-    List<Location> locations;
+    private List<Student>  students;
+    private List<Location> locations;
 
     private double attributesInfluence            = 1;
     private double distanceStudentInfluence       = 1;
@@ -135,9 +135,9 @@ public class Simulation {
     }
 
     private double[] compareToOtherElement(double[] csAttr, SimElement element) {
-        double[] locAttr = element.getAttributes();
+        double[] elemAttr = element.getAttributes();
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-            csAttr[i] += ((locAttr[i] - csAttr[i]) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
+            csAttr[i] += ((elemAttr[i] - csAttr[i]) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
         }
         return csAttr;
     }
