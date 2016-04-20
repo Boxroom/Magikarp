@@ -196,8 +196,8 @@ public class Simulation {
         double distance = sPos.getDistanceTo(lPos);
         double time = getTime();
         Status timelinePrio = location.getTimeline().getStatus(time);
-
-        location.setPriority(distanceLocationInfluence * distance + Status.toInteger(timelinePrio) * timelineInfluence);
+        double prio = distanceLocationInfluence * distance + timelinePrio.toInt() * timelineInfluence;
+        location.setPriority(prio);
         if (location.getPriority() > locationsPrioMAX) {
             locationsPrioMAX = location.getPriority();
         }

@@ -28,7 +28,7 @@ $RECYCLE.BIN/
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.ear
 
@@ -243,6 +243,3 @@ gradle-app.setting
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
-
-!hamcrest-core-1.3.jar
-!junit-4.12.jar

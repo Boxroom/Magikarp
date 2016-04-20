@@ -8,20 +8,14 @@ public enum Status {
     IN_EVENT,
     BEFORE_EVENT;
 
-
-    public static int toInteger(Status d) {
-        int r = 1;
-        switch (d) {
-            case NO_EVENT:
-                r = 1;
-                break;
+    public int toInt() {
+        switch (this) {
             case IN_EVENT:
-                r = 2;
-                break;
+                return 2;
             case BEFORE_EVENT:
-                r = 3;
-                break;
+                return 3;
+            default: // NO_EVENT
+                return 1;
         }
-        return r;
     }
 }
