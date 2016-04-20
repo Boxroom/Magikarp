@@ -10,13 +10,13 @@ import javafx.stage.Stage;
 import simulation.Simulation;
 
 /**
- * Created by mlg on 18.04.2016.
+ * @author Jendrik, nilsw
  */
 public class Dhimulate extends Application {
     private static final Map<String, Scene> m_ScenesMap = new HashMap<>();
-    private static Stage m_PrimaryStage;
+    private static Stage      m_PrimaryStage;
     private static Simulation m_Simulation;
-    private String m_OS;
+    private        String     m_OS;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -29,12 +29,12 @@ public class Dhimulate extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
     }
+
     //load all scenes from the view folder
     private void loadScenes() {
         String path = "";
         try {
             path = new File(".").getCanonicalPath();
-            System.out.println(path);
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -42,26 +42,31 @@ public class Dhimulate extends Application {
         List<String> files = getFilesOsDependent(path);
         fillScenesMap(files);
     }
+
     //to fix issues between the way linux stores files and the way windows does
     private List<String> getFilesOsDependent(final String path) {
+        File folder;
         if (isWindows()) {
-            return getAllFilesOfFolder(new File(path + "\\Quellcode\\src\\sample\\view"));
+            folder = new File(path + "\\src\\view");
         }
         else {
-            return getAllFilesOfFolder(new File(path + "/src/sample/view"));
+            folder = new File(path + "/src/view");
         }
+        return getAllFilesOfFolder(folder);
     }
+
     //check if the os is windows
-    private  boolean isWindows() {
+    private boolean isWindows() {
         return getOsName().startsWith("Windows");
     }
 
-    private  String getOsName() {
+    private String getOsName() {
         if (m_OS == null) {
             m_OS = System.getProperty("os.name");
         }
         return m_OS;
     }
+
     //load all files from the specified folder
     private List<String> getAllFilesOfFolder(final File folder) {
         List<String> files = new LinkedList<>();
@@ -72,23 +77,22 @@ public class Dhimulate extends Application {
         }
         return files;
     }
+
     //Fill the different levels with objects etc.
     private void fillScenesMap(List<String> files) {
         String name;
         for (String filename : files) {
             try {
                 name = filename.split("\\.")[0];
-                m_ScenesMap.put(name, loadSceneFromFXML(filename));
+                Scene scene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("view/" + filename)));
+                m_ScenesMap.put(name, scene);
             }
             catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-    //load a scene from XML
-    private Scene loadSceneFromFXML(String name) throws IOException {
-        return new Scene(FXMLLoader.load(getClass().getResource("view/" + name)));
-    }
+
     //switch to the scene with the title (name)
     public static boolean setScene(String name) {
         Scene scene = getScene(name);
