@@ -2,12 +2,15 @@ package simulation;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import Dhimulate.Dhimulate;
+import javafx.animation.AnimationTimer;
 import model.*;
 
 /**
  * @author Jendrik, nilsw
  */
-public class Simulation {
+public class Simulation extends AnimationTimer {
 
     private List<Student>  students;
     private List<Location> locations;
@@ -21,12 +24,17 @@ public class Simulation {
     private double timelineInfluence              = 1;
     private double studentsPrioMAX                = 0.0;
     private double locationsPrioMAX               = 0.0;
-    private double studentsVMAX                   = 0.0;
+    private double studentsVMAX                   = 1;
     private double directionInfluenceByStudents   = 0.001;
     private double directionInfluenceByLocations  = 0.005;
     private double attributesInfluenceByStudents  = 0.00001;
     private double attributesInfluenceByLocations = 0.00005;
     private double minGapBetweenStudents          = 1;
+    Dhimulate m_dhimulate;
+
+    public Simulation(Dhimulate dhimulate){
+        m_dhimulate = dhimulate;
+    }
 
 
     public void simAllStudents(List<Student> students, List<Location> locations) {
@@ -47,19 +55,15 @@ public class Simulation {
         //adjust attributes
         this.adjustAttributes(student);
 
+
+
         //check the status flag
         if (student.isMoving()) {
-
             //adjust direction according to students and locations
             this.adjustDirection(student);
-
+            //System.out.println("simulating "+student.getDirection().mX);
             //move the Student
-            Vector2D pos = student.getPosition();
-            Vector2D dir = student.getDirection();
-            double xPos = pos.mX + dir.mX;
-            double yPos = pos.mY + dir.mY;
-            Vector2D newPos = new Vector2D(xPos, yPos);
-            student.setPosition(newPos);
+            student.move();
 
             //inside location
         }
@@ -72,7 +76,6 @@ public class Simulation {
     }
 
     private void prioritizeStudents(Student referenceStudent) {
-        List<Student> prioritizedList = new LinkedList<>();
         //iterate through all students and compare attributes
         double attributesDifference;
         double distance;
@@ -115,10 +118,6 @@ public class Simulation {
                 studentsPrioMAX = student.getPriority();
             }
         }
-    }
-
-    private void prioritizeLocations(Student referenceStudent) {
-
     }
 
     //adjusting attributes
@@ -184,7 +183,7 @@ public class Simulation {
         referenceStudent.setDirection(newDir);
     }
 
-    private void prioritizeAllLocations(Student referenceStudent) {
+    private void prioritizeLocations(Student referenceStudent) {
         for (Location location : locations) {
             prioritizeLocation(referenceStudent, location);
         }
@@ -202,4 +201,26 @@ public class Simulation {
             locationsPrioMAX = location.getPriority();
         }
     }
+
+    @Override
+    public void handle(long nownano) {
+        simAllStudents(m_dhimulate.getStudents(), m_dhimulate.getLocations());
+    }
+
+    @Override
+    public void start(){
+        super.start();
+
+
+
+    }
+
+    @Override
+    public void stop(){
+        super.stop();
+
+
+
+    }
+
 }

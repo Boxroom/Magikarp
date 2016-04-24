@@ -1,29 +1,39 @@
 package model;
 
 
+import javafx.scene.shape.Circle;
+
 /**
- * @author Sebastian, nilsw
+ * @author Sebastian, nilsw, jendrik
  */
 public class Student extends SimElement {
 
-    private static int counter = 0;
-    private final int id;
-
-    private Vector2D direction;
+    private Vector2D direction=new Vector2D(0,0);
 
     private int     condition;
-    private boolean binged, failed, moving;
+    private boolean binged, failed = false, moving = true;
     private int[] grades = new int[2]; //grades, count of 2 for now -->fail 2 times -->failed=true-->student's gone
     private String forename, surname, enrolmentNumber, course;
+    private Circle m_circle;
 
-    public Student() {
-        this.id = counter++;
+    public Student(int id) {
+        super(id);
+        setPosition(Math.random()*1280,50+Math.random()*700);
+        setDirection(1,1);
     }
 
     /* following only getters and setters */
 
     public int getId() {
         return id;
+    }
+
+    public void setCircle(Circle c){
+        m_circle = c;
+    }
+
+    public Circle getCircle(){
+        return m_circle;
     }
 
     public boolean isMoving() {
@@ -66,6 +76,32 @@ public class Student extends SimElement {
         this.direction = direction;
     }
 
+    public void setDirection(double x, double y){
+        Vector2D v = getDirection();
+        v.mX = x;
+        v.mY = y;
+        setDirection(v);
+    }
+
+    @Override
+    public void setPosition(final Vector2D pos){
+        super.setPosition(pos);
+        Circle c = getCircle();
+        if(c != null){
+            getCircle().setLayoutX(pos.mX);
+            getCircle().setLayoutY(pos.mY);
+            //if(id==1){System.out.println("[moved] id:"+id+" to x:"+pos.mX+" y:"+pos.mY +" direction:"+getDirection().mX);}
+        }else{
+            System.out.println("student [id:"+id+"] was null");
+        }
+    }
+
+    @Override
+    public void setPosition(double x, double y){
+        super.setPosition(x, y);
+        setPosition(getPosition());
+    }
+
     public int[] getGrades() {
         return grades;
     }
@@ -104,5 +140,9 @@ public class Student extends SimElement {
 
     public void setCourse(final String course) {
         this.course = course;
+    }
+
+    public void move() {
+        setPosition(getPosition().mX+getDirection().mX,getPosition().mY+getDirection().mY);
     }
 }

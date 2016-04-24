@@ -10,7 +10,7 @@ import javafx.scene.layout.GridPane;
 
 public class Window {
 	
-private BorderPane root;
+	private BorderPane root;
 	
 	public Window(String title, boolean topButtons, boolean leftButtons, String fxmlRessource) {
 		root = new BorderPane();

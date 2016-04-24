@@ -1,9 +1,13 @@
 package model;
 
+import javax.print.DocFlavor;
+
 /**
- * @author nilsw
+ * @author nilsw, jendrik
  */
 public class Location extends SimElement {
+
+    public static String[] names =  {"Disco","Universität","Bibliothek","Zuhause"};
 
     private Timeline timeline;
 
@@ -18,8 +22,18 @@ public class Location extends SimElement {
         return timeline;
     }
 
+    public void setName(String name){
+        this.name = name;
+    }
+
     public void setTimeline(final Timeline timeline) {
         this.timeline = timeline;
+    }
+
+    public Location(int id){
+        super(id);
+        setPosition(500,500);
+        timeline = new Timeline();
     }
 
 }
