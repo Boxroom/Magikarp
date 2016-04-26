@@ -19,7 +19,7 @@ public class Student extends SimElement {
     public Student(int id) {
         super(id);
         setPosition(Math.random()*1280,50+Math.random()*700);
-        setDirection(1,1);
+        setDirection(Math.random(),Math.random());
     }
 
     /* following only getters and setters */
@@ -142,7 +142,7 @@ public class Student extends SimElement {
         this.course = course;
     }
 
-    public void move() {
-        setPosition(getPosition().mX+getDirection().mX,getPosition().mY+getDirection().mY);
+    public void move(long elapsed) {
+        setPosition(getPosition().mX+getDirection().mX*(elapsed/10000000),getPosition().mY+getDirection().mY*(elapsed/10000000));
     }
 }

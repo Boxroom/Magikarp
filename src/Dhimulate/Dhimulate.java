@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import model.Location;
+import model.SimElement;
 import model.Student;
 import model.Vector2D;
 import simulation.Simulation;
@@ -57,28 +58,31 @@ public class Dhimulate extends Application {
         m_students = new LinkedList<>();
         Circle c;
         Student s;
+        if(cnt<MAXStudentCNT) {
+            for (int i = 0; i < cnt; i++) {
+                //create new student object
+                s = new Student(i);
 
-        for (int i=0;i<cnt;i++){
-            //create new student object
-            s = new Student(i);
+                //get circle object
+                c = (Circle) getScene(MainGameSceneName).lookup("#student" + i);
 
-            //get circle object
-            c = (Circle)getScene(MainGameSceneName).lookup("#student"+i);
+                //add circle to student
+                s.setCircle(c);
 
-            //add circle to student
-            s.setCircle(c);
+                //setAttributes
+                for(int p=0;p<SimElement.ATTR_COUNT;p++){
+                    s.setAttributes(p,Math.random()*100);
+                }
 
-            //setAttributes
-
-
-
-
-            //add student to list
-            m_students.add(s);
+                //add student to list
+                m_students.add(s);
+            }
         }
-        for (int i=cnt;i<MAXStudentCNT;i++){
-            c = (Circle)getScene(MainGameSceneName).lookup("#student"+i);
-            c.setVisible(false);
+        if(cnt<MAXStudentCNT){
+            for (int i=cnt+1;i<MAXStudentCNT;i++){
+                c = (Circle)getScene(MainGameSceneName).lookup("#student"+i);
+                c.setVisible(false);
+            }
         }
     }
 
@@ -87,7 +91,7 @@ public class Dhimulate extends Application {
         m_locations = new LinkedList<>();
         Location l;
 
-        for (int i=0;i<4;i++){
+        for (int i=0;i<Location.names.length;i++){
             //create new location object
             l = new Location(i);
 
@@ -96,22 +100,38 @@ public class Dhimulate extends Application {
             switch(l.getName()){
                 case "Universität":
                     l.setPosition(797,345);
-
+                    l.setAttributes(SimElement.ALCOHOL,20);
+                    l.setAttributes(SimElement.LEADERSHIP,80);
+                    l.setAttributes(SimElement.LEARNING,80);
+                    l.setAttributes(SimElement.PARTY,20);
+                    l.setAttributes(SimElement.TEAM,60);
 
                     break;
                 case "Disco":
                     l.setPosition(268,824);
-
+                    l.setAttributes(SimElement.ALCOHOL,100);
+                    l.setAttributes(SimElement.LEADERSHIP,30);
+                    l.setAttributes(SimElement.LEARNING,0);
+                    l.setAttributes(SimElement.PARTY,100);
+                    l.setAttributes(SimElement.TEAM,90);
 
                     break;
                 case  "Bibliothek":
                     l.setPosition(1521,870);
-
+                    l.setAttributes(SimElement.ALCOHOL,0);
+                    l.setAttributes(SimElement.LEADERSHIP,10);
+                    l.setAttributes(SimElement.LEARNING,100);
+                    l.setAttributes(SimElement.PARTY,0);
+                    l.setAttributes(SimElement.TEAM,50);
 
                     break;
                 case "Zuhause":
                     l.setPosition(1487,167);
-
+                    l.setAttributes(SimElement.ALCOHOL,60);
+                    l.setAttributes(SimElement.LEADERSHIP,0);
+                    l.setAttributes(SimElement.LEARNING,70);
+                    l.setAttributes(SimElement.PARTY,20);
+                    l.setAttributes(SimElement.TEAM,0);
 
                     break;
             }

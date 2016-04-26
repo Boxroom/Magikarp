@@ -14,6 +14,12 @@ public abstract class SimElement {
     private double priority;
     private double[] attributes = new double[ATTR_COUNT]; /*double, to represent the percentage of the students' composition (30% drinkers, 20% nerds etc.)*/
 
+    public static int LEADERSHIP = 1;
+    public static int TEAM = 2;
+    public static int LEARNING = 3;
+    public static int ALCOHOL = 4;
+    public static int PARTY = 0;
+
     public double getPriority() {
         return priority;
     }
@@ -40,8 +46,16 @@ public abstract class SimElement {
         return attributes;
     }
 
+    public double getAttributes(int index) {
+        return attributes[index];
+    }
+
     public void setAttributes(final double[] attributes) {
         this.attributes = attributes;
+    }
+
+    public void setAttributes(int index, double attr) {
+        this.attributes[index] = attr;
     }
 
     public int getID(){

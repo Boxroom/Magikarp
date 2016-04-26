@@ -24,28 +24,31 @@ public class Simulation extends AnimationTimer {
     private double timelineInfluence              = 1;
     private double studentsPrioMAX                = 0.0;
     private double locationsPrioMAX               = 0.0;
-    private double studentsVMAX                   = 1;
-    private double directionInfluenceByStudents   = 0.001;
-    private double directionInfluenceByLocations  = 0.005;
-    private double attributesInfluenceByStudents  = 0.00001;
-    private double attributesInfluenceByLocations = 0.00005;
+    private double studentsVMAX                   = 0.5;
+    private double directionInfluenceByStudents   = 0.0005;      //je höher desto mehr
+    private double directionInfluenceByLocations  = 0.0001;  //je höher desto mehr
+    private double attributesInfluenceByStudents  = 1;
+    private double attributesInfluenceByLocations = 1;
     private double minGapBetweenStudents          = 1;
     Dhimulate m_dhimulate;
+    private long lastnano = 0;
+    private double simspeed = 2;
+    private double lockDistanceStudentLocation = 30;
 
     public Simulation(Dhimulate dhimulate){
         m_dhimulate = dhimulate;
     }
 
 
-    public void simAllStudents(List<Student> students, List<Location> locations) {
+    public void simAllStudents(List<Student> students, List<Location> locations,long elapsed) {
         this.students = students;
         this.locations = locations;
         for (Student element : students) {
-            simStudent(element);
+            simStudent(element,elapsed);
         }
     }
 
-    private void simStudent(Student student) {
+    private void simStudent(Student student,long elapsed) {
         //analyse students
         this.prioritizeStudents(student);
 
@@ -60,10 +63,10 @@ public class Simulation extends AnimationTimer {
         //check the status flag
         if (student.isMoving()) {
             //adjust direction according to students and locations
-            this.adjustDirection(student);
-            //System.out.println("simulating "+student.getDirection().mX);
+            this.adjustDirection(student,elapsed);
+
             //move the Student
-            student.move();
+            student.move(elapsed);
 
             //inside location
         }
@@ -103,7 +106,7 @@ public class Simulation extends AnimationTimer {
             Vector2D sPos = student.getPosition();
             distance = refPos.getDistanceTo(sPos);
             if (distance < minGapBetweenStudents) {
-                distance *= 3;
+                distance = distance+(minGapBetweenStudents-distance)*4;
             }
 
             //compare Direction
@@ -124,19 +127,19 @@ public class Simulation extends AnimationTimer {
     private void adjustAttributes(Student currentStudent) {
         double[] csAttr = currentStudent.getAttributes();
         for (Student student : students) {
-            csAttr = compareToOtherElement(csAttr, student);
+            csAttr = compareToOtherElement(csAttr, student, studentsPrioMAX, attributesInfluenceByStudents);
         }
 
         for (Location location : locations) {
-            csAttr = compareToOtherElement(csAttr, location);
+            csAttr = compareToOtherElement(csAttr, location, locationsPrioMAX, attributesInfluenceByLocations);
         }
         currentStudent.setAttributes(csAttr);
     }
 
-    private double[] compareToOtherElement(double[] csAttr, SimElement element) {
+    private double[] compareToOtherElement(double[] csAttr, SimElement element, double priomax, double influence) {
         double[] elemAttr = element.getAttributes();
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-            csAttr[i] += ((elemAttr[i] - csAttr[i]) * (1 - (element.getPriority() / studentsPrioMAX)) * attributesInfluenceByLocations);
+            csAttr[i] += ((elemAttr[i] - csAttr[i]) * (1 - (element.getPriority() / priomax)) * influence);
         }
         return csAttr;
     }
@@ -146,7 +149,7 @@ public class Simulation extends AnimationTimer {
     }
 
     //adjusting direction
-    private void adjustDirection(Student referenceStudent) {
+    private void adjustDirection(Student referenceStudent,long elapsed) {
         //iterate through all students and locations
 
         //students
@@ -160,11 +163,14 @@ public class Simulation extends AnimationTimer {
             studentsdVX += delta.mX * (1 - (student.getPriority() / studentsPrioMAX));
             studentsdVY += delta.mY * (1 - (student.getPriority() / studentsPrioMAX));
         }
+        studentsdVX /= students.size();
+        studentsdVY /= students.size();
 
         //locations
         double locationsdVX = 0.0;
         double locationsdVY = 0.0;
         for (Location location : locations) {
+            //System.out.println(location.getName()+" "+location.getAttributes(Location.LEARNING));
             Vector2D lPos = location.getPosition();
             Vector2D delta = refPos.subtract(lPos);
 
@@ -172,9 +178,12 @@ public class Simulation extends AnimationTimer {
             locationsdVY += delta.mY * (1 - (location.getPriority() / locationsPrioMAX));
         }
 
+        locationsdVX /= Location.names.length;
+        locationsdVY /= Location.names.length;
+
         Vector2D refDir = referenceStudent.getDirection();
-        double dX = refDir.mX + studentsdVX * directionInfluenceByStudents + locationsdVX * directionInfluenceByLocations;
-        double dY = refDir.mY + studentsdVY * directionInfluenceByStudents + locationsdVY * directionInfluenceByLocations;
+        double dX = refDir.mX - studentsdVX * directionInfluenceByStudents - locationsdVX * directionInfluenceByLocations;
+        double dY = refDir.mY - studentsdVY * directionInfluenceByStudents - locationsdVY * directionInfluenceByLocations;
 
         Vector2D newDir = new Vector2D(dX, dY);
         double factor = studentsVMAX / newDir.length();
@@ -190,12 +199,29 @@ public class Simulation extends AnimationTimer {
     }
 
     private void prioritizeLocation(Student referenceStudent, Location location) {
-        Vector2D sPos = referenceStudent.getPosition();
-        Vector2D lPos = location.getPosition();
-        double distance = sPos.getDistanceTo(lPos);
         double time = getTime();
         Status timelinePrio = location.getTimeline().getStatus(time);
-        double prio = distanceLocationInfluence * distance + timelinePrio.toInt() * timelineInfluence;
+
+        //compare attributes
+        double attributesDifference = 0.0;
+        double[] lAttr = location.getAttributes();
+        double[] refAttr = referenceStudent.getAttributes();
+
+        for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
+            attributesDifference += Math.abs(lAttr[i] - refAttr[i]);
+        }
+
+        //compare position
+        Vector2D refPos = referenceStudent.getPosition();
+        Vector2D lPos = location.getPosition();
+        double distance = refPos.getDistanceTo(lPos);
+        if (distance < lockDistanceStudentLocation) {
+            //lock on to location
+
+
+        }
+
+        double prio = distanceLocationInfluence * distance + timelinePrio.toInt() * timelineInfluence + attributesDifference*attributesInfluenceByLocations;
         location.setPriority(prio);
         if (location.getPriority() > locationsPrioMAX) {
             locationsPrioMAX = location.getPriority();
@@ -204,13 +230,15 @@ public class Simulation extends AnimationTimer {
 
     @Override
     public void handle(long nownano) {
-        simAllStudents(m_dhimulate.getStudents(), m_dhimulate.getLocations());
+        long elapsed = nownano-lastnano;
+        lastnano=nownano;
+        simAllStudents(m_dhimulate.getStudents(), m_dhimulate.getLocations(),(long)(elapsed*simspeed));
     }
 
     @Override
     public void start(){
         super.start();
-
+        lastnano=System.nanoTime();
 
 
     }
