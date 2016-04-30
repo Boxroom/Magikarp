@@ -35,6 +35,7 @@ public class simController implements Initializable {
     @Override
     public void initialize(URL fxmlFileLocation, ResourceBundle resources) {
         Circle c;
+        ImageView image;
         for (int i = 0; i<Dhimulate.MAXStudentCNT; i++){
             //create new circle object
             c = new Circle();
@@ -44,6 +45,13 @@ public class simController implements Initializable {
             c.setId("student"+Integer.toString(i));
             c.setFill(Paint.valueOf("lightblue"));
             pane.getChildren().add(c);
+
+            image = new ImageView("view/death.png");
+            image.setScaleX(0.1);
+            image.setScaleY(0.1);
+            image.setVisible(false);
+            image.setId("death"+Integer.toString(i));
+            pane.getChildren().add(image);
         }
     }
 }

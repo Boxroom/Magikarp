@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -37,13 +38,18 @@ public class Dhimulate extends Application {
     private        String     m_OS;
     public   static int MAXStudentCNT = 200;
     private    int StudentCNT = 100;
+    private    int StudentNumberStart = 0;
+    private    int StudentNumber = 0;
     private double[] referenceattributes = new double[SimElement.ATTR_COUNT];
     private List<Student> m_students;
     private List<Location> m_locations;
     private String MainGameSceneName = "sim3";
     private double adjustingtoreference = 1;
     private static Label timelabel;
+    private static Label studentslabel;
+    private static Label semesterlabel;
     private static Rectangle darkness;
+    private ProgressBar semesterprogress;
 
 
     @Override
@@ -67,6 +73,8 @@ public class Dhimulate extends Application {
                 referenceattributes[SimElement.TEAM]=((Slider)getScene("config").lookup("#teamSlider")).getValue();
                 referenceattributes[SimElement.LEARNING]=((Slider)getScene("config").lookup("#learnSlider")).getValue();
                 StudentCNT=(int)((((Slider)getScene("config").lookup("#countSlider")).getValue()/100)*MAXStudentCNT);
+                StudentNumberStart=StudentCNT;
+                StudentNumber=StudentCNT;
                 System.out.println(((Slider)getScene("config").lookup("#countSlider")).getValue());
                 configandstartSim();
             }
@@ -77,7 +85,7 @@ public class Dhimulate extends Application {
             public void handle(ActionEvent event) {
                 if(m_Simulation.isRunning()==true){
                     m_Simulation.stop();
-                    ((Button)event.getSource()).setText("Resume");
+                    ((Button)event.getSource()).setText("Weiter");
                 }else{
                     m_Simulation.start();
                     ((Button)event.getSource()).setText("Stop");
@@ -86,11 +94,26 @@ public class Dhimulate extends Application {
         });
 
         timelabel=((Label)getScene(MainGameSceneName).lookup("#timeLabel"));
+        semesterlabel=((Label)getScene(MainGameSceneName).lookup("#semesterLabel"));
+        studentslabel=((Label)getScene(MainGameSceneName).lookup("#studentenLabel"));
         darkness=((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
+        semesterprogress=((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
     }
 
-    public static void updateTime(double[] time){
-        timelabel.setText("Uhrzeit: "+stockTime(""+((int)time[0]))+":"+stockTime(""+((int)time[1]))/*+":"+((int)time[2])*/+"Uhr");
+    private void getConstants(){
+        m_Simulation.onesemesterisxdays=((Slider)getScene("config").lookup("#onesemesterisxdaysSlider")).getValue();
+        m_Simulation.healthdecreaseondanger=((Slider)getScene("config").lookup("#healthdecreaseondangerSlider")).getValue();
+        m_Simulation.adjustattributesInfluenceByStudents=((Slider)getScene("config").lookup("#adjustattributesInfluenceByStudentsSlider")).getValue();
+        m_Simulation.adjustattributesInfluenceByLocations=((Slider)getScene("config").lookup("#adjustattributesInfluenceByLocationsSlider")).getValue();
+        m_Simulation.directionInfluenceByStudents=((Slider)getScene("config").lookup("#directionInfluenceByStudentsSlider")).getValue();
+        m_Simulation.directionInfluenceByLocations=((Slider)getScene("config").lookup("#directionInfluenceByLocationsSlider")).getValue();
+        m_Simulation.timelineInfluence=((Slider)getScene("config").lookup("#timelineInfluenceSlider")).getValue();
+        m_Simulation.distanceStudentInfluence=((Slider)getScene("config").lookup("#distanceStudentInfluenceSlider")).getValue();
+        m_Simulation.distanceLocationInfluence=((Slider)getScene("config").lookup("#distanceLocationInfluenceSlider")).getValue();
+    }
+
+    public void updateTime(int day, double[] time){
+        timelabel.setText("Tag "+day+" | "+stockTime(""+((int)time[0]))+":"+stockTime(""+((int)time[1]))/*+":"+((int)time[2])*/+"Uhr");
         if(time[0]>12){
             darkness.setOpacity(-0.3+((time[0]%12)/12));
         }else{
@@ -98,7 +121,19 @@ public class Dhimulate extends Application {
         }
     }
 
-    private static String stockTime(String part){
+    private void updateStudentsLabel(){
+        studentslabel.setText("Studenten: "+StudentNumber+"/"+StudentNumberStart);
+    }
+
+    public void killStudent(Student s){
+        if(s!=null) {
+            StudentNumber--;
+            updateStudentsLabel();
+            s.die();
+        }
+    }
+
+    private String stockTime(String part){
         if(part.length()!=2){
             part = "0"+part;
         }
@@ -114,7 +149,8 @@ public class Dhimulate extends Application {
     private void initGame(){
         createLocations();
         createStudents(StudentCNT);
-        m_Simulation = new Simulation(m_students, m_locations);
+        m_Simulation = new Simulation(this,m_students, m_locations);
+        getConstants();
     }
 
     private void createStudents(int cnt){
@@ -122,6 +158,7 @@ public class Dhimulate extends Application {
         m_students = new LinkedList<>();
         Circle c;
         Student s;
+        ImageView img;
         if(cnt<MAXStudentCNT) {
             for (int i = 0; i < cnt; i++) {
                 //create new student object
@@ -130,8 +167,14 @@ public class Dhimulate extends Application {
                 //get circle object
                 c = (Circle) getScene(MainGameSceneName).lookup("#student" + i);
 
+                //get death object
+                img = (ImageView) getScene(MainGameSceneName).lookup("#death" + i);
+
                 //add circle to student
                 s.setCircle(c);
+
+                //add circle to student
+                s.setDeathImg(img);
 
                 //setAttributes
                 for(int p=0;p<SimElement.ATTR_COUNT;p++){
@@ -155,6 +198,7 @@ public class Dhimulate extends Application {
                 c.setVisible(false);
             }
         }
+        updateStudentsLabel();
     }
 
     private void createLocations(){
@@ -310,5 +354,9 @@ public class Dhimulate extends Application {
 
     public List<Location> getLocations() {
         return m_locations;
+    }
+
+    public void setsemesterprogress(double p) {
+        semesterprogress.setProgress(p);
     }
 }

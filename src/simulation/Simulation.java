@@ -19,36 +19,41 @@ public class Simulation extends AnimationTimer {
     private List<Location> locations;
 
     private double attributesInfluence            = 0.2; //0.2
-    private double distanceStudentInfluence       = 1;//1
-    private double distanceLocationInfluence      = 0.1;//0.1
+    public double distanceStudentInfluence       = 1;//1
+    public double distanceLocationInfluence      = 0.1;//0.1
     private double directionInfluence             = 0.01;
     private double studentInfluence               = 1;
     private double locationInfluence              = 1;
-    private double timelineInfluence              = 1;
+    public double timelineInfluence              = 1;
     private double studentsPrioMAX                = 0.0;
     private double locationsPrioMAX               = 0.0;
     private double studentsVMAX                   = 0.5;//0.5
-    private double directionInfluenceByStudents   = 0.0002; //0.0002
-    private double directionInfluenceByLocations  = 0.002;//0.002
+    public double directionInfluenceByStudents   = 0.0002; //0.0002
+    public double directionInfluenceByLocations  = 0.002;//0.002
     private double attributesInfluenceByStudents  = 0.1;//0.1
     private double attributesInfluenceByLocations = 0.003;//0.003
-    private double adjustattributesInfluenceByStudents  = 0.00001;//0.000001
-    private double adjustattributesInfluenceByLocations = 0.00000001;//0.00000001
+    public double adjustattributesInfluenceByStudents  = 0.00001;//0.000001
+    public double adjustattributesInfluenceByLocations = 0.00000001;//0.00000001
     private double minGapBetweenStudents          = 1;
+    public double healthdecreaseondanger = 0.1;
     private int day = 0;
     private double[] time = new double[3];
+    private double semesterprogress = 0;
+    public double onesemesterisxdays=3;
 
     private long lastnano = 0;
     private double simspeed = 2;
     private double lockDistanceStudentLocation = 50;
+    private Dhimulate m_dhimulate;
 
     private boolean running = false;
 
-    public Simulation(List<Student> students, List<Location> locations){
+    public Simulation(Dhimulate dh,List<Student> students, List<Location> locations){
         this.students = students;
         this.locations = locations;
         time[0]=0;time[1]=0;time[2]=0;
         day=0;
+        m_dhimulate = dh;
     }
 
 
@@ -56,7 +61,22 @@ public class Simulation extends AnimationTimer {
         locationsPrioMAX=0;
         studentsPrioMAX= 0;
         for (Student element : students) {
-            simStudent(element,elapsed);
+            if(element.isDisabled()!=true){
+                if(element.isAlive()==true){
+                    simStudent(element,elapsed);
+                }else{
+                    simDeath(element);
+                }
+            }
+        }
+    }
+
+
+
+    private void simDeath(Student element) {
+        element.simDeath();
+        if(element.getdeathanimcnt()>Student.deathanimMax){
+            element.vanish();
         }
     }
 
@@ -74,10 +94,17 @@ public class Simulation extends AnimationTimer {
         student.calcDanger();
         this.setDangerColor(student);
 
+        if(student.getDanger()>(SimElement.dangerMAX/2)){
+            student.setHealth(student.getHealth()-healthdecreaseondanger);
+        }
 
 
         //check the status flag
         if (student.isMoving()) {
+            if(student.getHealth()<=0){
+                m_dhimulate.killStudent(student);
+            }
+
             //adjust direction according to students and locations
             this.adjustDirection(student,elapsed);
 
@@ -98,6 +125,8 @@ public class Simulation extends AnimationTimer {
         s.getCircle().setFill(Color.rgb( (int)(55+200*(s.getDanger()/SimElement.dangerMAX)),0,255-(int)(55+200*(s.getDanger()/SimElement.dangerMAX))));
     }
 
+
+
     private void prioritizeStudents(Student referenceStudent) {
         //iterate through all students and compare attributes
         double attributesDifference;
@@ -107,42 +136,43 @@ public class Simulation extends AnimationTimer {
         studentsPrioMAX = 0.0;
         double[] refAttr = referenceStudent.getAttributes();
         for (Student student : students) {
+            if(student.isAlive()==true) {
+                //exit if its the student we are comparing to
+                if (student.getId() == referenceStudent.getId() && student.isMoving() == true) {
+                    student.setPriority(-1);
+                    continue;
+                }
 
-            //exit if its the student we are comparing to
-            if (student.getId() == referenceStudent.getId() && student.isMoving()==true) {
-                student.setPriority(-1);
-                continue;
-            }
+                //compare attributes
+                attributesDifference = 0.0;
 
-            //compare attributes
-            attributesDifference = 0.0;
+                double[] sAttr = student.getAttributes();
+                double pot;
+                for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
+                    pot = Math.abs(sAttr[i] - refAttr[i]);
+                    attributesDifference += pot * pot * pot;
+                }
+                attributesDifference = attributesDifference + (Math.abs(referenceStudent.getDanger() - student.getDanger()) * Math.abs(referenceStudent.getDanger() - student.getDanger()));
 
-            double[] sAttr = student.getAttributes();
-            double pot;
-            for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-                pot = Math.abs(sAttr[i] - refAttr[i]);
-                attributesDifference += pot*pot*pot;
-            }
-            attributesDifference =attributesDifference+(Math.abs(referenceStudent.getDanger() - student.getDanger())*Math.abs(referenceStudent.getDanger() - student.getDanger()));
+                //compare position
+                Vector2D refPos = referenceStudent.getPosition();
+                Vector2D sPos = student.getPosition();
+                distance = refPos.getDistanceTo(sPos);
+                if (distance < minGapBetweenStudents) {
+                    distance = distance + (minGapBetweenStudents - distance) * 4;
+                }
 
-            //compare position
-            Vector2D refPos = referenceStudent.getPosition();
-            Vector2D sPos = student.getPosition();
-            distance = refPos.getDistanceTo(sPos);
-            if (distance < minGapBetweenStudents) {
-                distance = distance+(minGapBetweenStudents-distance)*4;
-            }
+                //compare Direction
+                Vector2D refDir = referenceStudent.getDirection();
+                Vector2D sDir = student.getDirection();
+                direction = refDir.getDistanceTo(sDir);
 
-            //compare Direction
-            Vector2D refDir = referenceStudent.getDirection();
-            Vector2D sDir = student.getDirection();
-            direction = refDir.getDistanceTo(sDir);
+                //combine those
+                student.setPriority(attributesDifference * attributesInfluence * attributesInfluenceByStudents + distance * distanceStudentInfluence + direction * directionInfluence);
 
-            //combine those
-            student.setPriority(attributesDifference * attributesInfluence *attributesInfluenceByStudents + distance * distanceStudentInfluence + direction * directionInfluence);
-
-            if (student.getPriority() > studentsPrioMAX) {
-                studentsPrioMAX = student.getPriority();
+                if (student.getPriority() > studentsPrioMAX) {
+                    studentsPrioMAX = student.getPriority();
+                }
             }
         }
     }
@@ -151,7 +181,11 @@ public class Simulation extends AnimationTimer {
     private void adjustAttributes(Student currentStudent) {
         double[] csAttr = currentStudent.getAttributes();
         for (Student student : students) {
-            if(student.getPriority()>0){csAttr = compareToOtherElement(csAttr, student, studentsPrioMAX, adjustattributesInfluenceByStudents);}
+            if(student.isAlive()==true) {
+                if (student.getPriority() > 0) {
+                    csAttr = compareToOtherElement(csAttr, student, studentsPrioMAX, adjustattributesInfluenceByStudents);
+                }
+            }
         }
 
         for (Location location : locations) {
@@ -185,6 +219,7 @@ public class Simulation extends AnimationTimer {
             time[2]=time[2]-60;
             if(time[1]>60){
                 time[0]++;
+                handlesemesterprogress();
                 time[1]=time[1]-60;
                 if(time[0]==24){
                     day++;
@@ -192,7 +227,9 @@ public class Simulation extends AnimationTimer {
                 }
             }
         }
-        if(((int)time[1])!=lastmin)Dhimulate.updateTime(time);
+        if(((int)time[1])!=lastmin){
+            m_dhimulate.updateTime(day,time);
+        };
     }
 
 
@@ -208,7 +245,7 @@ public class Simulation extends AnimationTimer {
 
         //students
         for (Student student : students) {
-            if(student.getID()!=referenceStudent.getID() && student.getPriority()>0){
+            if(student.getID()!=referenceStudent.getID() && student.getPriority()>0 && student.isAlive()==true){
                 pos2 = student.getPosition();
                 delta = refPos.subtract(pos2);
 
@@ -303,6 +340,11 @@ public class Simulation extends AnimationTimer {
         lastnano=nownano;
         addTime(elapsed);
         simAllStudents((long)(elapsed*simspeed));
+    }
+
+    private void handlesemesterprogress() { //called every minute
+        semesterprogress=((day+time[0]/24)%onesemesterisxdays)/onesemesterisxdays;
+        m_dhimulate.setsemesterprogress(semesterprogress);
     }
 
     @Override
