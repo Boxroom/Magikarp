@@ -18,31 +18,37 @@ public class Simulation extends AnimationTimer {
     private List<Student>  students;
     private List<Location> locations;
 
-    private double attributesInfluence            = 0.2; //1
+    private double attributesInfluence            = 0.2; //0.2
     private double distanceStudentInfluence       = 1;//1
-    private double distanceLocationInfluence      = 0.1;//1
+    private double distanceLocationInfluence      = 0.1;//0.1
     private double directionInfluence             = 0.01;
     private double studentInfluence               = 1;
     private double locationInfluence              = 1;
-    private double timelineInfluence              = 0.01;
+    private double timelineInfluence              = 1;
     private double studentsPrioMAX                = 0.0;
     private double locationsPrioMAX               = 0.0;
     private double studentsVMAX                   = 0.5;//0.5
-    private double directionInfluenceByStudents   = 0.0002; //0.0005
-    private double directionInfluenceByLocations  = 0.002;//0.005
-    private double attributesInfluenceByStudents  = 0.1;//0.01
+    private double directionInfluenceByStudents   = 0.0002; //0.0002
+    private double directionInfluenceByLocations  = 0.002;//0.002
+    private double attributesInfluenceByStudents  = 0.1;//0.1
     private double attributesInfluenceByLocations = 0.003;//0.003
-    private double adjustattributesInfluenceByStudents  = 0.00001;//0.0000001
+    private double adjustattributesInfluenceByStudents  = 0.00001;//0.000001
     private double adjustattributesInfluenceByLocations = 0.00000001;//0.00000001
     private double minGapBetweenStudents          = 1;
+    private int day = 0;
+    private double[] time = new double[3];
 
     private long lastnano = 0;
     private double simspeed = 2;
     private double lockDistanceStudentLocation = 50;
 
+    private boolean running = false;
+
     public Simulation(List<Student> students, List<Location> locations){
         this.students = students;
         this.locations = locations;
+        time[0]=0;time[1]=0;time[2]=0;
+        day=0;
     }
 
 
@@ -162,8 +168,31 @@ public class Simulation extends AnimationTimer {
         return csAttr;
     }
 
-    private double getTime() {
-        return 0;
+    private double[] getTime() {
+        return time;
+    }
+
+    private double getTime(int i) {
+        return time[i];
+    }
+
+    private void addTime(long nano){
+        int lastmin=(int)time[1];
+        double seconds = ((double)nano) / (1000000000.0/2000);
+        time[2]+=seconds;
+        if(time[2]>60){
+            time[1]++;
+            time[2]=time[2]-60;
+            if(time[1]>60){
+                time[0]++;
+                time[1]=time[1]-60;
+                if(time[0]==24){
+                    day++;
+                    time[0]=0;
+                }
+            }
+        }
+        if(((int)time[1])!=lastmin)Dhimulate.updateTime(time);
     }
 
 
@@ -241,9 +270,6 @@ public class Simulation extends AnimationTimer {
     }
 
     private void prioritizeLocation(Student referenceStudent, Location location) {
-        double time = getTime();
-        Status timelinePrio = location.getTimeline().getStatus(time);
-
         //compare attributes
         double attributesDifference = 0.0;
         double[] lAttr = location.getAttributes();
@@ -264,7 +290,7 @@ public class Simulation extends AnimationTimer {
             if(referenceStudent.isMoving()==true){enterLocation(referenceStudent,location);}
         }
 
-        double prio = distanceLocationInfluence * distance + /*timelinePrio.toInt() * timelineInfluence*/ + attributesDifference*attributesInfluenceByLocations * attributesInfluence;
+        double prio = distanceLocationInfluence * distance + location.getTimeline().getStatus(getTime(0)).toInt() * timelineInfluence + attributesDifference*attributesInfluenceByLocations * attributesInfluence;
         location.setPriority(prio);
         if (location.getPriority() > locationsPrioMAX) {
             locationsPrioMAX = location.getPriority();
@@ -275,6 +301,7 @@ public class Simulation extends AnimationTimer {
     public void handle(long nownano) {
         long elapsed = nownano-lastnano;
         lastnano=nownano;
+        addTime(elapsed);
         simAllStudents((long)(elapsed*simspeed));
     }
 
@@ -282,14 +309,16 @@ public class Simulation extends AnimationTimer {
     public void start(){
         super.start();
         lastnano=System.nanoTime();
-
+        running = true;
 
     }
+
+    public boolean isRunning(){return running;}
 
     @Override
     public void stop(){
         super.stop();
-
+        running = false;
 
 
     }

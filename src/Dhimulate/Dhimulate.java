@@ -11,12 +11,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import model.Location;
 import model.SimElement;
@@ -40,6 +42,8 @@ public class Dhimulate extends Application {
     private List<Location> m_locations;
     private String MainGameSceneName = "sim3";
     private double adjustingtoreference = 1;
+    private static Label timelabel;
+    private static Rectangle darkness;
 
 
     @Override
@@ -67,6 +71,38 @@ public class Dhimulate extends Application {
                 configandstartSim();
             }
         });
+
+        ((Button)getScene(MainGameSceneName).lookup("#pauseButton")).setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if(m_Simulation.isRunning()==true){
+                    m_Simulation.stop();
+                    ((Button)event.getSource()).setText("Resume");
+                }else{
+                    m_Simulation.start();
+                    ((Button)event.getSource()).setText("Stop");
+                }
+            }
+        });
+
+        timelabel=((Label)getScene(MainGameSceneName).lookup("#timeLabel"));
+        darkness=((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
+    }
+
+    public static void updateTime(double[] time){
+        timelabel.setText("Uhrzeit: "+stockTime(""+((int)time[0]))+":"+stockTime(""+((int)time[1]))/*+":"+((int)time[2])*/+"Uhr");
+        if(time[0]>12){
+            darkness.setOpacity(-0.3+((time[0]%12)/12));
+        }else{
+            darkness.setOpacity(0.7-((time[0]/12)));
+        }
+    }
+
+    private static String stockTime(String part){
+        if(part.length()!=2){
+            part = "0"+part;
+        }
+        return part;
     }
 
     private void configandstartSim(){
