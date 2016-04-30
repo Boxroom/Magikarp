@@ -21,10 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import model.Location;
-import model.SimElement;
-import model.Student;
-import model.Vector2D;
+import model.*;
 import simulation.Simulation;
 import view.Window;
 
@@ -44,7 +41,7 @@ public class Dhimulate extends Application {
     private List<Student> m_students;
     private List<Location> m_locations;
     private String MainGameSceneName = "sim3";
-    private double adjustingtoreference = 1;
+    private double adjustingtoreference = 0.5;
     private static Label timelabel;
     private static Label studentslabel;
     private static Label semesterlabel;
@@ -215,16 +212,20 @@ public class Dhimulate extends Application {
             switch(l.getName()){
                 case "Universität":
                     l.setImage((ImageView) getScene(MainGameSceneName).lookup("#uni"));
+                    l.setNotificationlabel((Label) getScene(MainGameSceneName).lookup("#lectureLabel"));
                     l.setAttributes(SimElement.ALCOHOL,00);
                     l.setAttributes(SimElement.LEADERSHIP,100);
                     l.setAttributes(SimElement.LEARNING,100);
                     l.setAttributes(SimElement.PARTY,0);
                     l.setAttributes(SimElement.TEAM,0);
-                    l.setPosition(100,100);
+                    l.setPosition(200,150);
                     l.calcDanger();
+                    l.getTimeline().addEvent(new TimelineEvent("Vorlesungsbeginn!",8,11));
+                    l.getTimeline().addEvent(new TimelineEvent("Vorlesungsbeginn!",13,16));
                     break;
                 case "Disco":
                     l.setImage((ImageView) getScene(MainGameSceneName).lookup("#disco"));
+                    l.setNotificationlabel((Label) getScene(MainGameSceneName).lookup("#partyLabel"));
                     l.setAttributes(SimElement.ALCOHOL,100);
                     l.setAttributes(SimElement.LEADERSHIP,0);
                     l.setAttributes(SimElement.LEARNING,0);
@@ -232,9 +233,11 @@ public class Dhimulate extends Application {
                     l.setAttributes(SimElement.TEAM,0);
                     l.setPosition(450,550);
                     l.calcDanger();
+                    l.getTimeline().addEvent(new TimelineEvent("Party!",21,5));
                     break;
                 case  "Bibliothek":
                     l.setImage((ImageView) getScene(MainGameSceneName).lookup("#bib"));
+                    l.setNotificationlabel((Label) getScene(MainGameSceneName).lookup("#learningLabel"));
                     l.setAttributes(SimElement.ALCOHOL,0);
                     l.setAttributes(SimElement.LEADERSHIP,00);
                     l.setAttributes(SimElement.LEARNING,100);
@@ -242,9 +245,11 @@ public class Dhimulate extends Application {
                     l.setAttributes(SimElement.TEAM,100);
                     l.setPosition(860,150);
                     l.calcDanger();
+                    l.getTimeline().addEvent(new TimelineEvent("Endlich lernen!",15,20));
                     break;
                 case "Zuhause":
                     l.setImage((ImageView) getScene(MainGameSceneName).lookup("#home"));
+                    l.setNotificationlabel((Label) getScene(MainGameSceneName).lookup("#sleepingLabel"));
                     l.setAttributes(SimElement.ALCOHOL,100);
                     l.setAttributes(SimElement.LEADERSHIP,0);
                     l.setAttributes(SimElement.LEARNING,100);
@@ -252,6 +257,7 @@ public class Dhimulate extends Application {
                     l.setAttributes(SimElement.TEAM,0);
                     l.setPosition(1030,600);
                     l.calcDanger();
+                    l.getTimeline().addEvent(new TimelineEvent("Schlafenszeit!",22,6));
                     break;
             }
 

@@ -60,6 +60,19 @@ public abstract class SimElement {
         return id;
     }
 
+    public double getDist() {
+        return dist;
+    }
+
+    public void setDist(double dist) {
+        if(dist==0){
+            dist=0.00000000001;
+        }
+        this.dist = dist;
+    }
+
+    private double dist = 0;
+
     public static double dangerMAX = 200;
 
     public SimElement(int id){

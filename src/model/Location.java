@@ -1,5 +1,6 @@
 package model;
 
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -16,7 +17,43 @@ public class Location extends SimElement {
 
     private String name = "default";
 
+
+
+    public void setShowingnotification(boolean shwoingnotification) {
+        this.showingnotification = shwoingnotification;
+    }
+
+    public boolean isShowingnotification() {
+        return showingnotification;
+    }
+
+
+
     private ImageView image;
+    private int notificationcntMAX = 300;
+
+    public void setNotificationcnt(int notificationcnt) {
+        this.notificationcnt = notificationcnt;
+    }
+
+    public int getNotificationcnt() {
+        return notificationcnt;
+    }
+
+    private int notificationcnt= 0;
+    private boolean showingnotification = false;
+
+    public void setNotificationlabel(Label notificationlabel) {
+        this.notificationlabel = notificationlabel;
+
+        resetNotification();
+    }
+
+    public Label getNotificationlabel() {
+        return notificationlabel;
+    }
+
+    private Label notificationlabel;
 
     public String getName() {
         return name;
@@ -98,6 +135,36 @@ public class Location extends SimElement {
         }else{
             System.out.println(getName() +" was null");
         }
+    }
+
+    public void animNotification(){
+        setNotificationcnt(getNotificationcnt()+1);
+        notificationlabel.setOpacity(notificationlabel.getOpacity()-0.002);
+        notificationlabel.setLayoutY(notificationlabel.getLayoutY()-0.1);
+        if(getNotificationcnt()>notificationcntMAX){
+            hideNotification();
+        }
+    }
+
+    public void resetNotification(){
+        notificationlabel.setVisible(false);
+        Vector2D v = getPosition();
+        notificationlabel.setLayoutX(v.mX-20);
+        notificationlabel.setLayoutY(v.mY-30);
+        setNotificationcnt(0);
+        notificationlabel.setOpacity(1);
+        setShowingnotification(false);
+    }
+
+    public void hideNotification(){
+        resetNotification();
+    }
+
+    public void showNotification(String txt){
+        resetNotification();
+        notificationlabel.setText(txt);
+        notificationlabel.setVisible(true);
+        setShowingnotification(true);
     }
 
     public Location(int id){

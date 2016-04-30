@@ -41,6 +41,27 @@ public class Student extends SimElement {
 
     private double health = 100;
 
+    public void setInlocationcnt(int inlocationcnt) {
+        this.inlocationcnt = inlocationcnt;
+    }
+
+    public int getInlocationcnt() {
+        return inlocationcnt;
+    }
+
+    public void setInsidelocation(Location insidelocation) {
+        this.insidelocation = insidelocation;
+    }
+
+    public Location getInsidelocation() {
+        return insidelocation;
+    }
+
+    private Location insidelocation;
+
+
+    private int inlocationcnt = 0;
+
     public Student(int id) {
         super(id);
         alive=true;

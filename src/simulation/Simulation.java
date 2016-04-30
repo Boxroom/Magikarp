@@ -18,24 +18,24 @@ public class Simulation extends AnimationTimer {
     private List<Student>  students;
     private List<Location> locations;
 
-    private double attributesInfluence            = 0.2; //0.2
-    public double distanceStudentInfluence       = 1;//1
-    public double distanceLocationInfluence      = 0.1;//0.1
-    private double directionInfluence             = 0.01;
+    private double attributesInfluence            = 1; //0.2
+    public double distanceStudentInfluence       = 0.1;//1
+    public double distanceLocationInfluence      = 0.01;//0.1
+    private double directionInfluence             = 0.1;
     private double studentInfluence               = 1;
     private double locationInfluence              = 1;
-    public double timelineInfluence              = 1;
+    public double timelineInfluence              = 0.4;
     private double studentsPrioMAX                = 0.0;
     private double locationsPrioMAX               = 0.0;
-    private double studentsVMAX                   = 0.5;//0.5
+    private double studentsVMAX                   = 0.8;//0.5
     public double directionInfluenceByStudents   = 0.0002; //0.0002
-    public double directionInfluenceByLocations  = 0.002;//0.002
-    private double attributesInfluenceByStudents  = 0.1;//0.1
-    private double attributesInfluenceByLocations = 0.003;//0.003
-    public double adjustattributesInfluenceByStudents  = 0.00001;//0.000001
-    public double adjustattributesInfluenceByLocations = 0.00000001;//0.00000001
+    public double directionInfluenceByLocations  = 0.0002;//0.002
+    private double attributesInfluenceByStudents  = 0.000000001;//0.1
+    private double attributesInfluenceByLocations = 0.0000001;//0.003
+    public double adjustattributesInfluenceByStudents  = 0.001;//0.000001
+    public double adjustattributesInfluenceByLocations = 0.00000000001;//0.00000001
     private double minGapBetweenStudents          = 1;
-    public double healthdecreaseondanger = 0.1;
+    public double healthdecreaseondanger = 0.002;
     private int day = 0;
     private double[] time = new double[3];
     private double semesterprogress = 0;
@@ -47,6 +47,9 @@ public class Simulation extends AnimationTimer {
     private Dhimulate m_dhimulate;
 
     private boolean running = false;
+    private double stay_factor = 0.04;
+    private double leadershipinfluence =1;
+    private double attributesinfluenceinsidelocation = 0.001;
 
     public Simulation(Dhimulate dh,List<Student> students, List<Location> locations){
         this.students = students;
@@ -87,20 +90,20 @@ public class Simulation extends AnimationTimer {
         //analyse locations
         this.prioritizeLocations(student);
 
-        //adjust attributes
-        this.adjustAttributes(student);
-
 
         student.calcDanger();
         this.setDangerColor(student);
 
-        if(student.getDanger()>(SimElement.dangerMAX/2)){
-            student.setHealth(student.getHealth()-healthdecreaseondanger);
+        if(student.getDanger()>(SimElement.dangerMAX/1.7)){
+            student.setHealth(student.getHealth()-(student.getDanger()/(SimElement.dangerMAX/1.7))*healthdecreaseondanger);
         }
 
 
         //check the status flag
         if (student.isMoving()) {
+            //adjust attributes
+            this.adjustAttributes(student);
+
             if(student.getHealth()<=0){
                 m_dhimulate.killStudent(student);
             }
@@ -111,13 +114,33 @@ public class Simulation extends AnimationTimer {
             //move the Student
             student.move(elapsed);
 
-            //inside location
+            if(student.getInlocationcnt()>0){
+                student.setInlocationcnt(student.getInlocationcnt()-1);
+            }
         }
         else {
 
-            //handle the attributes
+            this.adjustAttributesInsideLocation(student);
 
-            //interact
+            student.setInlocationcnt(student.getInlocationcnt()+4);
+
+            if(student.getInsidelocation().getPriority()>locationsPrioMAX*0.8){
+                leaveLocation(student,student.getInsidelocation());
+            }
+
+        }
+
+
+    }
+
+    private void adjustAttributesInsideLocation(Student student) {
+        double v1,v2,f;
+        for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
+            f=1;
+            v1 = student.getAttribute(i);
+            v2 = student.getInsidelocation().getAttribute(i);
+            if(student.getInsidelocation().getName()=="Disco"){f=3;}
+            student.setAttributes(i,v1+(v2 - v1) * attributesinfluenceinsidelocation*f);
         }
     }
 
@@ -158,6 +181,8 @@ public class Simulation extends AnimationTimer {
                 Vector2D refPos = referenceStudent.getPosition();
                 Vector2D sPos = student.getPosition();
                 distance = refPos.getDistanceTo(sPos);
+                student.setDist(distance);
+
                 if (distance < minGapBetweenStudents) {
                     distance = distance + (minGapBetweenStudents - distance) * 4;
                 }
@@ -168,7 +193,7 @@ public class Simulation extends AnimationTimer {
                 direction = refDir.getDistanceTo(sDir);
 
                 //combine those
-                student.setPriority(attributesDifference * attributesInfluence * attributesInfluenceByStudents + distance * distanceStudentInfluence + direction * directionInfluence);
+                student.setPriority((100-student.getAttribute(Student.LEADERSHIP))*leadershipinfluence+attributesDifference * attributesInfluence * attributesInfluenceByStudents + distance * distanceStudentInfluence + direction * directionInfluence);
 
                 if (student.getPriority() > studentsPrioMAX) {
                     studentsPrioMAX = student.getPriority();
@@ -296,6 +321,8 @@ public class Simulation extends AnimationTimer {
         if(l.grow()==true) {
             s.getCircle().setVisible(false);
             s.setMoving(false);
+            s.setInsidelocation(l);
+            s.setInlocationcnt(0);
         }
     }
 
@@ -322,17 +349,34 @@ public class Simulation extends AnimationTimer {
         Vector2D refPos = referenceStudent.getPosition();
         Vector2D lPos = location.getCenterPosition();
         double distance = refPos.getDistanceTo(lPos);
+        location.setDist(distance);
+
         if (distance < lockDistanceStudentLocation) {
             //lock on to location
-            if(referenceStudent.isMoving()==true){enterLocation(referenceStudent,location);}
+            if(referenceStudent.isMoving()==true ){
+                if(referenceStudent.getInlocationcnt()>0){
+                    if (referenceStudent.getInsidelocation().getID()!=location.getID()){
+                        enterLocation(referenceStudent,location);
+                    }
+                }else{
+                    enterLocation(referenceStudent,location);
+                }
+            }
         }
-
-        double prio = distanceLocationInfluence * distance + location.getTimeline().getStatus(getTime(0)).toInt() * timelineInfluence + attributesDifference*attributesInfluenceByLocations * attributesInfluence;
+        double stay = 0;
+        if(referenceStudent.getInsidelocation() != null) {
+            if (location.getID() == referenceStudent.getInsidelocation().getID()) {
+                stay = referenceStudent.getInlocationcnt();
+            }
+        }
+        double prio = stay*stay_factor+distanceLocationInfluence * distance + Status.toInt(location.getTimeline().getStatus(getTime(0))) * timelineInfluence + attributesDifference*attributesInfluenceByLocations * attributesInfluence;
         location.setPriority(prio);
         if (location.getPriority() > locationsPrioMAX) {
             locationsPrioMAX = location.getPriority();
         }
     }
+
+
 
     @Override
     public void handle(long nownano) {
@@ -340,6 +384,19 @@ public class Simulation extends AnimationTimer {
         lastnano=nownano;
         addTime(elapsed);
         simAllStudents((long)(elapsed*simspeed));
+        simEvents();
+    }
+
+    private void simEvents() {
+        Status s;
+        for(Location l : locations){
+            s=l.getTimeline().getStatus(time[0]);
+            if(l.isShowingnotification()==true){
+                l.animNotification();
+            }else  if((s==Status.BEFORE_EVENT)&& l.isShowingnotification()==false){
+                l.showNotification(l.getTimeline().getCurrentEvent(time[0]).name);
+            }
+        }
     }
 
     private void handlesemesterprogress() { //called every minute
