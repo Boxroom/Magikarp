@@ -18,39 +18,37 @@ public class Simulation extends AnimationTimer {
     private List<Student>  students;
     private List<Location> locations;
 
-    private double attributesInfluence            = 1; //
-    private double distanceStudentInfluence       = 0.1;//0.1
-    private double distanceLocationInfluence      = 0.01;//0.003
-    private double directionInfluence             = 1;
+    private double attributesInfluence            = 0.2; //1
+    private double distanceStudentInfluence       = 1;//1
+    private double distanceLocationInfluence      = 0.1;//1
+    private double directionInfluence             = 0.01;
     private double studentInfluence               = 1;
     private double locationInfluence              = 1;
     private double timelineInfluence              = 0.01;
     private double studentsPrioMAX                = 0.0;
     private double locationsPrioMAX               = 0.0;
     private double studentsVMAX                   = 0.5;//0.5
-    private double directionInfluenceByStudents   = 0.0005; //0.0002
-    private double directionInfluenceByLocations  = 0.005;//0.001
-    private double attributesInfluenceByStudents  = 0.01;//0.01
-    private double attributesInfluenceByLocations = 0.003;//0.02
-    private double adjustattributesInfluenceByStudents  = 0.000001;//0.0000001
+    private double directionInfluenceByStudents   = 0.0002; //0.0005
+    private double directionInfluenceByLocations  = 0.002;//0.005
+    private double attributesInfluenceByStudents  = 0.1;//0.01
+    private double attributesInfluenceByLocations = 0.003;//0.003
+    private double adjustattributesInfluenceByStudents  = 0.00001;//0.0000001
     private double adjustattributesInfluenceByLocations = 0.00000001;//0.00000001
     private double minGapBetweenStudents          = 1;
 
-    Dhimulate m_dhimulate;
     private long lastnano = 0;
     private double simspeed = 2;
     private double lockDistanceStudentLocation = 50;
 
-    public Simulation(Dhimulate dhimulate){
-        m_dhimulate = dhimulate;
+    public Simulation(List<Student> students, List<Location> locations){
+        this.students = students;
+        this.locations = locations;
     }
 
 
-    public void simAllStudents(List<Student> students, List<Location> locations,long elapsed) {
+    public void simAllStudents(long elapsed) {
         locationsPrioMAX=0;
         studentsPrioMAX= 0;
-        this.students = students;
-        this.locations = locations;
         for (Student element : students) {
             simStudent(element,elapsed);
         }
@@ -91,7 +89,7 @@ public class Simulation extends AnimationTimer {
     }
 
     private void setDangerColor(Student s){
-        s.getCircle().setFill(Color.rgb( (int)(255*(s.getDanger()/SimElement.dangerMAX)),0,255-(int)(255*(s.getDanger()/SimElement.dangerMAX))));
+        s.getCircle().setFill(Color.rgb( (int)(55+200*(s.getDanger()/SimElement.dangerMAX)),0,255-(int)(55+200*(s.getDanger()/SimElement.dangerMAX))));
     }
 
     private void prioritizeStudents(Student referenceStudent) {
@@ -277,7 +275,7 @@ public class Simulation extends AnimationTimer {
     public void handle(long nownano) {
         long elapsed = nownano-lastnano;
         lastnano=nownano;
-        simAllStudents(m_dhimulate.getStudents(), m_dhimulate.getLocations(),(long)(elapsed*simspeed));
+        simAllStudents((long)(elapsed*simspeed));
     }
 
     @Override

@@ -6,8 +6,12 @@ import java.util.*;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -31,29 +35,50 @@ public class Dhimulate extends Application {
     private        String     m_OS;
     public   static int MAXStudentCNT = 200;
     private    int StudentCNT = 100;
+    private double[] referenceattributes = new double[SimElement.ATTR_COUNT];
     private List<Student> m_students;
     private List<Location> m_locations;
     private String MainGameSceneName = "sim3";
+    private double adjustingtoreference = 1;
 
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         m_PrimaryStage = primaryStage;
         loadScenes();
-        primaryStage.setScene(getScene(MainGameSceneName));
+        primaryStage.setScene(getScene("config"));
 
         primaryStage.setTitle("Magikarp DHBW Simulation");
         primaryStage.setResizable(false);
         primaryStage.show();
 
+
+        ((Button)getScene("config").lookup("#startButton")).setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                referenceattributes[SimElement.ALCOHOL]=((Slider)getScene("config").lookup("#alcSlider")).getValue();
+
+                referenceattributes[SimElement.PARTY]=((Slider)getScene("config").lookup("#partySlider")).getValue();
+                referenceattributes[SimElement.LEADERSHIP]=((Slider)getScene("config").lookup("#leaderSlider")).getValue();
+                referenceattributes[SimElement.TEAM]=((Slider)getScene("config").lookup("#teamSlider")).getValue();
+                referenceattributes[SimElement.LEARNING]=((Slider)getScene("config").lookup("#learnSlider")).getValue();
+                StudentCNT=(int)((((Slider)getScene("config").lookup("#countSlider")).getValue()/100)*MAXStudentCNT);
+                System.out.println(((Slider)getScene("config").lookup("#countSlider")).getValue());
+                configandstartSim();
+            }
+        });
+    }
+
+    private void configandstartSim(){
         initGame();
+        m_PrimaryStage.setScene(getScene(MainGameSceneName));
         m_Simulation.start();
     }
 
     private void initGame(){
         createLocations();
         createStudents(StudentCNT);
-        m_Simulation = new Simulation(this);
+        m_Simulation = new Simulation(m_students, m_locations);
     }
 
     private void createStudents(int cnt){
@@ -75,6 +100,13 @@ public class Dhimulate extends Application {
                 //setAttributes
                 for(int p=0;p<SimElement.ATTR_COUNT;p++){
                     s.setAttributes(p,Math.random()*100);
+                }
+
+                //adjust attributes according to reference attributes
+                double dif;
+                for(int p=0;p<SimElement.ATTR_COUNT;p++){
+                    dif=referenceattributes[p]-s.getAttribute(p);
+                    s.setAttributes(p,s.getAttribute(p)+dif*Math.random()*adjustingtoreference);
                 }
 
                 //add student to list
