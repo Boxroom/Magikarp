@@ -31,22 +31,20 @@ public abstract class SimElement {
     public Vector2D getPosition() {
         return position;
     }
-
+    private double danger;
     public void setPosition(final Vector2D position) {
         this.position = position;
     }
 
     public void setPosition(double x, double y) {
-        Vector2D v = getPosition();
-        v.mX = x;
-        v.mY = y;
-        setPosition(v);
+        position.mX = x;
+        position.mY = y;
     }
     public double[] getAttributes() {
         return attributes;
     }
 
-    public double getAttributes(int index) {
+    public double getAttribute(int index) {
         return attributes[index];
     }
 
@@ -62,7 +60,32 @@ public abstract class SimElement {
         return id;
     }
 
+    public static double dangerMAX = 200;
+
     public SimElement(int id){
         this.id=id;
+        danger =0;
+    }
+
+    public void calcDanger() {
+        double danger = 0;
+        danger += getAttribute(SimElement.ALCOHOL);
+        danger += getAttribute(SimElement.PARTY);
+        danger -= getAttribute(SimElement.LEARNING);
+        danger -= getAttribute(SimElement.TEAM);
+        if (danger<0){
+            danger=0;
+        }else if(danger>dangerMAX){
+            danger=dangerMAX;
+        }
+        setDanger(danger);
+    }
+
+    public void setDanger(double danger) {
+        this.danger = danger;
+    }
+
+    public double getDanger() {
+        return danger;
     }
 }

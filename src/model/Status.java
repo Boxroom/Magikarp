@@ -11,11 +11,11 @@ public enum Status {
     public int toInt() {
         switch (this) {
             case IN_EVENT:
-                return 2;
-            case BEFORE_EVENT:
-                return 3;
-            default: // NO_EVENT
                 return 1;
+            case BEFORE_EVENT:
+                return 2;
+            default: // NO_EVENT
+                return 3;
         }
     }
 }

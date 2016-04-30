@@ -18,6 +18,7 @@ public class Student extends SimElement {
 
     public Student(int id) {
         super(id);
+
         setPosition(Math.random()*1280,50+Math.random()*700);
         setDirection(Math.random(),Math.random());
     }
@@ -76,6 +77,8 @@ public class Student extends SimElement {
         this.direction = direction;
     }
 
+
+
     public void setDirection(double x, double y){
         Vector2D v = getDirection();
         v.mX = x;
@@ -92,7 +95,7 @@ public class Student extends SimElement {
             getCircle().setLayoutY(pos.mY);
             //if(id==1){System.out.println("[moved] id:"+id+" to x:"+pos.mX+" y:"+pos.mY +" direction:"+getDirection().mX);}
         }else{
-            System.out.println("student [id:"+id+"] was null");
+            //System.out.println("student [id:"+id+"] was null");
         }
     }
 
@@ -145,4 +148,6 @@ public class Student extends SimElement {
     public void move(long elapsed) {
         setPosition(getPosition().mX+getDirection().mX*(elapsed/10000000),getPosition().mY+getDirection().mY*(elapsed/10000000));
     }
+
+
 }

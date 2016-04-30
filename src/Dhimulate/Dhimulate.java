@@ -8,6 +8,8 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
@@ -27,18 +29,19 @@ public class Dhimulate extends Application {
     private static Stage      m_PrimaryStage;
     private static Simulation m_Simulation;
     private        String     m_OS;
-    public   static int MAXStudentCNT = 100;
-    private    int StudentCNT = 50;
+    public   static int MAXStudentCNT = 200;
+    private    int StudentCNT = 100;
     private List<Student> m_students;
     private List<Location> m_locations;
-    private String MainGameSceneName = "sim2";
+    private String MainGameSceneName = "sim3";
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         m_PrimaryStage = primaryStage;
         loadScenes();
         primaryStage.setScene(getScene(MainGameSceneName));
-        //Window w = new Window();
+
         primaryStage.setTitle("Magikarp DHBW Simulation");
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -79,7 +82,7 @@ public class Dhimulate extends Application {
             }
         }
         if(cnt<MAXStudentCNT){
-            for (int i=cnt+1;i<MAXStudentCNT;i++){
+            for (int i=cnt;i<MAXStudentCNT;i++){
                 c = (Circle)getScene(MainGameSceneName).lookup("#student"+i);
                 c.setVisible(false);
             }
@@ -99,40 +102,44 @@ public class Dhimulate extends Application {
             l.setName(Location.names[i]);
             switch(l.getName()){
                 case "Universität":
-                    l.setPosition(797,345);
-                    l.setAttributes(SimElement.ALCOHOL,20);
-                    l.setAttributes(SimElement.LEADERSHIP,80);
-                    l.setAttributes(SimElement.LEARNING,80);
-                    l.setAttributes(SimElement.PARTY,20);
-                    l.setAttributes(SimElement.TEAM,60);
-
-                    break;
-                case "Disco":
-                    l.setPosition(268,824);
-                    l.setAttributes(SimElement.ALCOHOL,100);
-                    l.setAttributes(SimElement.LEADERSHIP,30);
-                    l.setAttributes(SimElement.LEARNING,0);
-                    l.setAttributes(SimElement.PARTY,100);
-                    l.setAttributes(SimElement.TEAM,90);
-
-                    break;
-                case  "Bibliothek":
-                    l.setPosition(1521,870);
-                    l.setAttributes(SimElement.ALCOHOL,0);
-                    l.setAttributes(SimElement.LEADERSHIP,10);
+                    l.setImage((ImageView) getScene(MainGameSceneName).lookup("#uni"));
+                    l.setAttributes(SimElement.ALCOHOL,00);
+                    l.setAttributes(SimElement.LEADERSHIP,100);
                     l.setAttributes(SimElement.LEARNING,100);
                     l.setAttributes(SimElement.PARTY,0);
-                    l.setAttributes(SimElement.TEAM,50);
-
+                    l.setAttributes(SimElement.TEAM,0);
+                    l.setPosition(100,100);
+                    l.calcDanger();
+                    break;
+                case "Disco":
+                    l.setImage((ImageView) getScene(MainGameSceneName).lookup("#disco"));
+                    l.setAttributes(SimElement.ALCOHOL,100);
+                    l.setAttributes(SimElement.LEADERSHIP,0);
+                    l.setAttributes(SimElement.LEARNING,0);
+                    l.setAttributes(SimElement.PARTY,100);
+                    l.setAttributes(SimElement.TEAM,0);
+                    l.setPosition(450,550);
+                    l.calcDanger();
+                    break;
+                case  "Bibliothek":
+                    l.setImage((ImageView) getScene(MainGameSceneName).lookup("#bib"));
+                    l.setAttributes(SimElement.ALCOHOL,0);
+                    l.setAttributes(SimElement.LEADERSHIP,00);
+                    l.setAttributes(SimElement.LEARNING,100);
+                    l.setAttributes(SimElement.PARTY,0);
+                    l.setAttributes(SimElement.TEAM,100);
+                    l.setPosition(860,150);
+                    l.calcDanger();
                     break;
                 case "Zuhause":
-                    l.setPosition(1487,167);
-                    l.setAttributes(SimElement.ALCOHOL,60);
+                    l.setImage((ImageView) getScene(MainGameSceneName).lookup("#home"));
+                    l.setAttributes(SimElement.ALCOHOL,100);
                     l.setAttributes(SimElement.LEADERSHIP,0);
-                    l.setAttributes(SimElement.LEARNING,70);
-                    l.setAttributes(SimElement.PARTY,20);
+                    l.setAttributes(SimElement.LEARNING,100);
+                    l.setAttributes(SimElement.PARTY,0);
                     l.setAttributes(SimElement.TEAM,0);
-
+                    l.setPosition(1030,600);
+                    l.calcDanger();
                     break;
             }
 
