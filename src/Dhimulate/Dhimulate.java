@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -34,16 +32,16 @@ public class Dhimulate extends Application {
     private int      StudentCNT          = 100;
     private int      StudentNumberStart  = 0;
     private int      StudentNumber       = 0;
-    private double[] referenceattributes = new double[SimElement.ATTR_COUNT];
+    private double[] referenceAttributes = new double[SimElement.ATTR_COUNT];
     private List<Student>  m_students;
     private List<Location> m_locations;
     private String MainGameSceneName    = "sim3";
-    private double adjustingtoreference = 0.5;
-    private StackPane   toppane;
-    private ProgressBar semesterprogress;
-    private Button      m_pausebutton;
-    private Pane        klausurenpane;
-    private Label       semestercntLabel;
+    private double adjustingToReference = 0.5;
+    private StackPane   topPane;
+    private ProgressBar semesterProgress;
+    private Button      m_pauseButton;
+    private Pane        klausurenPane;
+    private Label       semesterCntLabel;
     private int semestercnt = 1;
 
     public static void main(String[] args) {
@@ -61,39 +59,31 @@ public class Dhimulate extends Application {
         primaryStage.show();
 
 
-        ((Button) getScene("config").lookup("#startButton")).setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                referenceattributes[SimElement.ALCOHOL] = ((Slider) getScene("config").lookup("#alcSlider")).getValue();
+        ((Button) getScene("config").lookup("#startButton")).setOnAction(event -> {
+            referenceAttributes[SimElement.ALCOHOL] = ((Slider) getScene("config").lookup("#alcSlider")).getValue();
 
-                referenceattributes[SimElement.PARTY] = ((Slider) getScene("config").lookup("#partySlider")).getValue();
-                referenceattributes[SimElement.LEADERSHIP] = ((Slider) getScene("config").lookup("#leaderSlider")).getValue();
-                referenceattributes[SimElement.TEAM] = ((Slider) getScene("config").lookup("#teamSlider")).getValue();
-                referenceattributes[SimElement.LEARNING] = ((Slider) getScene("config").lookup("#learnSlider")).getValue();
-                StudentCNT = (int) ((((Slider) getScene("config").lookup("#countSlider")).getValue() / 100) * MAXStudentCNT);
-                StudentNumberStart = StudentCNT;
-                StudentNumber = StudentCNT;
-                System.out.println(((Slider) getScene("config").lookup("#countSlider")).getValue());
-                configandstartSim();
-            }
+            referenceAttributes[SimElement.PARTY] = ((Slider) getScene("config").lookup("#partySlider")).getValue();
+            referenceAttributes[SimElement.LEADERSHIP] = ((Slider) getScene("config").lookup("#leaderSlider")).getValue();
+            referenceAttributes[SimElement.TEAM] = ((Slider) getScene("config").lookup("#teamSlider")).getValue();
+            referenceAttributes[SimElement.LEARNING] = ((Slider) getScene("config").lookup("#learnSlider")).getValue();
+            StudentCNT = (int) ((((Slider) getScene("config").lookup("#countSlider")).getValue() / 100) * MAXStudentCNT);
+            StudentNumberStart = StudentCNT;
+            StudentNumber = StudentCNT;
+            System.out.println(((Slider) getScene("config").lookup("#countSlider")).getValue());
+            configAndStartSim();
         });
 
-        ((Button) getScene(MainGameSceneName).lookup("#pauseButton")).setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                handlepause((Button) event.getSource());
-            }
-        });
+        ((Button) getScene(MainGameSceneName).lookup("#pauseButton")).setOnAction(event -> handlePause((Button) event.getSource()));
 
         timelabel = ((Label) getScene(MainGameSceneName).lookup("#timeLabel"));
         semesterlabel = ((Label) getScene(MainGameSceneName).lookup("#semesterLabel"));
         studentslabel = ((Label) getScene(MainGameSceneName).lookup("#studentenLabel"));
         darkness = ((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
-        semesterprogress = ((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
-        toppane = ((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
-        m_pausebutton = (Button) getScene(getMainGameSceneName()).lookup("#pauseButton");
-        klausurenpane = (Pane) getScene(getMainGameSceneName()).lookup("#klausurenpane");
-        semestercntLabel = ((Label) getScene(MainGameSceneName).lookup("#semestercnt"));
+        semesterProgress = ((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
+        topPane = ((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
+        m_pauseButton = (Button) getScene(getMainGameSceneName()).lookup("#pauseButton");
+        klausurenPane = (Pane) getScene(getMainGameSceneName()).lookup("#klausurenpane");
+        semesterCntLabel = ((Label) getScene(MainGameSceneName).lookup("#semestercnt"));
     }
 
     //load all scenes from the view folder
@@ -113,13 +103,13 @@ public class Dhimulate extends Application {
         return m_ScenesMap.get(name);
     }
 
-    private void configandstartSim() {
+    private void configAndStartSim() {
         initGame();
         m_PrimaryStage.setScene(getScene(MainGameSceneName));
         m_Simulation.start();
     }
 
-    public void handlepause(Button b) {
+    public void handlePause(Button b) {
         if (m_Simulation.isRunning()) {
             m_Simulation.stop();
             b.setText("Weiter");
@@ -166,8 +156,8 @@ public class Dhimulate extends Application {
         createStudents(StudentCNT);
         m_Simulation = new Simulation(this, m_students, m_locations);
         getConstants();
-        toppane.toFront();
-        klausurenpane.setVisible(false);
+        topPane.toFront();
+        klausurenPane.setVisible(false);
     }
 
     //check if the os is windows
@@ -201,7 +191,7 @@ public class Dhimulate extends Application {
                 case "Universität":
                     l.setImage((ImageView) getScene(MainGameSceneName).lookup("#uni"));
                     l.setNotificationlabel((Label) getScene(MainGameSceneName).lookup("#lectureLabel"));
-                    l.setAttributes(SimElement.ALCOHOL, 00);
+                    l.setAttributes(SimElement.ALCOHOL, 0);
                     l.setAttributes(SimElement.LEADERSHIP, 100);
                     l.setAttributes(SimElement.LEARNING, 100);
                     l.setAttributes(SimElement.PARTY, 0);
@@ -227,7 +217,7 @@ public class Dhimulate extends Application {
                     l.setImage((ImageView) getScene(MainGameSceneName).lookup("#bib"));
                     l.setNotificationlabel((Label) getScene(MainGameSceneName).lookup("#learningLabel"));
                     l.setAttributes(SimElement.ALCOHOL, 0);
-                    l.setAttributes(SimElement.LEADERSHIP, 00);
+                    l.setAttributes(SimElement.LEADERSHIP, 0);
                     l.setAttributes(SimElement.LEARNING, 100);
                     l.setAttributes(SimElement.PARTY, 0);
                     l.setAttributes(SimElement.TEAM, 100);
@@ -285,8 +275,8 @@ public class Dhimulate extends Application {
                 //adjust attributes according to reference attributes
                 double dif;
                 for (int p = 0; p < SimElement.ATTR_COUNT; p++) {
-                    dif = referenceattributes[p] - s.getAttribute(p);
-                    s.setAttributes(p, s.getAttribute(p) + dif * Math.random() * adjustingtoreference);
+                    dif = referenceAttributes[p] - s.getAttribute(p);
+                    s.setAttributes(p, s.getAttribute(p) + dif * Math.random() * adjustingToReference);
                 }
 
                 //add student to list
@@ -374,34 +364,32 @@ public class Dhimulate extends Application {
         return m_locations;
     }
 
-    public void setsemesterprogress(double p) {
-        semesterprogress.setProgress(p);
+    public void setSemesterProgress(double p) {
+        semesterProgress.setProgress(p);
     }
 
     public void handleKlausuren() {
-        klausurenpane.setVisible(true);
+        klausurenPane.setVisible(true);
     }
 
-    public void handlesimulationend() {
-        handlesemesterend();
-        showreport();
+    public void handleSimulationEnd() {
+        handleSemesterEnd();
+        showReportScreen();
     }
 
-    public void handlesemesterend() {
-        handlepause(m_pausebutton);
-        klausurenpane.setVisible(false);
+    public void handleSemesterEnd() {
+        handlePause(m_pauseButton);
+        klausurenPane.setVisible(false);
         semestercnt++;
-        semestercntLabel.setText(semestercnt + ". Semester");
+        semesterCntLabel.setText(semestercnt + ". Semester");
     }
 
-    public void showreport() {
-        calcreport();
+    private void showReportScreen() {
+        calcReport();
         m_PrimaryStage.setScene(getScene("report"));
     }
 
-    ;
-
-    private void calcreport() {
+    private void calcReport() {
 
     }
 }

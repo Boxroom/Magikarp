@@ -1,15 +1,9 @@
 package simulation;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import Dhimulate.Dhimulate;
+import java.util.List;
 import javafx.animation.AnimationTimer;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import model.*;
 
 /**
@@ -435,7 +429,7 @@ public class Simulation extends AnimationTimer {
 
     private void handlesemesterprogress() { //called every minute
         semesterprogress=(((day-1)+time[0]/24)%onesemesterisxdays)/onesemesterisxdays;
-        m_dhimulate.setsemesterprogress(semesterprogress);
+        m_dhimulate.setSemesterProgress(semesterprogress);
         if(semesterprogress>=0.9){
             if(klausurzeit==false){
                 m_dhimulate.handleKlausuren();
@@ -446,9 +440,9 @@ public class Simulation extends AnimationTimer {
         if(day==(day%onesemesterisxdays)+2 && klausurzeit==true){
             klausurzeit=false;
             if(day==(onesemesterisxdays+1*6)){
-                m_dhimulate.handlesimulationend();
+                m_dhimulate.handleSimulationEnd();
             }else {
-                m_dhimulate.handlesemesterend();
+                m_dhimulate.handleSemesterEnd();
             }
         }
 
