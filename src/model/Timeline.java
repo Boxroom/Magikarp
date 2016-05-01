@@ -30,20 +30,23 @@ public class Timeline {
 
     public Status getStatus(double now) {
         for (TimelineEvent event : events) {
-            if(event.start<event.end) {
+            if (event.start < event.end) {
                 if (event.start <= now && now <= event.end) {
                     // if the event is running
                     return Status.IN_EVENT;
-                } else if (event.start - beforeRange <= now && now < event.start) {
+                }
+                else if (event.start - beforeRange <= now && now < event.start) {
                     // if we're right before the event
                     return Status.BEFORE_EVENT;
 
                 }
-            }else if(event.start>event.end) {
+            }
+            else if (event.start > event.end) {
                 if (event.start <= now || now <= event.end) {
                     // if the event is running
                     return Status.IN_EVENT;
-                } else if (event.start - beforeRange <= now && now < event.start) {
+                }
+                else if (event.start - beforeRange <= now && now < event.start) {
                     // if we're right before the event
                     return Status.BEFORE_EVENT;
 
@@ -53,9 +56,9 @@ public class Timeline {
         return Status.NO_EVENT;
     }
 
-    public TimelineEvent getCurrentEvent(double now){
+    public TimelineEvent getCurrentEvent(double now) {
         for (TimelineEvent event : events) {
-            if(event.start<event.end) {
+            if (event.start < event.end) {
                 if (event.start <= now && now <= event.end) {
                     // if the event is running
                     return event;
@@ -64,7 +67,8 @@ public class Timeline {
                     // if we're right before the event
                     return event;
                 }
-            }else if(event.start>event.end) {
+            }
+            else if (event.start > event.end) {
                 if (event.start <= now || now <= event.end) {
                     // if the event is running
                     return event;

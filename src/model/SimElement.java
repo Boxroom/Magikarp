@@ -5,24 +5,20 @@ package model;
  */
 public abstract class SimElement {
 
-    public static final int    ATTR_COUNT = 5;
-    public static       int    PARTY      = 0;
-    public static       int    LEADERSHIP = 1;
-    public static       int    TEAM       = 2;
-    public static       int    LEARNING   = 3;
-    public static       int    ALCOHOL    = 4;
-    public static       double dangerMAX  = 200;
     protected int id;
-    private Vector2D position = new Vector2D(0, 0);
-    private double priority;
-    private double[] attributes = new double[ATTR_COUNT];
-    private double danger;
-    private double dist = 0;
 
-    public SimElement(int id) {
-        this.id = id;
-        danger = 0;
-    }
+    public static final int ATTR_COUNT = 5;
+
+    private Vector2D position = new Vector2D(0, 0);
+
+    private double priority;
+    private double[] attributes = new double[ATTR_COUNT]; /*double, to represent the percentage of the students' composition (30% drinkers, 20% nerds etc.)*/
+
+    public static int LEADERSHIP = 1;
+    public static int TEAM       = 2;
+    public static int LEARNING   = 3;
+    public static int ALCOHOL    = 4;
+    public static int PARTY      = 0;
 
     public double getPriority() {
         return priority;
@@ -36,6 +32,8 @@ public abstract class SimElement {
         return position;
     }
 
+    private double danger;
+
     public void setPosition(final Vector2D position) {
         this.position = position;
     }
@@ -47,6 +45,10 @@ public abstract class SimElement {
 
     public double[] getAttributes() {
         return attributes;
+    }
+
+    public double getAttribute(int index) {
+        return attributes[index];
     }
 
     public void setAttributes(final double[] attributes) {
@@ -72,6 +74,15 @@ public abstract class SimElement {
         this.dist = dist;
     }
 
+    private double dist = 0;
+
+    public static double dangerMAX = 200;
+
+    public SimElement(int id) {
+        this.id = id;
+        danger = 0;
+    }
+
     public void calcDanger() {
         double danger = 0;
         danger += getAttribute(SimElement.ALCOHOL);
@@ -87,15 +98,11 @@ public abstract class SimElement {
         setDanger(danger);
     }
 
-    public double getAttribute(int index) {
-        return attributes[index];
+    public void setDanger(double danger) {
+        this.danger = danger;
     }
 
     public double getDanger() {
         return danger;
-    }
-
-    public void setDanger(double danger) {
-        this.danger = danger;
     }
 }

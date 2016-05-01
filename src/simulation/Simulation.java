@@ -11,7 +11,7 @@ import model.*;
  */
 public class Simulation extends AnimationTimer {
 
-    private final boolean laptop = false;//true;
+    private final boolean laptop = true;//true;
     private List<Student>  students;
     private List<Location> locations;
 
@@ -38,6 +38,8 @@ public class Simulation extends AnimationTimer {
     private double   semesterprogress                     = 0;
     public  double   onesemesterisxdays                   = 3;
     private boolean  klausurzeit                          = false;
+    private double   discokillness                        = 3;
+    private double   elsehealness                         = 1;
 
     private long   lastnano                    = 0;
     private double simspeed                    = 2;
@@ -85,29 +87,33 @@ public class Simulation extends AnimationTimer {
     }
 
 
-    private void setLaptopConfig() {
+    private void setlaptopconfig() {
         attributesInfluence = 1; //0.2    #1
         distanceStudentInfluence = 1;//1        #1
-        distanceLocationInfluence = 0.06;//0.1   #0.06
+        distanceLocationInfluence = 0.05;//0.1   #0.06
         directionInfluence = 0.1;        //#0.1
         studentInfluence = 1;
         locationInfluence = 1;
         timelineInfluence = 1;           //#1
         studentsPrioMAX = 0.0;
         locationsPrioMAX = 0.0;
-        studentsVMAX = 0.6;//0.5   //#0.6
+        studentsVMAX = 0.7;//0.5   //#0.6
         directionInfluenceByStudents = 0.0002; //0.0002  #0.0002
-        directionInfluenceByLocations = 0.001;//0.002       #0.001
+        directionInfluenceByLocations = 0.0007;//0.002       #0.001
         attributesInfluenceByStudents = 0.000000001;//0.1 #0.000000001
         attributesInfluenceByLocations = 0.00001;//0.003  #0.00001
         adjustattributesInfluenceByStudents = 0.000001;//0.000001  #0.000001
         adjustattributesInfluenceByLocations = 0.00000000001;//0.00000001  #0.00000000001
         minGapBetweenStudents = 1;
-        healthdecreaseondanger = 0.05; //#0.05
-        onesemesterisxdays = 3;
-        stay_factor = 0.02;
+        //healthdecreaseondanger = 0.05; //#0.05
+        //onesemesterisxdays=3;
+        healthdecreaseondanger *= 2;
+        stay_factor = 0.1;
         leadershipinfluence = 1;
         attributesinfluenceinsidelocation = 0.001;
+        klausurdeath = 0.0015;
+        discokillness = 10;
+        elsehealness = 3;
     }
 
     private void simStudent(Student student, long elapsed) {
@@ -170,7 +176,10 @@ public class Simulation extends AnimationTimer {
             v1 = student.getAttribute(i);
             v2 = student.getInsidelocation().getAttribute(i);
             if (student.getInsidelocation().getName().equals("Disco")) {
-                f = 3;
+                f = discokillness;
+            }
+            else {
+                f = elsehealness;
             }
             student.setAttributes(i, v1 + (v2 - v1) * attributesinfluenceinsidelocation * f);
         }
@@ -186,6 +195,7 @@ public class Simulation extends AnimationTimer {
         double attributesDifference;
         double distance;
         double direction;
+        double priority = 0.0;
         studentsPrioMAX = 0.0;
         double[] refAttr = referenceStudent.getAttributes();
         for (Student student : students) {
@@ -279,7 +289,7 @@ public class Simulation extends AnimationTimer {
                     day++;
                     time[0] = 0;
                 }
-                handleSemesterProgress();
+                handlesemesterprogress();
             }
         }
         if (((int) time[1]) != lastmin) {
@@ -431,9 +441,9 @@ public class Simulation extends AnimationTimer {
         }
     }
 
-    private void handleSemesterProgress() { //called every minute
+    private void handlesemesterprogress() { //called every minute
         semesterprogress = (((day - 1) + time[0] / 24) % onesemesterisxdays) / onesemesterisxdays;
-        m_dhimulate.setSemesterProgress(semesterprogress);
+        m_dhimulate.setsemesterprogress(semesterprogress);
         if (semesterprogress >= 0.9) {
             if (!klausurzeit) {
                 m_dhimulate.handleKlausuren();
@@ -441,13 +451,14 @@ public class Simulation extends AnimationTimer {
             }
         }
 
-        if (day == (day % onesemesterisxdays) + 2 && klausurzeit) {
+        if ((day - 1) % (onesemesterisxdays) == 0 && klausurzeit && day != 1) {
             klausurzeit = false;
-            if (day == (onesemesterisxdays + 1 * 6)) {
-                m_dhimulate.handleSimulationEnd();
+            if (m_dhimulate.getSemestercnt() == 6) {
+                m_dhimulate.handlesimulationend();
             }
             else {
-                m_dhimulate.handleSemesterEnd();
+                m_dhimulate.handlesemesterend();
+                day = 1;
             }
         }
 
@@ -460,7 +471,7 @@ public class Simulation extends AnimationTimer {
         lastnano = System.nanoTime();
         running = true;
         if (laptop) {
-            setLaptopConfig();
+            setlaptopconfig();
         }
     }
 

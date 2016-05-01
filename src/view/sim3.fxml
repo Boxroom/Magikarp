@@ -1,119 +1,173 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.effect.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.image.*?>
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.text.Font?>
-
 <!-- @author Nils Wende -->
 
-<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="350.0" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.simController">
-   <children>
-      <ImageView fitHeight="800.0" fitWidth="1300.0" layoutY="53.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@bg2.png" />
-         </image>
-      </ImageView>
-      <GridPane fx:id="toppane" minWidth="350.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="0.0" minWidth="70.0" percentWidth="20.0" />
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="0.0" minWidth="210.0" percentWidth="60.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="0.0" minWidth="70.0" percentWidth="20.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <StackPane fx:id="stackpane" prefHeight="150.0" prefWidth="200.0" GridPane.columnIndex="1">
-               <children>
-                  <ProgressBar fx:id="semesterprogress" prefHeight="18.0" prefWidth="846.0" progress="0.0" />
-               </children>
-            </StackPane>
-            <Label fx:id="semesterLabel" text="Semesterfortschritt" GridPane.halignment="RIGHT" />
-            <Button fx:id="pauseButton" minWidth="30.0" mnemonicParsing="false" text="Pause" GridPane.columnIndex="2" GridPane.halignment="LEFT" />
-            <Label fx:id="timeLabel" alignment="TOP_LEFT" contentDisplay="RIGHT" minWidth="70.0" text="Tag " GridPane.columnIndex="2" GridPane.halignment="RIGHT">
-               <GridPane.margin>
-                  <Insets left="20.0" />
-               </GridPane.margin>
-            </Label>
-            <Label fx:id="studentenLabel" text="Studenten(aktuell/start)" />
-            <Label fx:id="semestercnt" text="1. Semester" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
-         </children>
-      </GridPane>
-      <Separator prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0" />
-      <ImageView id="home" fx:id="home" fitHeight="46.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@bed.png" />
-         </image>
-      </ImageView>
-      <ImageView id="bib" fx:id="bib" fitHeight="43.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@book.png" />
-         </image>
-      </ImageView>
-      <ImageView id="disco" fx:id="disco" fitHeight="44.0" fitWidth="44.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@disco.png" />
-         </image>
-      </ImageView>
-      <ImageView id="uni" fx:id="uni" fitHeight="44.0" fitWidth="87.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@uni.png" />
-         </image>
-      </ImageView>
-      <Rectangle fx:id="darkness" arcHeight="5.0" arcWidth="5.0" fill="#0c082c" height="691.0" layoutY="53.0" opacity="0.73" stroke="BLACK" strokeType="INSIDE" width="1300.0" />
-      <Label fx:id="lectureLabel" layoutX="620.0" layoutY="331.0" text="Vorlesungsbeginn!" textAlignment="CENTER" textFill="WHITE" visible="false">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </Label>
-      <Label fx:id="sleepingLabel" layoutX="630.0" layoutY="341.0" text="Schlafenszeit!" textAlignment="CENTER" textFill="WHITE" visible="false">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </Label>
-      <Label fx:id="partyLabel" layoutX="640.0" layoutY="351.0" text="Party!" textAlignment="CENTER" textFill="WHITE" visible="false">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </Label>
-      <Label fx:id="learningLabel" layoutX="650.0" layoutY="361.0" text="Endlich lernen!" textAlignment="CENTER" textFill="WHITE" visible="false">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </Label>
-      <Label fx:id="examLabel" layoutX="660.0" layoutY="371.0" text="Klausuren!" textAlignment="CENTER" textFill="WHITE" visible="false">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </Label>
-      <Pane fx:id="klausurenpane" layoutX="1000.0" layoutY="320.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-1044.0">
-         <children>
-            <Rectangle fx:id="darkness1" arcHeight="5.0" arcWidth="5.0" fill="RED" height="96.0" opacity="0.39" stroke="BLACK" strokeType="INSIDE" width="1324.0" />
-            <Label layoutX="500.0" layoutY="10.0" text="KLAUSUREN" textFill="WHITE">
-               <font>
-                  <Font name="System Bold" size="46.0" />
-               </font>
-            </Label>
-         </children>
-      </Pane>
-   </children>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.*?>
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="350.0"
+            prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controller.simController">
+    <children>
+        <ImageView fitHeight="800.0" fitWidth="1300.0" layoutY="53.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@bg2.png"/>
+            </image>
+        </ImageView>
+        <GridPane fx:id="toppane" minWidth="350.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
+                  AnchorPane.topAnchor="10.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="0.0" minWidth="70.0" percentWidth="20.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="0.0" minWidth="210.0" percentWidth="60.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="0.0" minWidth="70.0" percentWidth="20.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <StackPane fx:id="stackpane" prefHeight="150.0" prefWidth="200.0" GridPane.columnIndex="1">
+                    <children>
+                        <ProgressBar fx:id="semesterprogress" prefHeight="18.0" prefWidth="846.0" progress="0.0"/>
+                    </children>
+                </StackPane>
+                <Label fx:id="semesterLabel" text="Semesterfortschritt" GridPane.halignment="RIGHT"/>
+                <Button fx:id="pauseButton" minWidth="30.0" mnemonicParsing="false" text="Pause"
+                        GridPane.columnIndex="2" GridPane.halignment="LEFT"/>
+                <Label fx:id="timeLabel" alignment="TOP_LEFT" contentDisplay="RIGHT" minWidth="70.0" text="Tag "
+                       GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                    <GridPane.margin>
+                        <Insets left="20.0"/>
+                    </GridPane.margin>
+                </Label>
+                <Label fx:id="studentenLabel" text="Studenten(aktuell/start)"/>
+                <Label fx:id="semestercnt" text="1. Sem." GridPane.columnIndex="2" GridPane.halignment="CENTER"/>
+            </children>
+        </GridPane>
+        <Separator prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                   AnchorPane.topAnchor="50.0"/>
+        <ImageView id="home" fx:id="home" fitHeight="46.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@bed.png"/>
+            </image>
+        </ImageView>
+        <ImageView id="bib" fx:id="bib" fitHeight="43.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@book.png"/>
+            </image>
+        </ImageView>
+        <ImageView id="disco" fx:id="disco" fitHeight="44.0" fitWidth="44.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@disco.png"/>
+            </image>
+        </ImageView>
+        <ImageView id="uni" fx:id="uni" fitHeight="44.0" fitWidth="87.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@uni.png"/>
+            </image>
+        </ImageView>
+        <Rectangle fx:id="darkness" arcHeight="5.0" arcWidth="5.0" fill="#0c082c" height="691.0" layoutY="53.0"
+                   opacity="0.73" stroke="BLACK" strokeType="INSIDE" width="1300.0"/>
+        <Label fx:id="lectureLabel" layoutX="620.0" layoutY="331.0" text="Vorlesungsbeginn!" textAlignment="CENTER"
+               textFill="WHITE" visible="false">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Label>
+        <Label fx:id="sleepingLabel" layoutX="630.0" layoutY="341.0" text="Schlafenszeit!" textAlignment="CENTER"
+               textFill="WHITE" visible="false">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Label>
+        <Label fx:id="partyLabel" layoutX="640.0" layoutY="351.0" text="Party!" textAlignment="CENTER" textFill="WHITE"
+               visible="false">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Label>
+        <Label fx:id="learningLabel" layoutX="650.0" layoutY="361.0" text="Endlich lernen!" textAlignment="CENTER"
+               textFill="WHITE" visible="false">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Label>
+        <Label fx:id="examLabel" layoutX="660.0" layoutY="371.0" text="Klausuren!" textAlignment="CENTER"
+               textFill="WHITE" visible="false">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Label>
+        <Pane fx:id="klausurenpane" layoutX="1000.0" layoutY="320.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="-1044.0">
+            <children>
+                <Rectangle fx:id="darkness1" arcHeight="5.0" arcWidth="5.0" fill="RED" height="96.0" opacity="0.39"
+                           stroke="BLACK" strokeType="INSIDE" width="1324.0"/>
+                <Label layoutX="500.0" layoutY="10.0" text="KLAUSUREN" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="46.0"/>
+                    </font>
+                </Label>
+            </children>
+        </Pane>
+        <TitledPane fx:id="semesterbericht" layoutX="476.0" layoutY="191.0" prefHeight="400.0" prefWidth="400.0"
+                    text="Semesterbericht" collapsible="false">
+            <content>
+                <GridPane>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="184.0" minWidth="10.0" prefWidth="165.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="213.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <children>
+                        <Label text="Lernen" GridPane.rowIndex="1">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Team" GridPane.rowIndex="2">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Alkohol" GridPane.rowIndex="3">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Führung" GridPane.rowIndex="4">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Party" GridPane.rowIndex="5">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Studenten">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                    </children>
+                </GridPane>
+            </content>
+        </TitledPane>
+        <ProgressBar fx:id="studentenBar" layoutX="630.0" layoutY="245.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="lernenBar" layoutX="630.0" layoutY="305.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="teamBar" layoutX="630.0" layoutY="365.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="alkoholBar" layoutX="630.0" layoutY="425.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="fuhrungBar" layoutX="630.0" layoutY="485.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="partyBar" layoutX="630.0" layoutY="545.0" prefWidth="200.0" progress="0.0"/>
+    </children>
 </AnchorPane>

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -21,33 +23,59 @@ import simulation.Simulation;
  * @author Jendrik, nilsw
  */
 public class Dhimulate extends Application {
-    private static final Map<String, Scene> m_ScenesMap   = new HashMap<>();
-    public static        int                MAXStudentCNT = 200;
+    private static final Map<String, Scene> m_ScenesMap = new HashMap<>();
     private static Stage      m_PrimaryStage;
     private static Simulation m_Simulation;
-    private static Label      timelabel;
-    private static Label      studentslabel;
-    private static Label      semesterlabel;
-    private static Rectangle  darkness;
     private        String     m_OS;
-    private int      StudentCNT          = 100;
-    private int      StudentNumberStart  = 0;
-    private int      StudentNumber       = 0;
-    private double[] referenceAttributes = new double[SimElement.ATTR_COUNT];
+    public static int      MAXStudentCNT       = 200;
+    private       int      StudentCNT          = 100;
+    private       int      StudentNumberStart  = 0;
+    private       int      StudentNumber       = 0;
+    private       double[] referenceattributes = new double[SimElement.ATTR_COUNT];
     private List<Student>  m_students;
     private List<Location> m_locations;
     private String MainGameSceneName    = "sim3";
-    private double adjustingToReference = 0.5;
-    private StackPane   topPane;
-    private ProgressBar semesterProgress;
-    private Button      m_pauseButton;
-    private Pane        klausurenPane;
-    private Label       semesterCntLabel;
-    private int semestercnt = 1;
+    private double adjustingtoreference = 0.5;
+    private static Label       timelabel;
+    private static Label       studentslabel;
+    private static Label       semesterlabel;
+    private        StackPane   toppane;
+    private static Rectangle   darkness;
+    private        ProgressBar semesterprogress;
+    private        Button      m_pausebutton;
+    private        Pane        klausurenpane;
+    private        Label       semestercntLabel;
 
-    public static void main(String[] args) {
-        launch(args);
+    public int getSemestercnt() {
+        return semestercnt;
     }
+
+    private int semestercnt = 1;
+    private TitledPane  zwischenstand;
+    private ProgressBar studentenBar;
+    private ProgressBar teamBar;
+    private ProgressBar partyBar;
+    private ProgressBar lernenBar;
+    private ProgressBar fuhrungBar;
+    private ProgressBar alkoholBar;
+    private double[] startAttributes   = new double[SimElement.ATTR_COUNT];
+    private double[] currentAttributes = new double[SimElement.ATTR_COUNT];
+    private boolean  semesterend       = false;
+
+    private ProgressBar studentenBarv;
+    private ProgressBar teamBarv;
+    private ProgressBar partyBarv;
+    private ProgressBar lernenBarv;
+    private ProgressBar fuhrungBarv;
+    private ProgressBar alkoholBarv;
+
+    private ProgressBar studentenBarn;
+    private ProgressBar teamBarn;
+    private ProgressBar partyBarn;
+    private ProgressBar lernenBarn;
+    private ProgressBar fuhrungBarn;
+    private ProgressBar alkoholBarn;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -60,96 +88,141 @@ public class Dhimulate extends Application {
         primaryStage.show();
 
 
-        ((Button) getScene("config").lookup("#startButton")).setOnAction(event -> {
-            referenceAttributes[SimElement.ALCOHOL] = ((Slider) getScene("config").lookup("#alcSlider")).getValue();
+        ((Button) getScene("config").lookup("#startButton")).setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                referenceattributes[SimElement.ALCOHOL] = ((Slider) getScene("config").lookup("#alcSlider")).getValue();
 
-            referenceAttributes[SimElement.PARTY] = ((Slider) getScene("config").lookup("#partySlider")).getValue();
-            referenceAttributes[SimElement.LEADERSHIP] = ((Slider) getScene("config").lookup("#leaderSlider")).getValue();
-            referenceAttributes[SimElement.TEAM] = ((Slider) getScene("config").lookup("#teamSlider")).getValue();
-            referenceAttributes[SimElement.LEARNING] = ((Slider) getScene("config").lookup("#learnSlider")).getValue();
-            StudentCNT = (int) ((((Slider) getScene("config").lookup("#countSlider")).getValue() / 100) * MAXStudentCNT);
-            StudentNumberStart = StudentCNT;
-            StudentNumber = StudentCNT;
-            System.out.println(((Slider) getScene("config").lookup("#countSlider")).getValue());
-            configAndStartSim();
+                referenceattributes[SimElement.PARTY] = ((Slider) getScene("config").lookup("#partySlider")).getValue();
+                referenceattributes[SimElement.LEADERSHIP] = ((Slider) getScene("config").lookup("#leaderSlider")).getValue();
+                referenceattributes[SimElement.TEAM] = ((Slider) getScene("config").lookup("#teamSlider")).getValue();
+                referenceattributes[SimElement.LEARNING] = ((Slider) getScene("config").lookup("#learnSlider")).getValue();
+                StudentCNT = (int) ((((Slider) getScene("config").lookup("#countSlider")).getValue() / 100) * MAXStudentCNT);
+                StudentNumberStart = StudentCNT;
+                StudentNumber = StudentCNT;
+                System.out.println(((Slider) getScene("config").lookup("#countSlider")).getValue());
+                configandstartSim();
+            }
         });
 
-        ((Button) getScene(MainGameSceneName).lookup("#pauseButton")).setOnAction(event -> handlePause((Button) event.getSource()));
+        ((Button) getScene(MainGameSceneName).lookup("#pauseButton")).setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                handlepause((Button) event.getSource());
+            }
+        });
+
+        ((Button) getScene("report2").lookup("#save")).setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                save();
+            }
+        });
 
         timelabel = ((Label) getScene(MainGameSceneName).lookup("#timeLabel"));
         semesterlabel = ((Label) getScene(MainGameSceneName).lookup("#semesterLabel"));
         studentslabel = ((Label) getScene(MainGameSceneName).lookup("#studentenLabel"));
         darkness = ((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
-        semesterProgress = ((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
-        topPane = ((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
-        m_pauseButton = (Button) getScene(getMainGameSceneName()).lookup("#pauseButton");
-        klausurenPane = (Pane) getScene(getMainGameSceneName()).lookup("#klausurenpane");
-        semesterCntLabel = ((Label) getScene(MainGameSceneName).lookup("#semestercnt"));
+        semesterprogress = ((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
+        toppane = ((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
+        m_pausebutton = (Button) getScene(getMainGameSceneName()).lookup("#pauseButton");
+        klausurenpane = (Pane) getScene(getMainGameSceneName()).lookup("#klausurenpane");
+        zwischenstand = (TitledPane) getScene(getMainGameSceneName()).lookup("#semesterbericht");
+        semestercntLabel = ((Label) getScene(MainGameSceneName).lookup("#semestercnt"));
+
+        studentenBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#studentenBar"));
+        teamBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#teamBar"));
+        partyBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#partyBar"));
+        lernenBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#lernenBar"));
+        fuhrungBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#fuhrungBar"));
+        alkoholBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#alkoholBar"));
+
+        studentenBarv = ((ProgressBar) getScene("report2").lookup("#studentenBarv"));
+        teamBarv = ((ProgressBar) getScene("report2").lookup("#teamBarv"));
+        partyBarv = ((ProgressBar) getScene("report2").lookup("#partyBarv"));
+        lernenBarv = ((ProgressBar) getScene("report2").lookup("#lernenBarv"));
+        fuhrungBarv = ((ProgressBar) getScene("report2").lookup("#fuhrungBarv"));
+        alkoholBarv = ((ProgressBar) getScene("report2").lookup("#alkoholBarv"));
+
+        studentenBarn = ((ProgressBar) getScene("report2").lookup("#studentenBarn"));
+        teamBarn = ((ProgressBar) getScene("report2").lookup("#teamBarn"));
+        partyBarn = ((ProgressBar) getScene("report2").lookup("#partyBarn"));
+        lernenBarn = ((ProgressBar) getScene("report2").lookup("#lernenBarn"));
+        fuhrungBarn = ((ProgressBar) getScene("report2").lookup("#fuhrungBarn"));
+        alkoholBarn = ((ProgressBar) getScene("report2").lookup("#alkoholBarn"));
     }
 
-    //load all scenes from the view folder
-    private void loadScenes() {
-        String path = "";
-        try {
-            path = new File(".").getCanonicalPath();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        List<String> files = getFilesOsDependent(path);
-        fillScenesMap(files);
-    }
-
-    public Scene getScene(String name) { //unsauber!!!
-        return m_ScenesMap.get(name);
-    }
-
-    private void configAndStartSim() {
-        initGame();
-        m_PrimaryStage.setScene(getScene(MainGameSceneName));
-        m_Simulation.start();
-    }
-
-    public void handlePause(Button b) {
+    public void handlepause(Button b) {
         if (m_Simulation.isRunning()) {
             m_Simulation.stop();
             b.setText("Weiter");
         }
         else {
+            if (semesterend) {
+                startnewsemester();
+            }
             m_Simulation.start();
             b.setText("Stop");
         }
     }
 
-    public String getMainGameSceneName() {
-        return MainGameSceneName;
+
+    private void getConstants() {
+        m_Simulation.onesemesterisxdays = ((Slider) getScene("config").lookup("#onesemesterisxdaysSlider")).getValue();
+        m_Simulation.healthdecreaseondanger = ((Slider) getScene("config").lookup("#healthdecreaseondangerSlider")).getValue();
+        m_Simulation.adjustattributesInfluenceByStudents = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByStudentsSlider")).getValue();
+        m_Simulation.adjustattributesInfluenceByLocations = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByLocationsSlider")).getValue();
+        m_Simulation.directionInfluenceByStudents = ((Slider) getScene("config").lookup("#directionInfluenceByStudentsSlider")).getValue();
+        m_Simulation.directionInfluenceByLocations = ((Slider) getScene("config").lookup("#directionInfluenceByLocationsSlider")).getValue();
+        m_Simulation.timelineInfluence = ((Slider) getScene("config").lookup("#timelineInfluenceSlider")).getValue();
+        m_Simulation.distanceStudentInfluence = ((Slider) getScene("config").lookup("#distanceStudentInfluenceSlider")).getValue();
+        m_Simulation.distanceLocationInfluence = ((Slider) getScene("config").lookup("#distanceLocationInfluenceSlider")).getValue();
     }
 
-    //to fix issues between the way linux stores files and the way windows does
-    private List<String> getFilesOsDependent(final String path) {
-        File folder;
-        if (isWindows()) {
-            folder = new File(path + "\\src\\view");
+    public void updateTime(int day, double[] time) {
+        timelabel.setText(day + ". Tag" + "  " + stockTime("" + ((int) time[0])) + ":" + stockTime("" + ((int) time[1]))/*+":"+((int)time[2])*/ + "Uhr");
+        if (time[0] > 12) {
+            darkness.setOpacity(-0.3 + ((time[0] % 12) / 12));
         }
         else {
-            folder = new File(path + "/src/view");
+            darkness.setOpacity(0.7 - ((time[0] / 12)));
         }
-        return getAllFilesOfFolder(folder);
     }
 
-    //Fill the different levels with objects etc.
-    private void fillScenesMap(List<String> files) {
-        String name;
-        for (String filename : files) {
-            try {
-                name = filename.split("\\.")[0];
-                Scene scene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("view/" + filename)));
-                m_ScenesMap.put(name, scene);
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
+    private void updateStudentsLabel() {
+        studentslabel.setText("Studenten: " + StudentNumber + "/" + StudentNumberStart);
+    }
+
+    public void killStudent(Student s) {
+        if (s != null) {
+            StudentNumber--;
+            updateStudentsLabel();
+            s.die();
         }
+    }
+
+    private String stockTime(String part) {
+        if (part.length() != 2) {
+            part = "0" + part;
+        }
+        return part;
+    }
+
+    private void configandstartSim() {
+        initGame();
+        m_PrimaryStage.setScene(getScene(MainGameSceneName));
+        klausurenpane.toFront();
+        zwischenstand.toFront();
+
+        lernenBar.toFront();
+        studentenBar.toFront();
+        partyBar.toFront();
+        alkoholBar.toFront();
+        fuhrungBar.toFront();
+        teamBar.toFront();
+
+        toppane.toFront();
+        m_Simulation.start();
     }
 
     private void initGame() {
@@ -157,24 +230,67 @@ public class Dhimulate extends Application {
         createStudents(StudentCNT);
         m_Simulation = new Simulation(this, m_students, m_locations);
         getConstants();
-        topPane.toFront();
-        klausurenPane.setVisible(false);
+        handlezwischenstand(false);
+        calcAttributesTotal(startAttributes);
     }
 
-    //check if the os is windows
-    private boolean isWindows() {
-        return getOsName().startsWith("Windows");
+    private void handlezwischenstand(boolean b) {
+        klausurenpane.setVisible(b);
+        zwischenstand.setVisible(b);
+        lernenBar.setVisible(b);
+        studentenBar.setVisible(b);
+        partyBar.setVisible(b);
+        alkoholBar.setVisible(b);
+        fuhrungBar.setVisible(b);
+        teamBar.setVisible(b);
     }
 
-    //load all files from the specified folder
-    private List<String> getAllFilesOfFolder(final File folder) {
-        List<String> files = new LinkedList<>();
-        for (final File fileEntry : folder.listFiles()) {
-            if (!fileEntry.isDirectory() && fileEntry.getName().matches("(.*)fxml")) {
-                files.add(fileEntry.getName());
+    private void createStudents(int cnt) {
+        //create new list
+        m_students = new LinkedList<>();
+        Circle c;
+        Student s;
+        ImageView img;
+        if (cnt < MAXStudentCNT) {
+            for (int i = 0; i < cnt; i++) {
+                //create new student object
+                s = new Student(i);
+
+                //get circle object
+                c = (Circle) getScene(MainGameSceneName).lookup("#student" + i);
+
+                //get death object
+                img = (ImageView) getScene(MainGameSceneName).lookup("#death" + i);
+
+                //add circle to student
+                s.setCircle(c);
+
+                //add circle to student
+                s.setDeathImg(img);
+
+                //setAttributes
+                for (int p = 0; p < SimElement.ATTR_COUNT; p++) {
+                    s.setAttributes(p, Math.random() * 100);
+                }
+
+                //adjust attributes according to reference attributes
+                double dif;
+                for (int p = 0; p < SimElement.ATTR_COUNT; p++) {
+                    dif = referenceattributes[p] - s.getAttribute(p);
+                    s.setAttributes(p, s.getAttribute(p) + dif * Math.random() * adjustingtoreference);
+                }
+
+                //add student to list
+                m_students.add(s);
             }
         }
-        return files;
+        if (cnt < MAXStudentCNT) {
+            for (int i = cnt; i < MAXStudentCNT; i++) {
+                c = (Circle) getScene(MainGameSceneName).lookup("#student" + i);
+                c.setVisible(false);
+            }
+        }
+        updateStudentsLabel();
     }
 
     private void createLocations() {
@@ -245,60 +361,34 @@ public class Dhimulate extends Application {
         }
     }
 
-    private void createStudents(int cnt) {
-        //create new list
-        m_students = new LinkedList<>();
-        Circle c;
-        Student s;
-        ImageView img;
-        if (cnt <= MAXStudentCNT) {
-            for (int i = 0; i < cnt; i++) {
-
-                //get circle object
-                c = (Circle) getScene(MainGameSceneName).lookup("#student" + i);
-
-                //get death object
-                img = (ImageView) getScene(MainGameSceneName).lookup("#death" + i);
-
-                //create new student object
-                s = new Student(i, c);
-
-                //add death img to student
-                s.setDeathImg(img);
-
-                //setAttributes at random
-                for (int p = 0; p < SimElement.ATTR_COUNT; p++) {
-                    s.setAttributes(p, Math.random() * 100);
-                }
-
-                //adjust attributes according to reference attributes
-                double dif;
-                for (int p = 0; p < SimElement.ATTR_COUNT; p++) {
-                    dif = referenceAttributes[p] - s.getAttribute(p);
-                    s.setAttributes(p, s.getAttribute(p) + dif * Math.random() * adjustingToReference);
-                }
-
-                //add student to list
-                m_students.add(s);
-            }
-            for (int i = cnt; i < MAXStudentCNT; i++) {
-                c = (Circle) getScene(MainGameSceneName).lookup("#student" + i);
-                c.setVisible(false);
-            }
+    //load all scenes from the view folder
+    private void loadScenes() {
+        String path = "";
+        try {
+            path = new File(".").getCanonicalPath();
         }
-        updateStudentsLabel();
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        List<String> files = getFilesOsDependent(path);
+        fillScenesMap(files);
     }
 
-    private void getConstants() {
-        m_Simulation.onesemesterisxdays = ((Slider) getScene("config").lookup("#onesemesterisxdaysSlider")).getValue();
-        m_Simulation.healthdecreaseondanger = ((Slider) getScene("config").lookup("#healthdecreaseondangerSlider")).getValue();
-        m_Simulation.adjustattributesInfluenceByStudents = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByStudentsSlider")).getValue();
-        m_Simulation.adjustattributesInfluenceByLocations = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByLocationsSlider")).getValue();
-        m_Simulation.directionInfluenceByStudents = ((Slider) getScene("config").lookup("#directionInfluenceByStudentsSlider")).getValue();
-        m_Simulation.directionInfluenceByLocations = ((Slider) getScene("config").lookup("#directionInfluenceByLocationsSlider")).getValue();
-        m_Simulation.timelineInfluence = ((Slider) getScene("config").lookup("#timelineInfluenceSlider")).getValue();
-        m_Simulation.distanceStudentInfluence = ((Slider) getScene("config").lookup("#distanceStudentInfluenceSlider")).getValue();
-        m_Simulation.distanceLocationInfluence = ((Slider) getScene("config").lookup("#distanceLocationInfluenceSlider")).getValue();
+    //to fix issues between the way linux stores files and the way windows does
+    private List<String> getFilesOsDependent(final String path) {
+        File folder;
+        if (isWindows()) {
+            folder = new File(path + "\\src\\view");
+        }
+        else {
+            folder = new File(path + "/src/view");
+        }
+        return getAllFilesOfFolder(folder);
+    }
+
+    //check if the os is windows
+    private boolean isWindows() {
+        return getOsName().startsWith("Windows");
     }
 
     private String getOsName() {
@@ -308,36 +398,29 @@ public class Dhimulate extends Application {
         return m_OS;
     }
 
-    private void updateStudentsLabel() {
-        studentslabel.setText("Studenten: " + StudentNumber + "/" + StudentNumberStart);
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    public void updateTime(int day, double[] time) {
-        timelabel.setText(day + ". Tag" + "  " + stockTime("" + ((int) time[0])) + ":" + stockTime("" + ((int) time[1]))/*+":"+((int)time[2])*/ + "Uhr");
-        if (time[0] > 12) {
-            darkness.setOpacity(-0.3 + ((time[0] % 12) / 12));
+    //load all files from the specified folder
+    private List<String> getAllFilesOfFolder(final File folder) {
+        List<String> files = new LinkedList<>();
+        for (final File fileEntry : folder.listFiles()) {
+            if (!fileEntry.isDirectory() && fileEntry.getName().matches("(.*)fxml")) {
+                files.add(fileEntry.getName());
+            }
         }
-        else {
-            darkness.setOpacity(0.7 - ((time[0] / 12)));
-        }
+        return files;
     }
 
-    private String stockTime(String part) {
-        if (part.length() != 2) {
-            part = "0" + part;
-        }
-        return part;
-    }
-
-    public void killStudent(Student s) {
-        if (s != null) {
-            StudentNumber--;
-            updateStudentsLabel();
-            s.die();
+    //Fill the different levels with objects etc.
+    private void fillScenesMap(List<String> files) {
+        String name;
+        for (String filename : files) {
+            try {
+                name = filename.split("\\.")[0];
+                Scene scene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("view/" + filename)));
+                m_ScenesMap.put(name, scene);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -351,8 +434,20 @@ public class Dhimulate extends Application {
         return true;
     }
 
+    public Scene getScene(String name) { //unsauber!!!
+        return m_ScenesMap.get(name);
+    }
+
     private Stage getPrimaryStage() {
         return m_PrimaryStage;
+    }
+
+    @Override
+    public void stop() {
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 
     public List<Student> getStudents() {
@@ -363,45 +458,90 @@ public class Dhimulate extends Application {
         return m_locations;
     }
 
-    public void setSemesterProgress(double p) {
-        semesterProgress.setProgress(p);
+    public void setsemesterprogress(double p) {
+        semesterprogress.setProgress(p);
+    }
+
+    public String getMainGameSceneName() {
+        return MainGameSceneName;
+    }
+
+    public void handlesemesterend() {
+        handlepause(m_pausebutton);
+        klausurenpane.setVisible(false);
+        semestercnt++;
+        semestercntLabel.setText(semestercnt + ". Sem.");
+        calcAttributesTotal(currentAttributes);
+
+        studentenBar.setProgress((double) StudentNumber / (double) StudentNumberStart);
+        teamBar.setProgress(currentAttributes[SimElement.TEAM] / 100);
+        partyBar.setProgress(currentAttributes[SimElement.PARTY] / 100);
+        lernenBar.setProgress(currentAttributes[SimElement.LEARNING] / 100);
+        fuhrungBar.setProgress(currentAttributes[SimElement.LEADERSHIP] / 100);
+        alkoholBar.setProgress(currentAttributes[SimElement.ALCOHOL] / 100);
+
+        handlezwischenstand(true);
+        semesterend = true;
+        klausurenpane.setVisible(false);
     }
 
     public void handleKlausuren() {
-        klausurenPane.setVisible(true);
+        klausurenpane.setVisible(true);
     }
 
-    public void handleSimulationEnd() {
-        handleSemesterEnd();
-        showReportScreen();
+    public void handlesimulationend() {
+        handlepause(m_pausebutton);
+        calcAttributesTotal(currentAttributes);
+
+        studentenBarv.setProgress((double) StudentNumberStart / (double) StudentNumberStart);
+        teamBarv.setProgress(startAttributes[SimElement.TEAM] / 100);
+        partyBarv.setProgress(startAttributes[SimElement.PARTY] / 100);
+        lernenBarv.setProgress(startAttributes[SimElement.LEARNING] / 100);
+        fuhrungBarv.setProgress(startAttributes[SimElement.LEADERSHIP] / 100);
+        alkoholBarv.setProgress(startAttributes[SimElement.ALCOHOL] / 100);
+
+        studentenBarn.setProgress((double) StudentNumber / (double) StudentNumberStart);
+        teamBarn.setProgress(currentAttributes[SimElement.TEAM] / 100);
+        partyBarn.setProgress(currentAttributes[SimElement.PARTY] / 100);
+        lernenBarn.setProgress(currentAttributes[SimElement.LEARNING] / 100);
+        fuhrungBarn.setProgress(currentAttributes[SimElement.LEADERSHIP] / 100);
+        alkoholBarn.setProgress(currentAttributes[SimElement.ALCOHOL] / 100);
+
+        m_PrimaryStage.setScene(getScene("report2"));
     }
 
-    public void handleSemesterEnd() {
-        handlePause(m_pauseButton);
-        klausurenPane.setVisible(false);
-        semestercnt++;
-        semesterCntLabel.setText(semestercnt + ". Semester");
-    }
-
-    private void showReportScreen() {
-        calcReport();
-        m_PrimaryStage.setScene(getScene("report"));
-    }
-
-    private void calcReport() {
-        double[] statsAfter = new double[SimElement.ATTR_COUNT + 1];
-        statsAfter[0] = StudentNumber;
-        for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-            statsAfter[i + 1] = getAvgOfAttribute(i);
+    private void calcAttributesTotal(double[] a) {
+        for (int i = 0; i < Student.ATTR_COUNT; i++) {
+            a[i] = 0;
         }
-        Save.save(referenceAttributes, statsAfter);
-    }
-
-    private double getAvgOfAttribute(int i) {
-        double sum = 0.0;
         for (Student student : m_students) {
-            sum += student.getAttribute(i);
+            for (int i = 0; i < Student.ATTR_COUNT; i++) {
+                a[i] += student.getAttribute(i);
+            }
         }
-        return sum / m_students.size();
+        for (int i = 0; i < Student.ATTR_COUNT; i++) {
+            a[i] /= m_students.size();
+        }
+    }
+
+    public void save() {
+        double[] v = new double[SimElement.ATTR_COUNT + 1];
+        double[] n = new double[SimElement.ATTR_COUNT + 1];
+        for (int i = 0; i < SimElement.ATTR_COUNT; i++) {
+            v[i + 1] = startAttributes[i];
+            n[i + 1] = currentAttributes[i];
+        }
+        v[0] = StudentNumberStart;
+        n[0] = StudentNumber;
+        Save.save(v, n);
+    }
+
+    private void startnewsemester() {
+        for (Student student : m_students) {
+            student.setPosition(Math.random() * 1280, 50 + Math.random() * 700);
+            student.setHealth(100);
+        }
+        handlezwischenstand(false);
+        semesterend = false;
     }
 }
