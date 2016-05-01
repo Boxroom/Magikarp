@@ -11,16 +11,16 @@ import model.*;
  */
 public class Simulation extends AnimationTimer {
 
-    private final boolean laptop = false;//true;
-    public double distanceStudentInfluence             = 0.1;//1
-    public double distanceLocationInfluence            = 0.01;//0.1
-    public double timelineInfluence                    = 0.4;
-    public double directionInfluenceByStudents         = 0.0002; //0.0002
-    public double directionInfluenceByLocations        = 0.0002;//0.002
-    public double adjustattributesInfluenceByStudents  = 0.001;//0.000001
-    public double adjustattributesInfluenceByLocations = 0.00000000001;//0.00000001
-    public double healthDecreaseOnDanger               = 0.002;
-    public double oneSemesterIsXDays                   = 3;
+    private final boolean laptop                               = false;//true;
+    public        double  distanceStudentInfluence             = 0.1;//1
+    public        double  distanceLocationInfluence            = 0.01;//0.1
+    public        double  timelineInfluence                    = 0.4;
+    public        double  directionInfluenceByStudents         = 0.0002; //0.0002
+    public        double  directionInfluenceByLocations        = 0.0002;//0.002
+    public        double  adjustattributesInfluenceByStudents  = 0.001;//0.000001
+    public        double  adjustattributesInfluenceByLocations = 0.00000000001;//0.00000001
+    public        double  healthDecreaseOnDanger               = 0.002;
+    public        double  oneSemesterIsXDays                   = 3;
     private List<Student>  students;
     private List<Location> locations;
     private double attributesInfluence            = 1; //0.2
@@ -124,33 +124,6 @@ public class Simulation extends AnimationTimer {
         m_dhimulate.setsemesterprogress(semesterProgress);
     }
 
-
-    private void setlaptopconfig(){
-        attributesInfluence            = 1; //0.2    #1
-        distanceStudentInfluence       = 1;//1        #1
-        distanceLocationInfluence      = 0.06;//0.1   #0.06
-        directionInfluence             = 0.1;        //#0.1
-        studentInfluence               = 1;
-        locationInfluence              = 1;
-        timelineInfluence              = 1;           //#1
-        studentsPrioMAX                = 0.0;
-        locationsPrioMAX               = 0.0;
-        studentsVMAX                   = 0.6;//0.5   //#0.6
-        directionInfluenceByStudents   = 0.0002; //0.0002  #0.0002
-        directionInfluenceByLocations  = 0.001;//0.002       #0.001
-        attributesInfluenceByStudents  = 0.000000001;//0.1 #0.000000001
-        attributesInfluenceByLocations = 0.00001;//0.003  #0.00001
-        adjustattributesInfluenceByStudents  = 0.000001;//0.000001  #0.000001
-        adjustattributesInfluenceByLocations = 0.00000000001;//0.00000001  #0.00000000001
-        minGapBetweenStudents          = 1;
-        healthdecreaseondanger = 0.05; //#0.05
-        onesemesterisxdays=3;
-        stay_factor = 0.02;
-        leadershipinfluence =1;
-        attributesinfluenceinsidelocation = 0.001;
-    }
-
-    private void simStudent(Student student,long elapsed) {
     private void simStudent(Student student, long elapsed) {
         //analyse students
         this.prioritizeStudents(student);
@@ -427,9 +400,34 @@ public class Simulation extends AnimationTimer {
         super.start();
         lastNano = System.nanoTime();
         running = true;
-        if(laptop==true){
-            setlaptopconfig();
+        if (laptop) {
+            setLaptopConfig();
         }
+    }
+
+    private void setLaptopConfig() {
+        attributesInfluence = 1; //0.2    #1
+        distanceStudentInfluence = 1;//1        #1
+        distanceLocationInfluence = 0.06;//0.1   #0.06
+        directionInfluence = 0.1;        //#0.1
+        studentInfluence = 1;
+        locationInfluence = 1;
+        timelineInfluence = 1;           //#1
+        studentsPrioMAX = 0.0;
+        locationsPrioMAX = 0.0;
+        studentsVMAX = 0.6;//0.5   //#0.6
+        directionInfluenceByStudents = 0.0002; //0.0002  #0.0002
+        directionInfluenceByLocations = 0.001;//0.002       #0.001
+        attributesInfluenceByStudents = 0.000000001;//0.1 #0.000000001
+        attributesInfluenceByLocations = 0.00001;//0.003  #0.00001
+        adjustattributesInfluenceByStudents = 0.000001;//0.000001  #0.000001
+        adjustattributesInfluenceByLocations = 0.00000000001;//0.00000001  #0.00000000001
+        minGapBetweenStudents = 1;
+        healthDecreaseOnDanger = 0.05; //#0.05
+        oneSemesterIsXDays = 3;
+        stayFactor = 0.02;
+        leadershipInfluence = 1;
+        attributesInfluenceInsideLocation = 0.001;
     }
 
     @Override
