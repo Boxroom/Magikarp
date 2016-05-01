@@ -14,6 +14,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import model.*;
+import save.Save;
 import simulation.Simulation;
 
 /**
@@ -390,6 +391,19 @@ public class Dhimulate extends Application {
     }
 
     private void calcReport() {
+        double[] statsAfter = new double[SimElement.ATTR_COUNT + 1];
+        statsAfter[0] = StudentNumber;
+        for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
+            statsAfter[i + 1] = getAvgOfAttribute(i);
+        }
+        Save.save(referenceAttributes, statsAfter);
+    }
 
+    private double getAvgOfAttribute(int i) {
+        double sum = 0.0;
+        for (Student student : m_students) {
+            sum += student.getAttribute(i);
+        }
+        return sum / m_students.size();
     }
 }

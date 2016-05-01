@@ -61,7 +61,7 @@ public class Save {
             attr.setValue(tmstamp);
             report.setAttributeNode(attr);
 
-            String[] tags = {"CountBefore", "CountAfter", "AlcoholBefore", "AlcoholAfter", "LeadershipBefore", "LeadershipAfter", "LearningBefore", "LearningAfter", "TeamBefore", "TeamAfter", "PartyBefore", "PartyAfter"};
+            String[] tags = {"CountBefore", "CountAfter", "PartyBefore", "PartyAfter", "LeadershipBefore", "LeadershipAfter", "TeamBefore", "TeamAfter", "LearningBefore", "LearningAfter", "AlcoholBefore", "AlcoholAfter"};
 
             Element element;
             for (int i = 0; i < tags.length; ++i) {
