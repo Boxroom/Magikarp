@@ -69,7 +69,8 @@
                                         <Insets/>
                                     </GridPane.margin>
                                 </Label>
-                                <Slider fx:id="countSlider" value="50.0" GridPane.columnIndex="1"/>
+                                <Slider fx:id="countSlider" value="100.0" GridPane.columnIndex="1" min="50.0"
+                                        max="200.0"/>
                                 <Slider fx:id="teamSlider" value="50.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                                 <Slider fx:id="learnSlider" value="50.0" GridPane.columnIndex="1"
                                         GridPane.rowIndex="2"/>

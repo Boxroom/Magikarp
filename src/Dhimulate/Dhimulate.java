@@ -97,7 +97,7 @@ public class Dhimulate extends Application {
                 referenceattributes[SimElement.LEADERSHIP] = ((Slider) getScene("config").lookup("#leaderSlider")).getValue();
                 referenceattributes[SimElement.TEAM] = ((Slider) getScene("config").lookup("#teamSlider")).getValue();
                 referenceattributes[SimElement.LEARNING] = ((Slider) getScene("config").lookup("#learnSlider")).getValue();
-                StudentCNT = (int) ((((Slider) getScene("config").lookup("#countSlider")).getValue() / 100) * MAXStudentCNT);
+                StudentCNT = (int) ((Slider) getScene("config").lookup("#countSlider")).getValue();
                 StudentNumberStart = StudentCNT;
                 StudentNumber = StudentCNT;
                 System.out.println(((Slider) getScene("config").lookup("#countSlider")).getValue());
