@@ -24,8 +24,9 @@ public class Student extends SimElement {
     private Location insidelocation;
     private int inlocationcnt = 0;
 
-    public Student(int id) {
+    public Student(int id, Circle c) {
         super(id);
+        m_circle = c;
         alive = true;
         setPosition(Math.random() * 1280, 50 + Math.random() * 700);
         setDirection(Math.random(), Math.random());

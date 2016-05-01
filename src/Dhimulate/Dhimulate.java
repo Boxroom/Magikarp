@@ -253,8 +253,6 @@ public class Dhimulate extends Application {
         ImageView img;
         if (cnt <= MAXStudentCNT) {
             for (int i = 0; i < cnt; i++) {
-                //create new student object
-                s = new Student(i);
 
                 //get circle object
                 c = (Circle) getScene(MainGameSceneName).lookup("#student" + i);
@@ -262,10 +260,10 @@ public class Dhimulate extends Application {
                 //get death object
                 img = (ImageView) getScene(MainGameSceneName).lookup("#death" + i);
 
-                //add circle to student
-                s.setCircle(c);
+                //create new student object
+                s = new Student(i, c);
 
-                //add circle to student
+                //add death img to student
                 s.setDeathImg(img);
 
                 //setAttributes at random

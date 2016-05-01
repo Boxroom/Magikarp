@@ -15,7 +15,7 @@ public abstract class SimElement {
     protected int id;
     private Vector2D position = new Vector2D(0, 0);
     private double priority;
-    private double[] attributes = new double[ATTR_COUNT]; /*double, to represent the percentage of the students' composition (30% drinkers, 20% nerds etc.)*/
+    private double[] attributes = new double[ATTR_COUNT];
     private double danger;
     private double dist = 0;
 
