@@ -251,7 +251,7 @@ public class Dhimulate extends Application {
         Circle c;
         Student s;
         ImageView img;
-        if (cnt < MAXStudentCNT) {
+        if (cnt <= MAXStudentCNT) {
             for (int i = 0; i < cnt; i++) {
                 //create new student object
                 s = new Student(i);
