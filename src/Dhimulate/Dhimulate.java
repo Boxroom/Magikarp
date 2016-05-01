@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -88,36 +86,23 @@ public class Dhimulate extends Application {
         primaryStage.show();
 
 
-        ((Button) getScene("config").lookup("#startButton")).setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                referenceattributes[SimElement.ALCOHOL] = ((Slider) getScene("config").lookup("#alcSlider")).getValue();
+        ((Button) getScene("config").lookup("#startButton")).setOnAction(event -> {
+            referenceattributes[SimElement.ALCOHOL] = ((Slider) getScene("config").lookup("#alcSlider")).getValue();
 
-                referenceattributes[SimElement.PARTY] = ((Slider) getScene("config").lookup("#partySlider")).getValue();
-                referenceattributes[SimElement.LEADERSHIP] = ((Slider) getScene("config").lookup("#leaderSlider")).getValue();
-                referenceattributes[SimElement.TEAM] = ((Slider) getScene("config").lookup("#teamSlider")).getValue();
-                referenceattributes[SimElement.LEARNING] = ((Slider) getScene("config").lookup("#learnSlider")).getValue();
-                StudentCNT = (int) ((Slider) getScene("config").lookup("#countSlider")).getValue();
-                StudentNumberStart = StudentCNT;
-                StudentNumber = StudentCNT;
-                System.out.println(((Slider) getScene("config").lookup("#countSlider")).getValue());
-                configandstartSim();
-            }
+            referenceattributes[SimElement.PARTY] = ((Slider) getScene("config").lookup("#partySlider")).getValue();
+            referenceattributes[SimElement.LEADERSHIP] = ((Slider) getScene("config").lookup("#leaderSlider")).getValue();
+            referenceattributes[SimElement.TEAM] = ((Slider) getScene("config").lookup("#teamSlider")).getValue();
+            referenceattributes[SimElement.LEARNING] = ((Slider) getScene("config").lookup("#learnSlider")).getValue();
+            StudentCNT = (int) ((Slider) getScene("config").lookup("#countSlider")).getValue();
+            StudentNumberStart = StudentCNT;
+            StudentNumber = StudentCNT;
+            System.out.println(((Slider) getScene("config").lookup("#countSlider")).getValue());
+            configandstartSim();
         });
 
-        ((Button) getScene(MainGameSceneName).lookup("#pauseButton")).setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                handlepause((Button) event.getSource());
-            }
-        });
+        ((Button) getScene(MainGameSceneName).lookup("#pauseButton")).setOnAction(event -> handlepause((Button) event.getSource()));
 
-        ((Button) getScene("report2").lookup("#save")).setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                save();
-            }
-        });
+        ((Button) getScene("report2").lookup("#save")).setOnAction(event -> save());
 
         timelabel = ((Label) getScene(MainGameSceneName).lookup("#timeLabel"));
         semesterlabel = ((Label) getScene(MainGameSceneName).lookup("#semesterLabel"));
