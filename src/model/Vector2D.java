@@ -34,15 +34,6 @@ public class Vector2D {
         mY += v.mY;
     }
 
-    //substract a vector2D (v) from this Vector2D and return a new Vector2D
-    //this does not change any of the vectors being used
-    public Vector2D subtract(Vector2D v) {
-        Vector2D result = new Vector2D();
-        result.mX = this.mX - v.mX;
-        result.mY = this.mY - v.mY;
-        return result;
-    }
-
     //subtracts a Vector2D (v) from the Vector2D
     //this changes the vector being subtracted from,the vector being subtracted is not changed
     public void subtract2(Vector2D v) {
@@ -60,6 +51,15 @@ public class Vector2D {
     public double getDistanceTo(Vector2D v) {
         final Vector2D connectingVector = this.subtract(v);
         return connectingVector.length();
+    }
+
+    //substract a vector2D (v) from this Vector2D and return a new Vector2D
+    //this does not change any of the vectors being used
+    public Vector2D subtract(Vector2D v) {
+        Vector2D result = new Vector2D();
+        result.mX = this.mX - v.mX;
+        result.mY = this.mY - v.mY;
+        return result;
     }
 
     //returns the length of the Vector2D

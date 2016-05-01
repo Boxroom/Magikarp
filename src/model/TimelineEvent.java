@@ -5,7 +5,7 @@ package model;
  */
 public class TimelineEvent {
     public String name;
-    public double   start, end;
+    public double start, end;
 
     public TimelineEvent(final String name, double start, double end) {
         this.start = start;

@@ -1,17 +1,11 @@
 package Controller;
 
-import Dhimulate.Dhimulate;
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Slider;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-
-import java.net.URL;
-import java.util.ResourceBundle;
 
 /**
  * Created by mlg on 24.04.2016.
@@ -39,7 +33,8 @@ public class configController implements Initializable {
 
     }
 
-    @FXML protected void startSim(ActionEvent event) {
-        ;
+    @FXML
+    protected void startSim(ActionEvent event) {
+
     }
 }
