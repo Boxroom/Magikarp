@@ -17,6 +17,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -45,6 +47,7 @@ public class Dhimulate extends Application {
     private static Label timelabel;
     private static Label studentslabel;
     private static Label semesterlabel;
+    private StackPane toppane;
     private static Rectangle darkness;
     private ProgressBar semesterprogress;
 
@@ -80,13 +83,7 @@ public class Dhimulate extends Application {
         ((Button)getScene(MainGameSceneName).lookup("#pauseButton")).setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(m_Simulation.isRunning()==true){
-                    m_Simulation.stop();
-                    ((Button)event.getSource()).setText("Weiter");
-                }else{
-                    m_Simulation.start();
-                    ((Button)event.getSource()).setText("Stop");
-                }
+                handlepause((Button)event.getSource());
             }
         });
 
@@ -95,6 +92,17 @@ public class Dhimulate extends Application {
         studentslabel=((Label)getScene(MainGameSceneName).lookup("#studentenLabel"));
         darkness=((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
         semesterprogress=((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
+        toppane=((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
+    }
+
+    public void handlepause(Button b){
+        if(m_Simulation.isRunning()==true){
+            m_Simulation.stop();
+            b.setText("Weiter");
+        }else{
+            m_Simulation.start();
+            b.setText("Stop");
+        }
     }
 
     private void getConstants(){
@@ -148,6 +156,7 @@ public class Dhimulate extends Application {
         createStudents(StudentCNT);
         m_Simulation = new Simulation(this,m_students, m_locations);
         getConstants();
+        toppane.toFront();
     }
 
     private void createStudents(int cnt){
@@ -339,7 +348,7 @@ public class Dhimulate extends Application {
         return true;
     }
 
-    private Scene getScene(String name) { //unsauber!!!
+    public Scene getScene(String name) { //unsauber!!!
         return m_ScenesMap.get(name);
     }
 
@@ -364,5 +373,9 @@ public class Dhimulate extends Application {
 
     public void setsemesterprogress(double p) {
         semesterprogress.setProgress(p);
+    }
+
+    public String getMainGameSceneName() {
+        return MainGameSceneName;
     }
 }

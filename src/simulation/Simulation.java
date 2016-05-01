@@ -5,6 +5,7 @@ import java.util.List;
 
 import Dhimulate.Dhimulate;
 import javafx.animation.AnimationTimer;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -51,12 +52,13 @@ public class Simulation extends AnimationTimer {
     private double stay_factor = 0.04;
     private double leadershipinfluence =1;
     private double attributesinfluenceinsidelocation = 0.001;
+    private Button m_pausebutton;
 
     public Simulation(Dhimulate dh,List<Student> students, List<Location> locations){
         this.students = students;
         this.locations = locations;
         time[0]=0;time[1]=0;time[2]=0;
-        day=0;
+        day=1;
         m_dhimulate = dh;
     }
 
@@ -427,13 +429,17 @@ public class Simulation extends AnimationTimer {
     }
 
     private void handlesemesterprogress() { //called every minute
-        semesterprogress=((day+time[0]/24)%onesemesterisxdays)/onesemesterisxdays;
+        semesterprogress=(((day-1)+time[0]/24)%onesemesterisxdays)/onesemesterisxdays;
         m_dhimulate.setsemesterprogress(semesterprogress);
+        if(semesterprogress>=1){
+            m_dhimulate.handlepause(m_pausebutton);
+        }
     }
 
     @Override
     public void start(){
         super.start();
+        m_pausebutton = (Button)m_dhimulate.getScene(m_dhimulate.getMainGameSceneName()).lookup("#pauseButton");
         lastnano=System.nanoTime();
         running = true;
         if(laptop==true){
