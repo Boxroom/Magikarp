@@ -267,7 +267,7 @@ public class Dhimulate extends Application {
                 //add circle to student
                 s.setDeathImg(img);
 
-                //setAttributes
+                //setAttributes at random
                 for (int p = 0; p < SimElement.ATTR_COUNT; p++) {
                     s.setAttributes(p, Math.random() * 100);
                 }
