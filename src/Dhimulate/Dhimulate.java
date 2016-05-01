@@ -69,7 +69,7 @@ public class Dhimulate extends Application {
                 referenceattributes[SimElement.LEADERSHIP]=((Slider)getScene("config").lookup("#leaderSlider")).getValue();
                 referenceattributes[SimElement.TEAM]=((Slider)getScene("config").lookup("#teamSlider")).getValue();
                 referenceattributes[SimElement.LEARNING]=((Slider)getScene("config").lookup("#learnSlider")).getValue();
-                StudentCNT=(int)((((Slider)getScene("config").lookup("#countSlider")).getValue()/100)*MAXStudentCNT);
+                StudentCNT=(int)((((Slider)getScene("config").lookup("#countSlider")).getValue()/105)*MAXStudentCNT);
                 StudentNumberStart=StudentCNT;
                 StudentNumber=StudentCNT;
                 System.out.println(((Slider)getScene("config").lookup("#countSlider")).getValue());
@@ -110,7 +110,7 @@ public class Dhimulate extends Application {
     }
 
     public void updateTime(int day, double[] time){
-        timelabel.setText("Tag "+day+" | "+stockTime(""+((int)time[0]))+":"+stockTime(""+((int)time[1]))/*+":"+((int)time[2])*/+"Uhr");
+        timelabel.setText("Tag "+day+" | "+stockTime(""+((int)time[0]))+":"+stockTime(""+((int)time[1]))+/*":"+stockTime(""+((int)time[2]))+*/"Uhr");
         if(time[0]>12){
             darkness.setOpacity(-0.3+((time[0]%12)/12));
         }else{
@@ -364,5 +364,8 @@ public class Dhimulate extends Application {
 
     public void setsemesterprogress(double p) {
         semesterprogress.setProgress(p);
+    }
+
+    public void finishsemester() {
     }
 }

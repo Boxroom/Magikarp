@@ -15,13 +15,13 @@ import model.*;
  */
 public class Simulation extends AnimationTimer {
 
-    private final boolean laptop = false;//true;
+    private final boolean laptop = false;//false;//true;
     private List<Student>  students;
     private List<Location> locations;
 
     private double attributesInfluence            = 1; //0.2
-    public double distanceStudentInfluence       = 0.1;//1
-    public double distanceLocationInfluence      = 0.01;//0.1
+    public double distanceStudentInfluence       = 1;//1
+    public double distanceLocationInfluence      = 0.05;//0.1
     private double directionInfluence             = 0.1;
     private double studentInfluence               = 1;
     private double locationInfluence              = 1;
@@ -29,14 +29,14 @@ public class Simulation extends AnimationTimer {
     private double studentsPrioMAX                = 0.0;
     private double locationsPrioMAX               = 0.0;
     private double studentsVMAX                   = 0.8;//0.5
-    public double directionInfluenceByStudents   = 0.0002; //0.0002
-    public double directionInfluenceByLocations  = 0.0002;//0.002
-    private double attributesInfluenceByStudents  = 0.000000001;//0.1
-    private double attributesInfluenceByLocations = 0.0000001;//0.003
-    public double adjustattributesInfluenceByStudents  = 0.001;//0.000001
+    public double directionInfluenceByStudents   = 0.0001; //0.0002
+    public double directionInfluenceByLocations  = 0.002;//0.002
+    private double attributesInfluenceByStudents  = 0.0000001;//0.1
+    private double attributesInfluenceByLocations = 0.00001;//0.003
+    public double adjustattributesInfluenceByStudents  = 0.000001;//0.000001
     public double adjustattributesInfluenceByLocations = 0.00000000001;//0.00000001
     private double minGapBetweenStudents          = 1;
-    public double healthdecreaseondanger = 0.002;
+    public double healthdecreaseondanger = 1;
     private int day = 0;
     private double[] time = new double[3];
     private double semesterprogress = 0;
@@ -97,7 +97,7 @@ public class Simulation extends AnimationTimer {
         locationsPrioMAX               = 0.0;
         studentsVMAX                   = 0.6;//0.5   //#0.6
         directionInfluenceByStudents   = 0.0002; //0.0002  #0.0002
-        directionInfluenceByLocations  = 0.001;//0.002       #0.001
+        directionInfluenceByLocations  = 0.0001;//0.002       #0.001
         attributesInfluenceByStudents  = 0.000000001;//0.1 #0.000000001
         attributesInfluenceByLocations = 0.00001;//0.003  #0.00001
         adjustattributesInfluenceByStudents  = 0.000001;//0.000001  #0.000001
@@ -121,8 +121,8 @@ public class Simulation extends AnimationTimer {
         student.calcDanger();
         this.setDangerColor(student);
 
-        if(student.getDanger()>(SimElement.dangerMAX/1.7)){
-            student.setHealth(student.getHealth()-(student.getDanger()/(SimElement.dangerMAX/1.7))*healthdecreaseondanger);
+        if(student.getDanger()>(SimElement.dangerMAX/1.6)){
+            student.setHealth(student.getHealth()-(student.getDanger()/(SimElement.dangerMAX/1))*healthdecreaseondanger);
         }
 
 
@@ -166,7 +166,7 @@ public class Simulation extends AnimationTimer {
             f=1;
             v1 = student.getAttribute(i);
             v2 = student.getInsidelocation().getAttribute(i);
-            if(student.getInsidelocation().getName()=="Disco"){f=3;}
+            if(student.getInsidelocation().getName()=="Disco"){f=2.2;}else{f=1.3;}
             student.setAttributes(i,v1+(v2 - v1) * attributesinfluenceinsidelocation*f);
         }
     }
@@ -429,6 +429,10 @@ public class Simulation extends AnimationTimer {
     private void handlesemesterprogress() { //called every minute
         semesterprogress=((day+time[0]/24)%onesemesterisxdays)/onesemesterisxdays;
         m_dhimulate.setsemesterprogress(semesterprogress);
+
+        if(semesterprogress==100){
+            m_dhimulate.finishsemester();
+        }
     }
 
     @Override
