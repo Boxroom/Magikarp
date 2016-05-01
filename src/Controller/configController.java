@@ -35,6 +35,6 @@ public class configController implements Initializable {
 
     @FXML
     protected void startSim(ActionEvent event) {
-        ;
+
     }
 }

@@ -102,7 +102,10 @@ public class Dhimulate extends Application {
 
         ((Button) getScene(MainGameSceneName).lookup("#pauseButton")).setOnAction(event -> handlepause((Button) event.getSource()));
 
-        ((Button) getScene("report2").lookup("#save")).setOnAction(event -> save());
+        ((Button) getScene("report2").lookup("#save")).setOnAction(event -> {
+            save();
+            m_PrimaryStage.close();
+        });
 
         timelabel = ((Label) getScene(MainGameSceneName).lookup("#timeLabel"));
         semesterlabel = ((Label) getScene(MainGameSceneName).lookup("#semesterLabel"));
@@ -454,8 +457,6 @@ public class Dhimulate extends Application {
     public void handlesemesterend() {
         handlepause(m_pausebutton);
         klausurenpane.setVisible(false);
-        semestercnt++;
-        semestercntLabel.setText(semestercnt + ". Sem.");
         calcAttributesTotal(currentAttributes);
 
         studentenBar.setProgress((double) StudentNumber / (double) StudentNumberStart);
@@ -522,6 +523,8 @@ public class Dhimulate extends Application {
     }
 
     private void startnewsemester() {
+        semestercnt++;
+        semestercntLabel.setText(semestercnt + ". Sem.");
         for (Student student : m_students) {
             student.setPosition(Math.random() * 1280, 50 + Math.random() * 700);
             student.setHealth(100);
