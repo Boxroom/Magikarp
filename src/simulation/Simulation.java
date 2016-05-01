@@ -6,6 +6,7 @@ import java.util.List;
 import Dhimulate.Dhimulate;
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -42,6 +43,7 @@ public class Simulation extends AnimationTimer {
     private double[] time = new double[3];
     private double semesterprogress = 0;
     public double onesemesterisxdays=3;
+    private boolean klausurzeit = false;
 
     private long lastnano = 0;
     private double simspeed = 2;
@@ -52,7 +54,7 @@ public class Simulation extends AnimationTimer {
     private double stay_factor = 0.04;
     private double leadershipinfluence =1;
     private double attributesinfluenceinsidelocation = 0.001;
-    private Button m_pausebutton;
+    private double klausurdeath = 0.001;
 
     public Simulation(Dhimulate dh,List<Student> students, List<Location> locations){
         this.students = students;
@@ -127,6 +129,9 @@ public class Simulation extends AnimationTimer {
             student.setHealth(student.getHealth()-(student.getDanger()/(SimElement.dangerMAX/1.7))*healthdecreaseondanger);
         }
 
+        if(klausurzeit==true){
+            student.setHealth(student.getHealth()-((110-student.getAttribute(Student.LEARNING))*klausurdeath));
+        }
 
         //check the status flag
         if (student.isMoving()) {
@@ -273,12 +278,12 @@ public class Simulation extends AnimationTimer {
             time[2]=time[2]-60;
             if(time[1]>60){
                 time[0]++;
-                handlesemesterprogress();
                 time[1]=time[1]-60;
                 if(time[0]==24){
                     day++;
                     time[0]=0;
                 }
+                handlesemesterprogress();
             }
         }
         if(((int)time[1])!=lastmin){
@@ -431,15 +436,28 @@ public class Simulation extends AnimationTimer {
     private void handlesemesterprogress() { //called every minute
         semesterprogress=(((day-1)+time[0]/24)%onesemesterisxdays)/onesemesterisxdays;
         m_dhimulate.setsemesterprogress(semesterprogress);
-        if(semesterprogress>=1){
-            m_dhimulate.handlepause(m_pausebutton);
+        if(semesterprogress>=0.9){
+            if(klausurzeit==false){
+                m_dhimulate.handleKlausuren();
+                klausurzeit=true;
+            }
         }
+
+        if(day==(day%onesemesterisxdays)+2 && klausurzeit==true){
+            klausurzeit=false;
+            if(day==(onesemesterisxdays+1*6)){
+                m_dhimulate.handlesimulationend();
+            }else {
+                m_dhimulate.handlesemesterend();
+            }
+        }
+
+
     }
 
     @Override
     public void start(){
         super.start();
-        m_pausebutton = (Button)m_dhimulate.getScene(m_dhimulate.getMainGameSceneName()).lookup("#pauseButton");
         lastnano=System.nanoTime();
         running = true;
         if(laptop==true){

@@ -16,10 +16,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -50,7 +47,10 @@ public class Dhimulate extends Application {
     private StackPane toppane;
     private static Rectangle darkness;
     private ProgressBar semesterprogress;
-
+    private Button m_pausebutton;
+    private Pane klausurenpane;
+    private Label semestercntLabel;
+    private int semestercnt=1;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -93,6 +93,9 @@ public class Dhimulate extends Application {
         darkness=((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
         semesterprogress=((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
         toppane=((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
+        m_pausebutton = (Button)getScene(getMainGameSceneName()).lookup("#pauseButton");
+        klausurenpane = (Pane)getScene(getMainGameSceneName()).lookup("#klausurenpane");
+        semestercntLabel = ((Label)getScene(MainGameSceneName).lookup("#semestercnt"));
     }
 
     public void handlepause(Button b){
@@ -118,7 +121,7 @@ public class Dhimulate extends Application {
     }
 
     public void updateTime(int day, double[] time){
-        timelabel.setText("Tag "+day+" | "+stockTime(""+((int)time[0]))+":"+stockTime(""+((int)time[1]))/*+":"+((int)time[2])*/+"Uhr");
+        timelabel.setText(day+". Tag"+"  "+stockTime(""+((int)time[0]))+":"+stockTime(""+((int)time[1]))/*+":"+((int)time[2])*/+"Uhr");
         if(time[0]>12){
             darkness.setOpacity(-0.3+((time[0]%12)/12));
         }else{
@@ -157,6 +160,7 @@ public class Dhimulate extends Application {
         m_Simulation = new Simulation(this,m_students, m_locations);
         getConstants();
         toppane.toFront();
+        klausurenpane.setVisible(false);
     }
 
     private void createStudents(int cnt){
@@ -377,5 +381,30 @@ public class Dhimulate extends Application {
 
     public String getMainGameSceneName() {
         return MainGameSceneName;
+    }
+
+    public void handlesemesterend() {
+        handlepause(m_pausebutton);
+        klausurenpane.setVisible(false);
+        semestercnt++;
+        semestercntLabel.setText(semestercnt+". Semester");
+    }
+
+    public void handleKlausuren(){
+        klausurenpane.setVisible(true);
+    }
+
+    public void handlesimulationend() {
+        handlesemesterend();
+        showreport();
+    }
+
+    private void calcreport(){
+
+    };
+
+    public void showreport(){
+        calcreport();
+        m_PrimaryStage.setScene(getScene("report"));
     }
 }
