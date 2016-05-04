@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0"
+            prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <TitledPane fx:id="semesterbericht" layoutX="179.0" layoutY="174.0" prefHeight="400.0" prefWidth="400.0"
+                    text="Startbedingungen" collapsible="false">
+            <content>
+                <GridPane>
+                    <children>
+                        <Label text="Lernen" GridPane.rowIndex="1">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Team" GridPane.rowIndex="2">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Alkohol" GridPane.rowIndex="3">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Führung" GridPane.rowIndex="4">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Party" GridPane.rowIndex="5">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Studenten">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                    </children>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="184.0" minWidth="10.0" prefWidth="165.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="213.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                </GridPane>
+            </content>
+        </TitledPane>
+        <ProgressBar fx:id="partyBarv" layoutX="333.0" layoutY="528.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="fuhrungBarv" layoutX="333.0" layoutY="468.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="alkoholBarv" layoutX="333.0" layoutY="408.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="teamBarv" layoutX="333.0" layoutY="348.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="lernenBarv" layoutX="333.0" layoutY="288.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="studentenBarv" layoutX="333.0" layoutY="228.0" prefWidth="200.0" progress="0.0"/>
+        <TitledPane fx:id="semesterbericht1" layoutX="675.0" layoutY="174.0" prefHeight="400.0" prefWidth="400.0"
+                    text="Endergebnis" collapsible="false">
+            <content>
+                <GridPane>
+                    <children>
+                        <Label text="Lernen" GridPane.rowIndex="1">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Team" GridPane.rowIndex="2">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Alkohol" GridPane.rowIndex="3">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Führung" GridPane.rowIndex="4">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Party" GridPane.rowIndex="5">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Studenten">
+                            <font>
+                                <Font size="18.0"/>
+                            </font>
+                        </Label>
+                    </children>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="184.0" minWidth="10.0" prefWidth="165.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="213.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                </GridPane>
+            </content>
+        </TitledPane>
+        <ProgressBar fx:id="studentenBarn" layoutX="829.0" layoutY="228.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="alkoholBarn" layoutX="829.0" layoutY="408.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="lernenBarn" layoutX="829.0" layoutY="288.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="teamBarn" layoutX="829.0" layoutY="348.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="fuhrungBarn" layoutX="829.0" layoutY="468.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="partyBarn" layoutX="829.0" layoutY="528.0" prefWidth="200.0" progress="0.0"/>
+        <Button fx:id="save" layoutX="969.0" layoutY="631.0" mnemonicParsing="false" text="Save and Close"/>
+        <Label layoutX="473.0" layoutY="62.0" text="Simulationsergebnis">
+            <font>
+                <Font name="System Bold" size="31.0"/>
+            </font>
+        </Label>
+    </children>
+</AnchorPane>
