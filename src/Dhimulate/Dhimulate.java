@@ -351,6 +351,18 @@ public class Dhimulate extends Application {
 
     //load all scenes from the view folder
     private void loadScenes() {
+        List<String> files = new LinkedList<>();
+        files.add("config.fxml");
+        files.add("report.fxml");
+        files.add("report2.fxml");
+        files.add("sim.fxml");
+        files.add("sim2.fxml");
+        files.add("sim3.fxml");
+        fillScenesMap(files);
+    }
+    
+    /*//load all scenes from the view folder
+    private void loadScenes() {
         String path = "";
         try {
             path = new File(".").getCanonicalPath();
@@ -395,7 +407,7 @@ public class Dhimulate extends Application {
             }
         }
         return files;
-    }
+    }*/
 
     //Fill the different levels with objects etc.
     private void fillScenesMap(List<String> files) {
