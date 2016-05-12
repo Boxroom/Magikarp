@@ -37,12 +37,11 @@ public class Dhimulate extends Application {
     private List<Location> m_locations;
     private String MainGameSceneName    = "sim3";
     private double adjustingToReference = 0.5;
-    private        StackPane   toppane;
-    private        ProgressBar semesterprogress;
-    private        Button      m_pausebutton;
-    private        Pane        klausurenpane;
-    private        Label       semestercntLabel;
-    private int semesterCount = 1;
+    private StackPane   toppane;
+    private ProgressBar semesterProgressBar;
+    private Button      m_pausebutton;
+    private Pane        klausurenpane;
+    private Label       semestercntLabel;
     private TitledPane  zwischenstand;
     private ProgressBar studentenBar;
     private ProgressBar teamBar;
@@ -68,10 +67,6 @@ public class Dhimulate extends Application {
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    public int getSemesterCount() {
-        return semesterCount;
     }
 
     @Override
@@ -108,7 +103,7 @@ public class Dhimulate extends Application {
         semesterlabel = ((Label) getScene(MainGameSceneName).lookup("#semesterLabel"));
         studentslabel = ((Label) getScene(MainGameSceneName).lookup("#studentenLabel"));
         darkness = ((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
-        semesterprogress = ((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
+        semesterProgressBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
         toppane = ((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
         m_pausebutton = (Button) getScene(getMainGameSceneName()).lookup("#pauseButton");
         klausurenpane = (Pane) getScene(getMainGameSceneName()).lookup("#klausurenpane");
@@ -149,7 +144,7 @@ public class Dhimulate extends Application {
         fillScenesMap(files);
     }
 
-    public Scene getScene(String name) {
+    private Scene getScene(String name) {
         return m_ScenesMap.get(name);
     }
 
@@ -171,7 +166,7 @@ public class Dhimulate extends Application {
         m_Timer.start();
     }
 
-    public void handlePause(Button b) {
+    private void handlePause(Button b) {
         if (m_Timer.isRunning()) {
             m_Timer.stop();
             b.setText("Weiter");
@@ -181,11 +176,11 @@ public class Dhimulate extends Application {
                 startNextSemester();
             }
             m_Timer.start();
-            b.setText("Stop");
+            b.setText("Pause");
         }
     }
 
-    public void save() {
+    private void save() {
         double[] before = new double[SimElement.ATTR_COUNT + 1];
         double[] after = new double[SimElement.ATTR_COUNT + 1];
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
@@ -197,7 +192,7 @@ public class Dhimulate extends Application {
         Save.save(before, after);
     }
 
-    public String getMainGameSceneName() {
+    private String getMainGameSceneName() {
         return MainGameSceneName;
     }
 
@@ -219,22 +214,42 @@ public class Dhimulate extends Application {
     private void initGame() {
         createLocations();
         createStudents(studentStartCount);
-        m_Simulation = new Simulation(this, m_students, m_locations);
+        m_Simulation = new Simulation(m_students, m_locations);
         m_Simulation.minutePassedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 int day = m_Simulation.getDay();
                 double[] time = m_Simulation.getTime();
-                updateTime(day, time);
+                if (day <= m_Simulation.daysPerSemester) {
+                    updateTime(day, time);
+                }
             }
         });
+        m_Simulation.semesterProgressProperty().addListener(((observable, oldValue, newValue) -> {
+            final double semesterProgress = newValue.doubleValue();
+            setSemesterProgress(semesterProgress);
+            if (semesterProgress >= 0.9) {
+                handleKlausuren();
+            }
+        }));
+        m_Simulation.dayProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue.intValue() > m_Simulation.daysPerSemester) {
+                if (m_Simulation.getSemesterCount() == 6) {
+                    handleSimulationEnd();
+                }
+                else {
+                    handleSemesterEnd();
+                }
+            }
+        }));
+
         getConstants();
         handleZwischenstand(false);
         calcAttributesTotal(startAttributes);
     }
 
     private void startNextSemester() {
-        semesterCount++;
-        semestercntLabel.setText(semesterCount + ". Sem.");
+        m_Simulation.setDay(1);
+        semestercntLabel.setText(m_Simulation.getSemesterCount() + ". Sem.");
         for (Student student : m_students) {
             student.setPosition(Math.random() * 1280, 50 + Math.random() * 700);
             student.setHealth(100);
@@ -360,7 +375,7 @@ public class Dhimulate extends Application {
     }
 
     private void getConstants() {
-        m_Simulation.daysPerSemester = ((Slider) getScene("config").lookup("#onesemesterisxdaysSlider")).getValue();
+        m_Simulation.daysPerSemester = (int) ((Slider) getScene("config").lookup("#onesemesterisxdaysSlider")).getValue();
         m_Simulation.healthdecreaseondanger = ((Slider) getScene("config").lookup("#healthdecreaseondangerSlider")).getValue();
         m_Simulation.adjustattributesInfluenceByStudents = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByStudentsSlider")).getValue();
         m_Simulation.adjustattributesInfluenceByLocations = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByLocationsSlider")).getValue();
@@ -404,8 +419,8 @@ public class Dhimulate extends Application {
     public void stop() {
     }
 
-    public void updateTime(int day, double[] time) {
-        timelabel.setText(day + ". Tag" + "  " + stockTime("" + ((int) time[0])) + ":" + stockTime("" + ((int) time[1]))/*+":"+((int)time[2])*/ + "Uhr");
+    private void updateTime(int day, double[] time) {
+        timelabel.setText(day + ". Tag" + "  " + padTime(time[0]) + ":" + padTime(time[1]) + "Uhr");
         if (time[0] > 12) {
             darkness.setOpacity(-0.3 + ((time[0] % 12) / 12));
         }
@@ -414,14 +429,15 @@ public class Dhimulate extends Application {
         }
     }
 
-    private String stockTime(String part) {
-        if (part.length() != 2) {
-            part = "0" + part;
+    private String padTime(double part) {
+        final int time = (int) part;
+        if (time < 10) {
+            return "0" + time;
         }
-        return part;
+        return "" + time;
     }
 
-    public void killStudent(Student s) {
+    private void killStudent(Student s) {
         if (s != null) {
             currentStudentCount--;
             updateStudentsLabel();
@@ -432,7 +448,7 @@ public class Dhimulate extends Application {
         }
     }
 
-    public void handleSimulationEnd() {
+    private void handleSimulationEnd() {
         handlePause(m_pausebutton);
         calcAttributesTotal(currentAttributes);
 
@@ -475,11 +491,11 @@ public class Dhimulate extends Application {
         return m_locations;
     }
 
-    public void setSemesterProgress(double p) {
-        semesterprogress.setProgress(p);
+    private void setSemesterProgress(double p) {
+        semesterProgressBar.setProgress(p);
     }
 
-    public void handleSemesterEnd() {
+    private void handleSemesterEnd() {
         handlePause(m_pausebutton);
         klausurenpane.setVisible(false);
         calcAttributesTotal(currentAttributes);
@@ -496,7 +512,7 @@ public class Dhimulate extends Application {
         klausurenpane.setVisible(false);
     }
 
-    public void handleKlausuren() {
+    private void handleKlausuren() {
         klausurenpane.setVisible(true);
     }
 }

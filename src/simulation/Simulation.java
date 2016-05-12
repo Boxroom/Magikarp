@@ -1,9 +1,7 @@
 package simulation;
 
-import Dhimulate.Dhimulate;
 import java.util.List;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.*;
 import javafx.scene.paint.Color;
 import model.*;
 
@@ -20,41 +18,39 @@ public class Simulation {
     public double adjustattributesInfluenceByStudents  = 0.000001;
     public double adjustattributesInfluenceByLocations = 0.00000000001;
     public double healthdecreaseondanger               = 0.004;
-    public double daysPerSemester                      = 3;
-    private Dhimulate      m_dhimulate;
+    public int    daysPerSemester                      = 3;
     private List<Student>  students;
     private List<Location> locations;
-    private double   attributesInfluence               = 1;
-    private double   directionInfluence                = 0.1;
+    private BooleanProperty minutePassed                      = new SimpleBooleanProperty(false);
+    private DoubleProperty  semesterProgress                  = new SimpleDoubleProperty(0.0);
+    private IntegerProperty day                               = new SimpleIntegerProperty(1);
+    private int             semesterCount                     = 1;
+    private double[]        time                              = new double[3];
+    private boolean         klausurenTime                     = false;
+    private double          attributesInfluence               = 1.0;
+    private double          directionInfluence                = 0.1;
     private double          studentsPrioMAX                   = 0.0;
     private double          locationsPrioMAX                  = 0.0;
     private double          studentsVMAX                      = 0.7;
     private double          attributesInfluenceByStudents     = 0.000000001;
     private double          attributesInfluenceByLocations    = 0.00001;
-    private double          minGapBetweenStudents             = 1;
-    private int             day                               = 0;
-    private double[]        time                              = new double[3];
-    private BooleanProperty minutePassed                      = new SimpleBooleanProperty(false);
-    private double          semesterProgress                  = 0;
-    private boolean         klausurenTime                     = false;
-    private double          discoLethality                    = 10;
-    private double          restMending                       = 3;
-    private double          lockDistanceStudentLocation       = 50;
+    private double          minGapBetweenStudents             = 1.0;
+    private double          discoLethality                    = 10.0;
+    private double          restMending                       = 3.0;
+    private double          lockDistanceStudentLocation       = 50.0;
     private double          stayFactor                        = 0.1;
-    private double          leadershipInfluence               = 1;
+    private double          leadershipInfluence               = 1.0;
     private double          attributesInfluenceInsideLocation = 0.001;
     private double          klausurDeath                      = 0.0015;
-    private double   simSpeed                          = 2;
+    private double          simSpeed                          = 2;
 
 
-    public Simulation(Dhimulate dh, List<Student> students, List<Location> locations) {
+    public Simulation(List<Student> students, List<Location> locations) {
         this.students = students;
         this.locations = locations;
         time[0] = 0;
         time[1] = 0;
         time[2] = 0;
-        day = 1;
-        m_dhimulate = dh;
     }
 
     public void handle(long elapsed) {
@@ -67,14 +63,14 @@ public class Simulation {
     private void addTime(long elapsed) {
         double secondsElapsed = ((double) elapsed) / (1000000000.0 / 2000);
         time[2] += secondsElapsed;
-        if (time[2] > 60) {
+        if (time[2] >= 60) {
             time[1]++;
             time[2] = time[2] - 60;
-            if (time[1] > 60) {
+            if (time[1] >= 60) {
                 time[0]++;
                 time[1] = time[1] - 60;
                 if (time[0] == 24) {
-                    day++;
+                    incDay();
                     time[0] = 0;
                 }
                 handleSemesterProgress();
@@ -114,25 +110,15 @@ public class Simulation {
         }
     }
 
-    private void handleSemesterProgress() { //called every minute
-        semesterProgress = (((day - 1) + time[0] / 24) % daysPerSemester) / daysPerSemester;
-        m_dhimulate.setSemesterProgress(semesterProgress);
-        if (semesterProgress >= 0.9) {
-            if (!klausurenTime) {
-                m_dhimulate.handleKlausuren();
-                klausurenTime = true;
-            }
+    private void handleSemesterProgress() { //called every hour
+        final double semesterProgress = (((getDay() - 1) + time[0] / 24) % daysPerSemester) / daysPerSemester;
+        setSemesterProgress(semesterProgress);
+        if (semesterProgress >= 0.9 && !klausurenTime) {
+            klausurenTime = true;
         }
-
-        if ((day - 1) % (daysPerSemester) == 0 && klausurenTime && day != 1) {
+        if (getDay() > daysPerSemester) {
             klausurenTime = false;
-            if (m_dhimulate.getSemesterCount() == 6) {
-                m_dhimulate.handleSimulationEnd();
-            }
-            else {
-                m_dhimulate.handleSemesterEnd();
-                day = 1;
-            }
+            ++semesterCount;
         }
     }
 
@@ -142,7 +128,6 @@ public class Simulation {
 
         //analyse locations
         this.prioritizeLocations(student);
-
 
         student.calcDanger();
         this.setDangerColor(student);
@@ -405,6 +390,18 @@ public class Simulation {
         }
     }
 
+    public double getSemesterProgress() {
+        return semesterProgress.get();
+    }
+
+    public DoubleProperty semesterProgressProperty() {
+        return semesterProgress;
+    }
+
+    public void setSemesterProgress(final double semesterProgress) {
+        this.semesterProgress.set(semesterProgress);
+    }
+
     public boolean getMinutePassed() {
         return minutePassed.get();
     }
@@ -418,7 +415,19 @@ public class Simulation {
     }
 
     public int getDay() {
+        return day.get();
+    }
+
+    public IntegerProperty dayProperty() {
         return day;
+    }
+
+    public void setDay(final int day) {
+        this.day.set(day);
+    }
+
+    public void incDay() {
+        this.day.set(day.get() + 1);
     }
 
     public double[] getTime() {
@@ -427,5 +436,9 @@ public class Simulation {
 
     private double getTime(int i) {
         return time[i];
+    }
+
+    public int getSemesterCount() {
+        return semesterCount;
     }
 }
