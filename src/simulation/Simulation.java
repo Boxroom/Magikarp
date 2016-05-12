@@ -10,44 +10,38 @@ import model.*;
  */
 public class Simulation {
 
-    public final boolean laptop = true;
+    public double distanceStudentInfluence             = 1;
+    public double distanceLocationInfluence            = 0.05;
+    public double timelineInfluence                    = 1;
+    public double directionInfluenceByStudents         = 0.0002;
+    public double directionInfluenceByLocations        = 0.0007;
+    public double adjustattributesInfluenceByStudents  = 0.000001;
+    public double adjustattributesInfluenceByLocations = 0.00000000001;
+    public double healthdecreaseondanger               = 0.004;
+    public double daysPerSemester                      = 3;
+    private Dhimulate      m_dhimulate;
     private List<Student>  students;
     private List<Location> locations;
-
-    private double   attributesInfluence                  = 1;
-    public  double   distanceStudentInfluence             = 1;
-    public  double   distanceLocationInfluence            = 0.05;
-    private double   directionInfluence                   = 0.1;
-    public  double   timelineInfluence                    = 1;
-    private double   studentsPrioMAX                      = 0.0;
-    private double   locationsPrioMAX                     = 0.0;
-    private double   studentsVMAX                         = 0.7;
-    public  double   directionInfluenceByStudents         = 0.0002;
-    public  double   directionInfluenceByLocations        = 0.0007;
-    private double   attributesInfluenceByStudents        = 0.000000001;
-    private double   attributesInfluenceByLocations       = 0.00001;
-    public  double   adjustattributesInfluenceByStudents  = 0.000001;
-    public  double   adjustattributesInfluenceByLocations = 0.00000000001;
-    private double   minGapBetweenStudents                = 1;
-    public  double   healthdecreaseondanger               = 0.004;
-    private int      day                                  = 0;
-    private double[] time                                 = new double[3];
-    private double   semesterprogress                     = 0;
-    public  double   daysPerSemester                      = 3;
-    private boolean  klausurzeit                          = false;
-    private double   discokillness                        = 10;
-    private double   elsehealness                         = 3;
-
-    public  long   lastnano                    = 0;
-    private double simspeed                    = 2;
-    private double lockDistanceStudentLocation = 50;
-    private Dhimulate m_dhimulate;
-
-    public  boolean running                           = false;
-    private double  stay_factor                       = 0.1;
-    private double  leadershipinfluence               = 1;
-    private double  attributesinfluenceinsidelocation = 0.001;
-    private double  klausurdeath                      = 0.0015;
+    private double   attributesInfluence               = 1;
+    private double   directionInfluence                = 0.1;
+    private double   studentsPrioMAX                   = 0.0;
+    private double   locationsPrioMAX                  = 0.0;
+    private double   studentsVMAX                      = 0.7;
+    private double   attributesInfluenceByStudents     = 0.000000001;
+    private double   attributesInfluenceByLocations    = 0.00001;
+    private double   minGapBetweenStudents             = 1;
+    private int      day                               = 0;
+    private double[] time                              = new double[3];
+    private double   semesterProgress                  = 0;
+    private boolean  klausurenTime                     = false;
+    private double   discoLethality                    = 10;
+    private double   restMending                       = 3;
+    private double   lockDistanceStudentLocation       = 50;
+    private double   stayFactor                        = 0.1;
+    private double   leadershipInfluence               = 1;
+    private double   attributesInfluenceInsideLocation = 0.001;
+    private double   klausurDeath                      = 0.0015;
+    private double   simSpeed                          = 2;
 
 
     public Simulation(Dhimulate dh, List<Student> students, List<Location> locations) {
@@ -60,8 +54,36 @@ public class Simulation {
         m_dhimulate = dh;
     }
 
+    public void handle(long elapsed) {
+        addTime(elapsed);
+        simAllStudents((long) (elapsed * simSpeed));
+        simEvents();
+    }
 
-    public void simAllStudents(long elapsed) {
+    //time0 day, time1 hours, time2 seconds
+    private void addTime(long elapsed) {
+        int lastMinute = (int) time[1];
+        double secondsElapsed = ((double) elapsed) / (1000000000.0 / 2000);
+        time[2] += secondsElapsed;
+        if (time[2] > 60) {
+            time[1]++;
+            time[2] = time[2] - 60;
+            if (time[1] > 60) {
+                time[0]++;
+                time[1] = time[1] - 60;
+                if (time[0] == 24) {
+                    day++;
+                    time[0] = 0;
+                }
+                handleSemesterProgress();
+            }
+        }
+        if (((int) time[1]) != lastMinute) {
+            m_dhimulate.updateTime(day, time);
+        }
+    }
+
+    private void simAllStudents(long elapsed) {
         locationsPrioMAX = 0;
         studentsPrioMAX = 0;
         for (Student element : students) {
@@ -76,11 +98,38 @@ public class Simulation {
         }
     }
 
+    private void simEvents() {
+        Status s;
+        for (Location l : locations) {
+            s = l.getTimeline().getStatus(time[0]);
+            if (l.isShowingNotification()) {
+                l.animNotification();
+            }
+            else if ((s == Status.BEFORE_EVENT) && !l.isShowingNotification()) {
+                l.showNotification(l.getTimeline().getCurrentEvent(time[0]).name);
+            }
+        }
+    }
 
-    private void simDeath(Student element) {
-        element.simDeath();
-        if (element.getdeathanimcnt() > Student.deathanimMax) {
-            element.vanish();
+    private void handleSemesterProgress() { //called every minute
+        semesterProgress = (((day - 1) + time[0] / 24) % daysPerSemester) / daysPerSemester;
+        m_dhimulate.setSemesterProgress(semesterProgress);
+        if (semesterProgress >= 0.9) {
+            if (!klausurenTime) {
+                m_dhimulate.handleKlausuren();
+                klausurenTime = true;
+            }
+        }
+
+        if ((day - 1) % (daysPerSemester) == 0 && klausurenTime && day != 1) {
+            klausurenTime = false;
+            if (m_dhimulate.getSemesterCount() == 6) {
+                m_dhimulate.handleSimulationEnd();
+            }
+            else {
+                m_dhimulate.handleSemesterEnd();
+                day = 1;
+            }
         }
     }
 
@@ -99,8 +148,8 @@ public class Simulation {
             student.setHealth(student.getHealth() - (student.getDanger() / (SimElement.dangerMAX / 1.7)) * healthdecreaseondanger);
         }
 
-        if (klausurzeit) {
-            student.setHealth(student.getHealth() - ((110 - student.getAttribute(Student.LEARNING)) * klausurdeath));
+        if (klausurenTime) {
+            student.setHealth(student.getHealth() - ((110 - student.getAttribute(Student.LEARNING)) * klausurDeath));
         }
 
         //check the status flag
@@ -118,51 +167,33 @@ public class Simulation {
             //move the Student
             student.move(elapsed);
 
-            if (student.getInlocationcnt() > 0) {
-                student.setInlocationcnt(student.getInlocationcnt() - 1);
+            if (student.getInLocationCnt() > 0) {
+                student.setInlocationcnt(student.getInLocationCnt() - 1);
             }
         }
         else {
-
             this.adjustAttributesInsideLocation(student);
 
-            student.setInlocationcnt(student.getInlocationcnt() + 4);
+            student.setInlocationcnt(student.getInLocationCnt() + 4);
 
             if (student.getInsidelocation().getPriority() > locationsPrioMAX * 0.8) {
                 leaveLocation(student, student.getInsidelocation());
             }
-
-        }
-
-
-    }
-
-    private void adjustAttributesInsideLocation(Student student) {
-        double v1, v2, f;
-        for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-            v1 = student.getAttribute(i);
-            v2 = student.getInsidelocation().getAttribute(i);
-            if (student.getInsidelocation().getName().equals("Disco")) {
-                f = discokillness;
-            }
-            else {
-                f = elsehealness;
-            }
-            student.setAttributes(i, v1 + (v2 - v1) * attributesinfluenceinsidelocation * f);
         }
     }
 
-    private void setDangerColor(Student s) {
-        s.getCircle().setFill(Color.rgb((int) (55 + 200 * (s.getDanger() / SimElement.dangerMAX)), 0, 255 - (int) (55 + 200 * (s.getDanger() / SimElement.dangerMAX))));
+    private void simDeath(Student element) {
+        element.simDeath();
+        if (element.getdeathanimcnt() > Student.deathanimMax) {
+            element.vanish();
+        }
     }
-
 
     private void prioritizeStudents(Student referenceStudent) {
         //iterate through all students and compare attributes
         double attributesDifference;
         double distance;
         double direction;
-        double priority = 0.0;
         studentsPrioMAX = 0.0;
         double[] refAttr = referenceStudent.getAttributes();
         for (Student student : students) {
@@ -200,13 +231,24 @@ public class Simulation {
                 direction = refDir.getDistanceTo(sDir);
 
                 //combine those
-                student.setPriority((100 - student.getAttribute(Student.LEADERSHIP)) * leadershipinfluence + attributesDifference * attributesInfluence * attributesInfluenceByStudents + distance * distanceStudentInfluence + direction * directionInfluence);
+                student.setPriority((100 - student.getAttribute(Student.LEADERSHIP)) * leadershipInfluence + attributesDifference * attributesInfluence * attributesInfluenceByStudents + distance * distanceStudentInfluence + direction * directionInfluence);
 
                 if (student.getPriority() > studentsPrioMAX) {
                     studentsPrioMAX = student.getPriority();
                 }
             }
         }
+    }
+
+    private void prioritizeLocations(Student referenceStudent) {
+        locationsPrioMAX = 0;
+        for (Location location : locations) {
+            prioritizeLocation(referenceStudent, location);
+        }
+    }
+
+    private void setDangerColor(Student s) {
+        s.getCircle().setFill(Color.rgb((int) (55 + 200 * (s.getDanger() / SimElement.dangerMAX)), 0, 255 - (int) (55 + 200 * (s.getDanger() / SimElement.dangerMAX))));
     }
 
     //adjusting attributes
@@ -223,45 +265,6 @@ public class Simulation {
         }
         currentStudent.setAttributes(csAttr);
     }
-
-    private double[] compareToOtherElement(double[] csAttr, SimElement element, double priomax, double influence) {
-        double[] elemAttr = element.getAttributes();
-        for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-            csAttr[i] += ((elemAttr[i] - csAttr[i]) * (1 - (element.getPriority() / priomax)) * influence);
-        }
-        return csAttr;
-    }
-
-    private double[] getTime() {
-        return time;
-    }
-
-    private double getTime(int i) {
-        return time[i];
-    }
-
-    private void addTime(long nano) {
-        int lastmin = (int) time[1];
-        double seconds = ((double) nano) / (1000000000.0 / 2000);
-        time[2] += seconds;
-        if (time[2] > 60) {
-            time[1]++;
-            time[2] = time[2] - 60;
-            if (time[1] > 60) {
-                time[0]++;
-                time[1] = time[1] - 60;
-                if (time[0] == 24) {
-                    day++;
-                    time[0] = 0;
-                }
-                handlesemesterprogress();
-            }
-        }
-        if (((int) time[1]) != lastmin) {
-            m_dhimulate.updateTime(day, time);
-        }
-    }
-
 
     //adjusting direction
     private void adjustDirection(Student referenceStudent) {
@@ -315,19 +318,18 @@ public class Simulation {
         referenceStudent.setDirection(newDir);
     }
 
-    private void prioritizeLocations(Student referenceStudent) {
-        locationsPrioMAX = 0;
-        for (Location location : locations) {
-            prioritizeLocation(referenceStudent, location);
-        }
-    }
-
-    private void enterLocation(Student s, Location l) {
-        if (l.grow()) {
-            s.getCircle().setVisible(false);
-            s.setMoving(false);
-            s.setInsidelocation(l);
-            s.setInlocationcnt(0);
+    private void adjustAttributesInsideLocation(Student student) {
+        double v1, v2, f;
+        for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
+            v1 = student.getAttribute(i);
+            v2 = student.getInsidelocation().getAttribute(i);
+            if (student.getInsidelocation().getName().equals("Disco")) {
+                f = discoLethality;
+            }
+            else {
+                f = restMending;
+            }
+            student.setAttributes(i, v1 + (v2 - v1) * attributesInfluenceInsideLocation * f);
         }
     }
 
@@ -360,7 +362,7 @@ public class Simulation {
         if (distance < lockDistanceStudentLocation) {
             //lock on to location
             if (referenceStudent.isMoving()) {
-                if (referenceStudent.getInlocationcnt() > 0) {
+                if (referenceStudent.getInLocationCnt() > 0) {
                     if (referenceStudent.getInsidelocation().getID() != location.getID()) {
                         enterLocation(referenceStudent, location);
                     }
@@ -373,61 +375,34 @@ public class Simulation {
         double stay = 0;
         if (referenceStudent.getInsidelocation() != null) {
             if (location.getID() == referenceStudent.getInsidelocation().getID()) {
-                stay = referenceStudent.getInlocationcnt();
+                stay = referenceStudent.getInLocationCnt();
             }
         }
-        double prio = stay * stay_factor + distanceLocationInfluence * distance + Status.toInt(location.getTimeline().getStatus(getTime(0))) * timelineInfluence + attributesDifference * attributesInfluenceByLocations * attributesInfluence;
+        double prio = stay * stayFactor + distanceLocationInfluence * distance + Status.toInt(location.getTimeline().getStatus(getTime(0))) * timelineInfluence + attributesDifference * attributesInfluenceByLocations * attributesInfluence;
         location.setPriority(prio);
         if (location.getPriority() > locationsPrioMAX) {
             locationsPrioMAX = location.getPriority();
         }
     }
 
-    public void handle(long nownano) {
-        long elapsed = nownano - lastnano;
-        lastnano = nownano;
-        addTime(elapsed);
-        simAllStudents((long) (elapsed * simspeed));
-        simEvents();
+    private double[] compareToOtherElement(double[] csAttr, SimElement element, double priomax, double influence) {
+        double[] elemAttr = element.getAttributes();
+        for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
+            csAttr[i] += ((elemAttr[i] - csAttr[i]) * (1 - (element.getPriority() / priomax)) * influence);
+        }
+        return csAttr;
     }
 
-    private void simEvents() {
-        Status s;
-        for (Location l : locations) {
-            s = l.getTimeline().getStatus(time[0]);
-            if (l.isShowingnotification()) {
-                l.animNotification();
-            }
-            else if ((s == Status.BEFORE_EVENT) && !l.isShowingnotification()) {
-                l.showNotification(l.getTimeline().getCurrentEvent(time[0]).name);
-            }
+    private void enterLocation(Student s, Location l) {
+        if (l.grow()) {
+            s.getCircle().setVisible(false);
+            s.setMoving(false);
+            s.setInsidelocation(l);
+            s.setInlocationcnt(0);
         }
     }
 
-    private void handlesemesterprogress() { //called every minute
-        semesterprogress = (((day - 1) + time[0] / 24) % daysPerSemester) / daysPerSemester;
-        m_dhimulate.setSemesterProgress(semesterprogress);
-        if (semesterprogress >= 0.9) {
-            if (!klausurzeit) {
-                m_dhimulate.handleKlausuren();
-                klausurzeit = true;
-            }
-        }
-
-        if ((day - 1) % (daysPerSemester) == 0 && klausurzeit && day != 1) {
-            klausurzeit = false;
-            if (m_dhimulate.getSemestercnt() == 6) {
-                m_dhimulate.handleSimulationEnd();
-            }
-            else {
-                m_dhimulate.handleSemesterEnd();
-                day = 1;
-            }
-        }
+    private double getTime(int i) {
+        return time[i];
     }
-
-    public boolean isRunning() {
-        return running;
-    }
-
 }

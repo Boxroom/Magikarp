@@ -19,7 +19,7 @@ public class Location extends SimElement {
         this.showingnotification = shwoingnotification;
     }
 
-    public boolean isShowingnotification() {
+    public boolean isShowingNotification() {
         return showingnotification;
     }
 

@@ -7,27 +7,36 @@ import simulation.Simulation;
  * @author nilsw
  */
 public class SimTimer extends AnimationTimer {
-    private Simulation sim;
 
-    public SimTimer(final Simulation sim) {
+    private Simulation sim;
+    private long    before  = 0;
+    private boolean running = false;
+
+    SimTimer(final Simulation sim) {
         this.sim = sim;
     }
 
     @Override
     public void handle(final long now) {
-        sim.handle(now);
+        long elapsed = now - before;
+        before = now;
+        sim.handle(elapsed);
     }
 
     @Override
     public void start() {
         super.start();
-        sim.lastnano = System.nanoTime();
-        sim.running = true;
+        before = System.nanoTime();
+        running = true;
     }
 
     @Override
     public void stop() {
         super.stop();
-        sim.running = false;
+        running = false;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

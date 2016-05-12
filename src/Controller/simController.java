@@ -34,7 +34,7 @@ public class simController implements Initializable {
     public void initialize(URL fxmlFileLocation, ResourceBundle resources) {
         Circle c;
         ImageView image;
-        for (int i = 0; i < Dhimulate.MAXStudentCNT; i++) {
+        for (int i = 0; i < Dhimulate.MaxStudentCount; i++) {
             //create new circle object
             c = new Circle();
             c.setLayoutX(Math.random() * 1280);

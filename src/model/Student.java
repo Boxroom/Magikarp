@@ -45,7 +45,7 @@ public class Student extends SimElement {
         this.inlocationcnt = inlocationcnt;
     }
 
-    public int getInlocationcnt() {
+    public int getInLocationCnt() {
         return inlocationcnt;
     }
 
