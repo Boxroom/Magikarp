@@ -149,7 +149,7 @@ public class Dhimulate extends Application {
         fillScenesMap(files);
     }
 
-    public Scene getScene(String name) { //unsauber!!!
+    public Scene getScene(String name) {
         return m_ScenesMap.get(name);
     }
 
@@ -308,11 +308,15 @@ public class Dhimulate extends Application {
         //create new list
         m_students = new LinkedList<>();
         Circle c;
-        Student s;
         ImageView img;
         for (int i = 0; i < cnt; i++) {
             //create new student object
-            s = new Student(i);
+            Student s = new Student(i);
+            s.failedProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    killStudent(s);
+                }
+            });
 
             //get circle object
             c = (Circle) getScene(MainGameSceneName).lookup("#student" + i);

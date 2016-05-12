@@ -60,7 +60,7 @@ public class Simulation {
         simEvents();
     }
 
-    //time0 day, time1 hours, time2 seconds
+    //time0 hours, time1 minutes, time2 seconds
     private void addTime(long elapsed) {
         int lastMinute = (int) time[1];
         double secondsElapsed = ((double) elapsed) / (1000000000.0 / 2000);
@@ -86,13 +86,13 @@ public class Simulation {
     private void simAllStudents(long elapsed) {
         locationsPrioMAX = 0;
         studentsPrioMAX = 0;
-        for (Student element : students) {
-            if (!element.isDisabled()) {
-                if (element.isAlive()) {
-                    simStudent(element, elapsed);
+        for (Student student : students) {
+            if (!student.isDisabled()) {
+                if (student.isAlive()) {
+                    simStudent(student, elapsed);
                 }
                 else {
-                    simDeath(element);
+                    simDeath(student);
                 }
             }
         }
@@ -158,7 +158,7 @@ public class Simulation {
             this.adjustAttributes(student);
 
             if (student.getHealth() <= 0) {
-                m_dhimulate.killStudent(student);
+                student.setFailed(true);
             }
 
             //adjust direction according to students and locations
@@ -184,7 +184,7 @@ public class Simulation {
 
     private void simDeath(Student element) {
         element.simDeath();
-        if (element.getdeathanimcnt() > Student.deathanimMax) {
+        if (element.getdeathanimcnt() > Student.deathAnimMax) {
             element.vanish();
         }
     }
