@@ -95,9 +95,17 @@ public class Vector2D {
     }
 
     //scales the vector to a vector of the length 1
+    //the Vector2D is not changed
     public Vector2D normalize() {
         final double factor = 1 / this.length();
         return this.scalarMultiplication(factor);
+    }
+
+    //scales the vector to a vector of the length 1
+    //the Vector2D is changed
+    public void normalize2() {
+        final double factor = 1 / this.length();
+        this.scalarMultiplication2(factor);
     }
 
     //multiplies the Vector2D with a constant factor and returns the result as a new Vector

@@ -2,55 +2,53 @@ package simulation;
 
 import Dhimulate.Dhimulate;
 import java.util.List;
-import javafx.animation.AnimationTimer;
 import javafx.scene.paint.Color;
 import model.*;
 
 /**
  * @author Jendrik, nilsw
  */
-public class Simulation extends AnimationTimer {
+public class Simulation {
 
-    private final boolean laptop = true;//true;
+    public final boolean laptop = true;
     private List<Student>  students;
     private List<Location> locations;
 
-    private double   attributesInfluence                  = 1; //0.2
-    public  double   distanceStudentInfluence             = 0.1;//1
-    public  double   distanceLocationInfluence            = 0.01;//0.1
+    private double   attributesInfluence                  = 1;
+    public  double   distanceStudentInfluence             = 1;
+    public  double   distanceLocationInfluence            = 0.05;
     private double   directionInfluence                   = 0.1;
-    private double   studentInfluence                     = 1;
-    private double   locationInfluence                    = 1;
-    public  double   timelineInfluence                    = 0.4;
+    public  double   timelineInfluence                    = 1;
     private double   studentsPrioMAX                      = 0.0;
     private double   locationsPrioMAX                     = 0.0;
-    private double   studentsVMAX                         = 0.8;//0.5
-    public  double   directionInfluenceByStudents         = 0.0002; //0.0002
-    public  double   directionInfluenceByLocations        = 0.0002;//0.002
-    private double   attributesInfluenceByStudents        = 0.000000001;//0.1
-    private double   attributesInfluenceByLocations       = 0.0000001;//0.003
-    public  double   adjustattributesInfluenceByStudents  = 0.001;//0.000001
-    public  double   adjustattributesInfluenceByLocations = 0.00000000001;//0.00000001
+    private double   studentsVMAX                         = 0.7;
+    public  double   directionInfluenceByStudents         = 0.0002;
+    public  double   directionInfluenceByLocations        = 0.0007;
+    private double   attributesInfluenceByStudents        = 0.000000001;
+    private double   attributesInfluenceByLocations       = 0.00001;
+    public  double   adjustattributesInfluenceByStudents  = 0.000001;
+    public  double   adjustattributesInfluenceByLocations = 0.00000000001;
     private double   minGapBetweenStudents                = 1;
-    public  double   healthdecreaseondanger               = 0.002;
+    public  double   healthdecreaseondanger               = 0.004;
     private int      day                                  = 0;
     private double[] time                                 = new double[3];
     private double   semesterprogress                     = 0;
-    public  double   onesemesterisxdays                   = 3;
+    public  double   daysPerSemester                      = 3;
     private boolean  klausurzeit                          = false;
-    private double   discokillness                        = 3;
-    private double   elsehealness                         = 1;
+    private double   discokillness                        = 10;
+    private double   elsehealness                         = 3;
 
-    private long   lastnano                    = 0;
+    public  long   lastnano                    = 0;
     private double simspeed                    = 2;
     private double lockDistanceStudentLocation = 50;
     private Dhimulate m_dhimulate;
 
-    private boolean running                           = false;
-    private double  stay_factor                       = 0.04;
+    public  boolean running                           = false;
+    private double  stay_factor                       = 0.1;
     private double  leadershipinfluence               = 1;
     private double  attributesinfluenceinsidelocation = 0.001;
-    private double  klausurdeath                      = 0.001;
+    private double  klausurdeath                      = 0.0015;
+
 
     public Simulation(Dhimulate dh, List<Student> students, List<Location> locations) {
         this.students = students;
@@ -86,36 +84,6 @@ public class Simulation extends AnimationTimer {
         }
     }
 
-
-    private void setlaptopconfig() {
-        attributesInfluence = 1; //0.2    #1
-        distanceStudentInfluence = 1;//1        #1
-        distanceLocationInfluence = 0.05;//0.1   #0.06
-        directionInfluence = 0.1;        //#0.1
-        studentInfluence = 1;
-        locationInfluence = 1;
-        timelineInfluence = 1;           //#1
-        studentsPrioMAX = 0.0;
-        locationsPrioMAX = 0.0;
-        studentsVMAX = 0.7;//0.5   //#0.6
-        directionInfluenceByStudents = 0.0002; //0.0002  #0.0002
-        directionInfluenceByLocations = 0.0007;//0.002       #0.001
-        attributesInfluenceByStudents = 0.000000001;//0.1 #0.000000001
-        attributesInfluenceByLocations = 0.00001;//0.003  #0.00001
-        adjustattributesInfluenceByStudents = 0.000001;//0.000001  #0.000001
-        adjustattributesInfluenceByLocations = 0.00000000001;//0.00000001  #0.00000000001
-        minGapBetweenStudents = 1;
-        //healthdecreaseondanger = 0.05; //#0.05
-        //onesemesterisxdays=3;
-        healthdecreaseondanger *= 2;
-        stay_factor = 0.1;
-        leadershipinfluence = 1;
-        attributesinfluenceinsidelocation = 0.001;
-        klausurdeath = 0.0015;
-        discokillness = 10;
-        elsehealness = 3;
-    }
-
     private void simStudent(Student student, long elapsed) {
         //analyse students
         this.prioritizeStudents(student);
@@ -145,7 +113,7 @@ public class Simulation extends AnimationTimer {
             }
 
             //adjust direction according to students and locations
-            this.adjustDirection(student, elapsed);
+            adjustDirection(student);
 
             //move the Student
             student.move(elapsed);
@@ -172,7 +140,6 @@ public class Simulation extends AnimationTimer {
     private void adjustAttributesInsideLocation(Student student) {
         double v1, v2, f;
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-            f = 1;
             v1 = student.getAttribute(i);
             v2 = student.getInsidelocation().getAttribute(i);
             if (student.getInsidelocation().getName().equals("Disco")) {
@@ -246,10 +213,8 @@ public class Simulation extends AnimationTimer {
     private void adjustAttributes(Student currentStudent) {
         double[] csAttr = currentStudent.getAttributes();
         for (Student student : students) {
-            if (student.isAlive()) {
-                if (student.getPriority() > 0) {
-                    csAttr = compareToOtherElement(csAttr, student, studentsPrioMAX, adjustattributesInfluenceByStudents);
-                }
+            if (student.isAlive() && student.getPriority() > 0) {
+                csAttr = compareToOtherElement(csAttr, student, studentsPrioMAX, adjustattributesInfluenceByStudents);
             }
         }
 
@@ -295,12 +260,11 @@ public class Simulation extends AnimationTimer {
         if (((int) time[1]) != lastmin) {
             m_dhimulate.updateTime(day, time);
         }
-        ;
     }
 
 
     //adjusting direction
-    private void adjustDirection(Student referenceStudent, long elapsed) {
+    private void adjustDirection(Student referenceStudent) {
         //iterate through all students and locations
         double factor;
         Vector2D refPos = referenceStudent.getPosition();
@@ -371,6 +335,7 @@ public class Simulation extends AnimationTimer {
         if (l.shrink()) {
             s.getCircle().setVisible(true);
             s.setMoving(true);
+
         }
     }
 
@@ -418,8 +383,6 @@ public class Simulation extends AnimationTimer {
         }
     }
 
-
-    @Override
     public void handle(long nownano) {
         long elapsed = nownano - lastnano;
         lastnano = nownano;
@@ -442,8 +405,8 @@ public class Simulation extends AnimationTimer {
     }
 
     private void handlesemesterprogress() { //called every minute
-        semesterprogress = (((day - 1) + time[0] / 24) % onesemesterisxdays) / onesemesterisxdays;
-        m_dhimulate.setsemesterprogress(semesterprogress);
+        semesterprogress = (((day - 1) + time[0] / 24) % daysPerSemester) / daysPerSemester;
+        m_dhimulate.setSemesterProgress(semesterprogress);
         if (semesterprogress >= 0.9) {
             if (!klausurzeit) {
                 m_dhimulate.handleKlausuren();
@@ -451,40 +414,20 @@ public class Simulation extends AnimationTimer {
             }
         }
 
-        if ((day - 1) % (onesemesterisxdays) == 0 && klausurzeit && day != 1) {
+        if ((day - 1) % (daysPerSemester) == 0 && klausurzeit && day != 1) {
             klausurzeit = false;
             if (m_dhimulate.getSemestercnt() == 6) {
-                m_dhimulate.handlesimulationend();
+                m_dhimulate.handleSimulationEnd();
             }
             else {
-                m_dhimulate.handlesemesterend();
+                m_dhimulate.handleSemesterEnd();
                 day = 1;
             }
-        }
-
-
-    }
-
-    @Override
-    public void start() {
-        super.start();
-        lastnano = System.nanoTime();
-        running = true;
-        if (laptop) {
-            setlaptopconfig();
         }
     }
 
     public boolean isRunning() {
         return running;
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
-        running = false;
-
-
     }
 
 }

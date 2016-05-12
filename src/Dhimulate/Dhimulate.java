@@ -1,6 +1,5 @@
 package Dhimulate;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import javafx.application.Application;
@@ -24,6 +23,7 @@ public class Dhimulate extends Application {
     private static final Map<String, Scene> m_ScenesMap = new HashMap<>();
     private static Stage      m_PrimaryStage;
     private static Simulation m_Simulation;
+    private static SimTimer   m_Timer;
     private        String     m_OS;
     public static int      MAXStudentCNT       = 200;
     private       int      StudentCNT          = 100;
@@ -96,7 +96,6 @@ public class Dhimulate extends Application {
             StudentCNT = (int) ((Slider) getScene("config").lookup("#countSlider")).getValue();
             StudentNumberStart = StudentCNT;
             StudentNumber = StudentCNT;
-            System.out.println(((Slider) getScene("config").lookup("#countSlider")).getValue());
             configandstartSim();
         });
 
@@ -140,64 +139,9 @@ public class Dhimulate extends Application {
         alkoholBarn = ((ProgressBar) getScene("report2").lookup("#alkoholBarn"));
     }
 
-    public void handlepause(Button b) {
-        if (m_Simulation.isRunning()) {
-            m_Simulation.stop();
-            b.setText("Weiter");
-        }
-        else {
-            if (semesterend) {
-                startnewsemester();
-            }
-            m_Simulation.start();
-            b.setText("Stop");
-        }
-    }
-
-
-    private void getConstants() {
-        m_Simulation.onesemesterisxdays = ((Slider) getScene("config").lookup("#onesemesterisxdaysSlider")).getValue();
-        m_Simulation.healthdecreaseondanger = ((Slider) getScene("config").lookup("#healthdecreaseondangerSlider")).getValue();
-        m_Simulation.adjustattributesInfluenceByStudents = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByStudentsSlider")).getValue();
-        m_Simulation.adjustattributesInfluenceByLocations = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByLocationsSlider")).getValue();
-        m_Simulation.directionInfluenceByStudents = ((Slider) getScene("config").lookup("#directionInfluenceByStudentsSlider")).getValue();
-        m_Simulation.directionInfluenceByLocations = ((Slider) getScene("config").lookup("#directionInfluenceByLocationsSlider")).getValue();
-        m_Simulation.timelineInfluence = ((Slider) getScene("config").lookup("#timelineInfluenceSlider")).getValue();
-        m_Simulation.distanceStudentInfluence = ((Slider) getScene("config").lookup("#distanceStudentInfluenceSlider")).getValue();
-        m_Simulation.distanceLocationInfluence = ((Slider) getScene("config").lookup("#distanceLocationInfluenceSlider")).getValue();
-    }
-
-    public void updateTime(int day, double[] time) {
-        timelabel.setText(day + ". Tag" + "  " + stockTime("" + ((int) time[0])) + ":" + stockTime("" + ((int) time[1]))/*+":"+((int)time[2])*/ + "Uhr");
-        if (time[0] > 12) {
-            darkness.setOpacity(-0.3 + ((time[0] % 12) / 12));
-        }
-        else {
-            darkness.setOpacity(0.7 - ((time[0] / 12)));
-        }
-    }
-
-    private void updateStudentsLabel() {
-        studentslabel.setText("Studenten: " + StudentNumber + "/" + StudentNumberStart);
-    }
-
-    public void killStudent(Student s) {
-        if (s != null) {
-            StudentNumber--;
-            updateStudentsLabel();
-            s.die();
-        }
-    }
-
-    private String stockTime(String part) {
-        if (part.length() != 2) {
-            part = "0" + part;
-        }
-        return part;
-    }
-
     private void configandstartSim() {
         initGame();
+        m_Timer = new SimTimer(m_Simulation);
         m_PrimaryStage.setScene(getScene(MainGameSceneName));
         klausurenpane.toFront();
         zwischenstand.toFront();
@@ -210,7 +154,7 @@ public class Dhimulate extends Application {
         teamBar.toFront();
 
         toppane.toFront();
-        m_Simulation.start();
+        m_Timer.start();
     }
 
     private void initGame() {
@@ -220,6 +164,64 @@ public class Dhimulate extends Application {
         getConstants();
         handlezwischenstand(false);
         calcAttributesTotal(startAttributes);
+    }
+
+    private void getConstants() {
+        m_Simulation.daysPerSemester = ((Slider) getScene("config").lookup("#onesemesterisxdaysSlider")).getValue();
+        m_Simulation.healthdecreaseondanger = ((Slider) getScene("config").lookup("#healthdecreaseondangerSlider")).getValue();
+        m_Simulation.adjustattributesInfluenceByStudents = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByStudentsSlider")).getValue();
+        m_Simulation.adjustattributesInfluenceByLocations = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByLocationsSlider")).getValue();
+        m_Simulation.directionInfluenceByStudents = ((Slider) getScene("config").lookup("#directionInfluenceByStudentsSlider")).getValue();
+        m_Simulation.directionInfluenceByLocations = ((Slider) getScene("config").lookup("#directionInfluenceByLocationsSlider")).getValue();
+        m_Simulation.timelineInfluence = ((Slider) getScene("config").lookup("#timelineInfluenceSlider")).getValue();
+        m_Simulation.distanceStudentInfluence = ((Slider) getScene("config").lookup("#distanceStudentInfluenceSlider")).getValue();
+        m_Simulation.distanceLocationInfluence = ((Slider) getScene("config").lookup("#distanceLocationInfluenceSlider")).getValue();
+    }
+
+    public void handlepause(Button b) {
+        if (m_Simulation.isRunning()) {
+            m_Timer.stop();
+            b.setText("Weiter");
+        }
+        else {
+            if (semesterend) {
+                startnewsemester();
+            }
+            m_Timer.start();
+            b.setText("Stop");
+        }
+    }
+
+    public void updateTime(int day, double[] time) {
+        timelabel.setText(day + ". Tag" + "  " + stockTime("" + ((int) time[0])) + ":" + stockTime("" + ((int) time[1]))/*+":"+((int)time[2])*/ + "Uhr");
+        if (time[0] > 12) {
+            darkness.setOpacity(-0.3 + ((time[0] % 12) / 12));
+        }
+        else {
+            darkness.setOpacity(0.7 - ((time[0] / 12)));
+        }
+    }
+
+    private String stockTime(String part) {
+        if (part.length() != 2) {
+            part = "0" + part;
+        }
+        return part;
+    }
+
+    public void killStudent(Student s) {
+        if (s != null) {
+            StudentNumber--;
+            updateStudentsLabel();
+            s.die();
+        }
+        if (StudentNumber == 0) {
+            handleSimulationEnd();
+        }
+    }
+
+    private void updateStudentsLabel() {
+        studentslabel.setText("Studenten: " + StudentNumber + "/" + StudentNumberStart);
     }
 
     private void handlezwischenstand(boolean b) {
@@ -360,54 +362,6 @@ public class Dhimulate extends Application {
         files.add("sim3.fxml");
         fillScenesMap(files);
     }
-    
-    /*//load all scenes from the view folder
-    private void loadScenes() {
-        String path = "";
-        try {
-            path = new File(".").getCanonicalPath();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        List<String> files = getFilesOsDependent(path);
-        fillScenesMap(files);
-    }
-
-    //to fix issues between the way linux stores files and the way windows does
-    private List<String> getFilesOsDependent(final String path) {
-        File folder;
-        if (isWindows()) {
-            folder = new File(path + "\\src\\view");
-        }
-        else {
-            folder = new File(path + "/src/view");
-        }
-        return getAllFilesOfFolder(folder);
-    }
-
-    //check if the os is windows
-    private boolean isWindows() {
-        return getOsName().startsWith("Windows");
-    }
-
-    private String getOsName() {
-        if (m_OS == null) {
-            m_OS = System.getProperty("os.name");
-        }
-        return m_OS;
-    }
-
-    //load all files from the specified folder
-    private List<String> getAllFilesOfFolder(final File folder) {
-        List<String> files = new LinkedList<>();
-        for (final File fileEntry : folder.listFiles()) {
-            if (!fileEntry.isDirectory() && fileEntry.getName().matches("(.*)fxml")) {
-                files.add(fileEntry.getName());
-            }
-        }
-        return files;
-    }*/
 
     //Fill the different levels with objects etc.
     private void fillScenesMap(List<String> files) {
@@ -458,7 +412,7 @@ public class Dhimulate extends Application {
         return m_locations;
     }
 
-    public void setsemesterprogress(double p) {
+    public void setSemesterProgress(double p) {
         semesterprogress.setProgress(p);
     }
 
@@ -466,7 +420,7 @@ public class Dhimulate extends Application {
         return MainGameSceneName;
     }
 
-    public void handlesemesterend() {
+    public void handleSemesterEnd() {
         handlepause(m_pausebutton);
         klausurenpane.setVisible(false);
         calcAttributesTotal(currentAttributes);
@@ -487,7 +441,7 @@ public class Dhimulate extends Application {
         klausurenpane.setVisible(true);
     }
 
-    public void handlesimulationend() {
+    public void handleSimulationEnd() {
         handlepause(m_pausebutton);
         calcAttributesTotal(currentAttributes);
 
