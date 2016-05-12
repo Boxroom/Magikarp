@@ -2,6 +2,8 @@ package simulation;
 
 import Dhimulate.Dhimulate;
 import java.util.List;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.paint.Color;
 import model.*;
 
@@ -24,23 +26,24 @@ public class Simulation {
     private List<Location> locations;
     private double   attributesInfluence               = 1;
     private double   directionInfluence                = 0.1;
-    private double   studentsPrioMAX                   = 0.0;
-    private double   locationsPrioMAX                  = 0.0;
-    private double   studentsVMAX                      = 0.7;
-    private double   attributesInfluenceByStudents     = 0.000000001;
-    private double   attributesInfluenceByLocations    = 0.00001;
-    private double   minGapBetweenStudents             = 1;
-    private int      day                               = 0;
-    private double[] time                              = new double[3];
-    private double   semesterProgress                  = 0;
-    private boolean  klausurenTime                     = false;
-    private double   discoLethality                    = 10;
-    private double   restMending                       = 3;
-    private double   lockDistanceStudentLocation       = 50;
-    private double   stayFactor                        = 0.1;
-    private double   leadershipInfluence               = 1;
-    private double   attributesInfluenceInsideLocation = 0.001;
-    private double   klausurDeath                      = 0.0015;
+    private double          studentsPrioMAX                   = 0.0;
+    private double          locationsPrioMAX                  = 0.0;
+    private double          studentsVMAX                      = 0.7;
+    private double          attributesInfluenceByStudents     = 0.000000001;
+    private double          attributesInfluenceByLocations    = 0.00001;
+    private double          minGapBetweenStudents             = 1;
+    private int             day                               = 0;
+    private double[]        time                              = new double[3];
+    private BooleanProperty minutePassed                      = new SimpleBooleanProperty(false);
+    private double          semesterProgress                  = 0;
+    private boolean         klausurenTime                     = false;
+    private double          discoLethality                    = 10;
+    private double          restMending                       = 3;
+    private double          lockDistanceStudentLocation       = 50;
+    private double          stayFactor                        = 0.1;
+    private double          leadershipInfluence               = 1;
+    private double          attributesInfluenceInsideLocation = 0.001;
+    private double          klausurDeath                      = 0.0015;
     private double   simSpeed                          = 2;
 
 
@@ -62,7 +65,6 @@ public class Simulation {
 
     //time0 hours, time1 minutes, time2 seconds
     private void addTime(long elapsed) {
-        int lastMinute = (int) time[1];
         double secondsElapsed = ((double) elapsed) / (1000000000.0 / 2000);
         time[2] += secondsElapsed;
         if (time[2] > 60) {
@@ -77,9 +79,10 @@ public class Simulation {
                 }
                 handleSemesterProgress();
             }
+            setMinutePassed(true);
         }
-        if (((int) time[1]) != lastMinute) {
-            m_dhimulate.updateTime(day, time);
+        if (getMinutePassed()) {
+            setMinutePassed(false);
         }
     }
 
@@ -400,6 +403,26 @@ public class Simulation {
             s.setInsidelocation(l);
             s.setInlocationcnt(0);
         }
+    }
+
+    public boolean getMinutePassed() {
+        return minutePassed.get();
+    }
+
+    public BooleanProperty minutePassedProperty() {
+        return minutePassed;
+    }
+
+    public void setMinutePassed(final boolean minutePassed) {
+        this.minutePassed.set(minutePassed);
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public double[] getTime() {
+        return time;
     }
 
     private double getTime(int i) {

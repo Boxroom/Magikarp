@@ -220,6 +220,13 @@ public class Dhimulate extends Application {
         createLocations();
         createStudents(studentStartCount);
         m_Simulation = new Simulation(this, m_students, m_locations);
+        m_Simulation.minutePassedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                int day = m_Simulation.getDay();
+                double[] time = m_Simulation.getTime();
+                updateTime(day, time);
+            }
+        });
         getConstants();
         handleZwischenstand(false);
         calcAttributesTotal(startAttributes);
