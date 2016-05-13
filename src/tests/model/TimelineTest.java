@@ -13,7 +13,7 @@ public class TimelineTest {
     @Before
     public void setUp() throws Exception {
         timeline = new Timeline();
-        TimelineEvent evt = new TimelineEvent("evt", 15, 20);
+        final TimelineEvent evt = new TimelineEvent("evt", 15, 20);
         timeline.addEvent(evt);
     }
 

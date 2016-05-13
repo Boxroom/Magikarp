@@ -10,39 +10,39 @@ import model.*;
  */
 public class Simulation {
 
-    public        double distanceStudentInfluence             = 1;
-    public        double distanceLocationInfluence            = 0.05;
-    public        double timelineInfluence                    = 1;
-    public        double directionInfluenceByStudents         = 0.0002;
-    public        double directionInfluenceByLocations        = 0.0007;
-    public        double adjustAttributesInfluenceByStudents  = 0.000001;
-    public        double adjustAttributesInfluenceByLocations = 0.00000000001;
-    public        double healthDecreaseOnDanger               = 0.004;
-    public        int    daysPerSemester                      = 3;
-    private final double attributesInfluence                  = 1.0;
-    private final double directionInfluence                   = 0.1;
-    private final double studentsVMAX                         = 0.7;
-    private final double attributesInfluenceByStudents        = 0.000000001;
-    private final double attributesInfluenceByLocations       = 0.00001;
-    private final double minGapBetweenStudents                = 1.0;
-    private final double discoMultiplier                      = 6.0;
-    private final double restMultiplier                       = 2.5;
-    private final double lockDistanceStudentLocation          = 50.0;
-    private final double stayFactor                           = 0.1;
-    private final double leadershipInfluence                  = 1.0;
-    private final double attributesInfluenceInsideLocation    = 0.001;
-    private final double klausurDeath                         = 0.001;
-    private final int    simSpeed                             = 3;
-    private List<Student>  students;
-    private List<Location> locations;
-    private BooleanProperty minutePassed     = new SimpleBooleanProperty(false);
-    private DoubleProperty  semesterProgress = new SimpleDoubleProperty(0.0);
-    private IntegerProperty day              = new SimpleIntegerProperty(1);
-    private boolean         klausurenTime    = false;
-    private double[]        time             = {0.0, 0.0, 0.0};
-    private double          studentsPrioMAX  = 0.0;
-    private double          locationsPrioMAX = 0.0;
-    private int             semesterCount    = 1;
+    public        double   distanceStudentInfluence             = 1;
+    public        double   distanceLocationInfluence            = 0.05;
+    public        double   timelineInfluence                    = 1;
+    public        double   directionInfluenceByStudents         = 0.0002;
+    public        double   directionInfluenceByLocations        = 0.0007;
+    public        double   adjustAttributesInfluenceByStudents  = 0.000001;
+    public        double   adjustAttributesInfluenceByLocations = 0.00000000001;
+    public        double   healthDecreaseOnDanger               = 0.004;
+    public        int      daysPerSemester                      = 3;
+    private final double   attributesInfluence                  = 1.0;
+    private final double   directionInfluence                   = 0.1;
+    private final double   studentsVMAX                         = 0.7;
+    private final double   attributesInfluenceByStudents        = 0.000000001;
+    private final double   attributesInfluenceByLocations       = 0.00001;
+    private final double   minGapBetweenStudents                = 1.0;
+    private final double   discoMultiplier                      = 6.0;
+    private final double   restMultiplier                       = 2.5;
+    private final double   lockDistanceStudentLocation          = 50.0;
+    private final double   stayFactor                           = 0.1;
+    private final double   leadershipInfluence                  = 1.0;
+    private final double   attributesInfluenceInsideLocation    = 0.001;
+    private final double   klausurDeath                         = 0.001;
+    private final double[] time                                 = {0.0, 0.0, 0.0};
+    private final int      simSpeed                             = 3;
+    private final List<Student>  students;
+    private final List<Location> locations;
+    private final BooleanProperty minutePassed     = new SimpleBooleanProperty(false);
+    private final DoubleProperty  semesterProgress = new SimpleDoubleProperty(0.0);
+    private final IntegerProperty day              = new SimpleIntegerProperty(1);
+    private       boolean         klausurenTime    = false;
+    private       double          studentsPrioMAX  = 0.0;
+    private       double          locationsPrioMAX = 0.0;
+    private       int             semesterCount    = 1;
 
 
     public Simulation(List<Student> students, List<Location> locations) {
@@ -82,7 +82,7 @@ public class Simulation {
     private void simAllStudents(long elapsed) {
         locationsPrioMAX = 0;
         studentsPrioMAX = 0;
-        for (Student student : students) {
+        for (final Student student : students) {
             if (!student.isDisabled()) {
                 if (student.isAlive()) {
                     simStudent(student, elapsed);
@@ -96,7 +96,7 @@ public class Simulation {
 
     private void simEvents() {
         Status s;
-        for (Location l : locations) {
+        for (final Location l : locations) {
             s = l.getTimeline().getStatus(time[0]);
             if (l.isShowingNotification()) {
                 l.animNotification();
@@ -180,13 +180,13 @@ public class Simulation {
         double distance;
         double direction;
         studentsPrioMAX = 0.0;
-        double[] refAttr = referenceStudent.getAttributes();
-        for (Student student : students) {
+        final double[] refAttr = referenceStudent.getAttributes();
+        for (final Student student : students) {
             if (student.isAlive() && (student.getId() != referenceStudent.getId() || !student.isMoving())) {
                 //compare attributes
                 attributesDifference = 0.0;
 
-                double[] sAttr = student.getAttributes();
+                final double[] sAttr = student.getAttributes();
                 double pot;
                 for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
                     pot = Math.abs(sAttr[i] - refAttr[i]);
@@ -195,8 +195,8 @@ public class Simulation {
                 attributesDifference = attributesDifference + (Math.abs(referenceStudent.getDanger() - student.getDanger()) * Math.abs(referenceStudent.getDanger() - student.getDanger()));
 
                 //compare position
-                Vector2D refPos = referenceStudent.getPosition();
-                Vector2D sPos = student.getPosition();
+                final Vector2D refPos = referenceStudent.getPosition();
+                final Vector2D sPos = student.getPosition();
                 distance = refPos.getDistanceTo(sPos);
                 student.setDist(distance);
 
@@ -205,8 +205,8 @@ public class Simulation {
                 }
 
                 //compare Direction
-                Vector2D refDir = referenceStudent.getDirection();
-                Vector2D sDir = student.getDirection();
+                final Vector2D refDir = referenceStudent.getDirection();
+                final Vector2D sDir = student.getDirection();
                 direction = refDir.getDistanceTo(sDir);
 
                 //combine those
@@ -224,7 +224,7 @@ public class Simulation {
 
     private void prioritizeLocations(Student referenceStudent) {
         locationsPrioMAX = 0;
-        for (Location location : locations) {
+        for (final Location location : locations) {
             prioritizeLocation(referenceStudent, location);
         }
     }
@@ -236,13 +236,13 @@ public class Simulation {
     //adjusting attributes
     private void adjustAttributes(Student currentStudent) {
         double[] csAttr = currentStudent.getAttributes();
-        for (Student student : students) {
+        for (final Student student : students) {
             if (student.isAlive() && student.getPriority() > 0) {
                 csAttr = compareToOtherElement(csAttr, student, studentsPrioMAX, adjustAttributesInfluenceByStudents);
             }
         }
 
-        for (Location location : locations) {
+        for (final Location location : locations) {
             csAttr = compareToOtherElement(csAttr, location, locationsPrioMAX, adjustAttributesInfluenceByLocations);
         }
         currentStudent.setAttributes(csAttr);
@@ -250,13 +250,13 @@ public class Simulation {
 
     //adjusting direction
     private void adjustDirection(Student referenceStudent) {
-        Vector2D refPos = referenceStudent.getPosition();
+        final Vector2D refPos = referenceStudent.getPosition();
         Vector2D pos2;
         Vector2D delta;
-        Vector2D studentsDir = new Vector2D(0, 0);
-        Vector2D locationsDir = new Vector2D(0, 0);
+        final Vector2D studentsDir = new Vector2D(0, 0);
+        final Vector2D locationsDir = new Vector2D(0, 0);
 
-        for (Student student : students) {
+        for (final Student student : students) {
             if (student.getID() != referenceStudent.getID() && student.getPriority() > 0 && student.isAlive()) {
                 pos2 = student.getPosition();
                 delta = refPos.subtract(pos2);
@@ -267,7 +267,7 @@ public class Simulation {
             }
         }
 
-        for (Location location : locations) {
+        for (final Location location : locations) {
             pos2 = location.getCenterPosition();
             delta = refPos.subtract(pos2);
             delta.normalize2();
@@ -278,7 +278,7 @@ public class Simulation {
 
         locationsDir.scalarMultiplication2(students.size() / locations.size());
 
-        Vector2D refDir = referenceStudent.getDirection();
+        final Vector2D refDir = referenceStudent.getDirection();
         studentsDir.scalarMultiplication2(directionInfluenceByStudents);
         locationsDir.scalarMultiplication2(directionInfluenceByLocations);
         refDir.subtract2(studentsDir);
@@ -312,8 +312,8 @@ public class Simulation {
     private void prioritizeLocation(Student referenceStudent, Location location) {
         //compare attributes
         double attributesDifference = 0.0;
-        double[] lAttr = location.getAttributes();
-        double[] refAttr = referenceStudent.getAttributes();
+        final double[] lAttr = location.getAttributes();
+        final double[] refAttr = referenceStudent.getAttributes();
         double pot;
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
             pot = Math.abs(lAttr[i] - refAttr[i]);
@@ -322,9 +322,9 @@ public class Simulation {
         attributesDifference = attributesDifference + (Math.abs(referenceStudent.getDanger() - location.getDanger()) * Math.abs(referenceStudent.getDanger() - location.getDanger()));
 
         //compare position
-        Vector2D refPos = referenceStudent.getPosition();
-        Vector2D lPos = location.getCenterPosition();
-        double distance = refPos.getDistanceTo(lPos);
+        final Vector2D refPos = referenceStudent.getPosition();
+        final Vector2D lPos = location.getCenterPosition();
+        final double distance = refPos.getDistanceTo(lPos);
         location.setDist(distance);
 
         if (distance < lockDistanceStudentLocation && referenceStudent.isMoving()) {
@@ -344,7 +344,7 @@ public class Simulation {
                 stay = referenceStudent.getInLocationCnt();
             }
         }
-        double prio = stay * stayFactor + distanceLocationInfluence * distance + Status.toInt(location.getTimeline().getStatus(getTime(0))) * timelineInfluence + attributesDifference * attributesInfluenceByLocations * attributesInfluence;
+        final double prio = stay * stayFactor + distanceLocationInfluence * distance + Status.toInt(location.getTimeline().getStatus(getTime(0))) * timelineInfluence + attributesDifference * attributesInfluenceByLocations * attributesInfluence;
         location.setPriority(prio);
         if (location.getPriority() > locationsPrioMAX) {
             locationsPrioMAX = location.getPriority();
@@ -352,7 +352,7 @@ public class Simulation {
     }
 
     private double[] compareToOtherElement(double[] csAttr, SimElement element, double priomax, double influence) {
-        double[] elemAttr = element.getAttributes();
+        final double[] elemAttr = element.getAttributes();
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
             csAttr[i] += ((elemAttr[i] - csAttr[i]) * (1 - (element.getPriority() / priomax)) * influence);
         }

@@ -1,4 +1,4 @@
-package Dhimulate;
+package main;
 
 import java.io.IOException;
 import java.util.*;
@@ -20,28 +20,28 @@ import simulation.Simulation;
  * @author Jendrik, nilsw
  */
 public class Dhimulate extends Application {
-    public static final  int                MaxStudentCount = 200;
-    private static final Map<String, Scene> m_ScenesMap     = new HashMap<>();
-    private static Stage      m_PrimaryStage;
-    private static SimTimer   m_Timer;
-    private static Simulation m_Simulation;
-    private static Label      timelabel, studentslabel;
-    private static Rectangle      darkness;
+    public static final int                MaxStudentCount = 200;
+    private final       Map<String, Scene> m_ScenesMap     = new HashMap<>();
+    private Stage      m_PrimaryStage;
+    private SimTimer   m_Timer;
+    private Simulation m_Simulation;
+    private Label      timeLabel, studentsLabel;
+    private        Rectangle      darkness;
     private        List<Student>  m_students;
     private        List<Location> m_locations;
     private        int            studentStartCount;
     private        int            currentStudentCount;
-    private double[] referenceAttributes  = new double[SimElement.ATTR_COUNT];
-    private double[] startAttributes      = new double[SimElement.ATTR_COUNT];
-    private double[] currentAttributes    = new double[SimElement.ATTR_COUNT];
-    private boolean  semesterEnded        = false;
-    private double   adjustingToReference = 0.5;
-    private String   MainGameSceneName    = "sim3";
+    private final double[] referenceAttributes  = new double[SimElement.ATTR_COUNT];
+    private final double[] startAttributes      = new double[SimElement.ATTR_COUNT];
+    private final double[] currentAttributes    = new double[SimElement.ATTR_COUNT];
+    private final double   adjustingToReference = 0.5;
+    private final String   MainGameSceneName    = "sim3";
+    private       boolean  semesterEnded        = false;
     private StackPane   topPane;
     private ProgressBar semesterProgressBar;
     private Button      m_pauseButton;
-    private Pane        klausurenpane;
-    private Label       semestercntLabel;
+    private Pane        klausurenPane;
+    private Label       semesterCntLabel;
     private TitledPane  intermediateResults;
     private ProgressBar studentenBar, teamBar, partyBar, lernenBar, fuhrungBar, alkoholBar;
     private ProgressBar studentenBarv, teamBarv, partyBarv, lernenBarv, fuhrungBarv, alkoholBarv;
@@ -85,7 +85,7 @@ public class Dhimulate extends Application {
 
     //load all scenes from the view folder
     private void loadScenes() {
-        List<String> files = new LinkedList<>();
+        final List<String> files = new LinkedList<>();
         files.add("config.fxml");
         files.add("sim3.fxml");
         files.add("report2.fxml");
@@ -102,7 +102,7 @@ public class Dhimulate extends Application {
         m_PrimaryStage.setScene(getScene(MainGameSceneName));
         toggleStageIfMaximized();
 
-        klausurenpane.toFront();
+        klausurenPane.toFront();
         intermediateResults.toFront();
         lernenBar.toFront();
         studentenBar.toFront();
@@ -137,8 +137,8 @@ public class Dhimulate extends Application {
     }
 
     private void save() {
-        double[] before = new double[SimElement.ATTR_COUNT + 1];
-        double[] after = new double[SimElement.ATTR_COUNT + 1];
+        final double[] before = new double[SimElement.ATTR_COUNT + 1];
+        final double[] after = new double[SimElement.ATTR_COUNT + 1];
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
             before[i + 1] = startAttributes[i];
             after[i + 1] = currentAttributes[i];
@@ -149,15 +149,15 @@ public class Dhimulate extends Application {
     }
 
     private void lookupNodes() {
-        timelabel = ((Label) getScene(MainGameSceneName).lookup("#timeLabel"));
-        studentslabel = ((Label) getScene(MainGameSceneName).lookup("#studentenLabel"));
+        timeLabel = ((Label) getScene(MainGameSceneName).lookup("#timeLabel"));
+        studentsLabel = ((Label) getScene(MainGameSceneName).lookup("#studentenLabel"));
         darkness = ((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
         semesterProgressBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
         topPane = ((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
         m_pauseButton = (Button) getScene(getMainGameSceneName()).lookup("#pauseButton");
-        klausurenpane = (Pane) getScene(getMainGameSceneName()).lookup("#klausurenpane");
+        klausurenPane = (Pane) getScene(getMainGameSceneName()).lookup("#klausurenpane");
         intermediateResults = (TitledPane) getScene(getMainGameSceneName()).lookup("#semesterbericht");
-        semestercntLabel = ((Label) getScene(MainGameSceneName).lookup("#semestercnt"));
+        semesterCntLabel = ((Label) getScene(MainGameSceneName).lookup("#semestercnt"));
 
         studentenBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#studentenBar"));
         teamBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#teamBar"));
@@ -188,13 +188,13 @@ public class Dhimulate extends Application {
     //Fill the different levels with objects etc.
     private void fillScenesMap(List<String> files) {
         String name;
-        for (String filename : files) {
+        for (final String filename : files) {
             try {
                 name = filename.split("\\.")[0];
-                Scene scene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("view/" + filename)));
+                final Scene scene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("view/" + filename)));
                 m_ScenesMap.put(name, scene);
             }
-            catch (IOException e) {
+            catch (final IOException e) {
                 e.printStackTrace();
             }
         }
@@ -206,8 +206,8 @@ public class Dhimulate extends Application {
         m_Simulation = new Simulation(m_students, m_locations);
         m_Simulation.minutePassedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                int day = m_Simulation.getDay();
-                double[] time = m_Simulation.getTime();
+                final int day = m_Simulation.getDay();
+                final double[] time = m_Simulation.getTime();
                 if (day <= m_Simulation.daysPerSemester) {
                     updateTime(day, time);
                 }
@@ -217,7 +217,7 @@ public class Dhimulate extends Application {
             final double semesterProgress = newValue.doubleValue();
             semesterProgressBar.setProgress(semesterProgress);
             if (semesterProgress >= 0.9) {
-                klausurenpane.setVisible(true);
+                klausurenPane.setVisible(true);
             }
         }));
         m_Simulation.dayProperty().addListener(((observable, oldValue, newValue) -> {
@@ -238,8 +238,8 @@ public class Dhimulate extends Application {
 
     private void startNextSemester() {
         m_Simulation.setDay(1);
-        semestercntLabel.setText(m_Simulation.getSemesterCount() + ". Sem.");
-        for (Student student : m_students) {
+        semesterCntLabel.setText(m_Simulation.getSemesterCount() + ". Sem.");
+        for (final Student student : m_students) {
             student.setPosition(Math.random() * 1280, 50 + Math.random() * 700);
             student.setHealth(100);
         }
@@ -322,7 +322,7 @@ public class Dhimulate extends Application {
         ImageView img;
         for (int i = 0; i < cnt; i++) {
             //create new student object
-            Student s = new Student(i);
+            final Student s = new Student(i);
             s.failedProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
                     killStudent(s);
@@ -376,7 +376,7 @@ public class Dhimulate extends Application {
     }
 
     private void handleZwischenstand(boolean b) {
-        klausurenpane.setVisible(b);
+        klausurenPane.setVisible(b);
         intermediateResults.setVisible(b);
         lernenBar.setVisible(b);
         studentenBar.setVisible(b);
@@ -390,7 +390,7 @@ public class Dhimulate extends Application {
         for (int i = 0; i < Student.ATTR_COUNT; i++) {
             a[i] = 0;
         }
-        for (Student student : m_students) {
+        for (final Student student : m_students) {
             for (int i = 0; i < Student.ATTR_COUNT; i++) {
                 a[i] += student.getAttribute(i);
             }
@@ -401,11 +401,11 @@ public class Dhimulate extends Application {
     }
 
     private void updateStudentsLabel() {
-        studentslabel.setText("Studenten: " + currentStudentCount + "/" + studentStartCount);
+        studentsLabel.setText("Studenten: " + currentStudentCount + "/" + studentStartCount);
     }
 
     private void updateTime(int day, double[] time) {
-        timelabel.setText(day + ". Tag" + "  " + padTime(time[0]) + ":" + padTime(time[1]) + "Uhr");
+        timeLabel.setText(day + ". Tag" + "  " + padTime(time[0]) + ":" + padTime(time[1]) + "Uhr");
         if (time[0] > 12) {
             darkness.setOpacity(-0.3 + ((time[0] % 12) / 12));
         }
@@ -457,7 +457,7 @@ public class Dhimulate extends Application {
 
     //switch to the scene with the title (name)
     private boolean setScene(String name) {
-        Scene scene = getScene(name);
+        final Scene scene = getScene(name);
         if (scene == null) {
             return false;
         }
@@ -467,7 +467,7 @@ public class Dhimulate extends Application {
 
     private void handleSemesterEnd() {
         handlePause(m_pauseButton);
-        klausurenpane.setVisible(false);
+        klausurenPane.setVisible(false);
         calcAttributesTotal(currentAttributes);
 
         studentenBar.setProgress((double) currentStudentCount / (double) studentStartCount);
@@ -479,6 +479,6 @@ public class Dhimulate extends Application {
 
         handleZwischenstand(true);
         semesterEnded = true;
-        klausurenpane.setVisible(false);
+        klausurenPane.setVisible(false);
     }
 }

@@ -1,4 +1,4 @@
-package Dhimulate;
+package main;
 
 import javafx.animation.AnimationTimer;
 import simulation.Simulation;
@@ -8,8 +8,8 @@ import simulation.Simulation;
  */
 public class SimTimer extends AnimationTimer {
 
-    private Simulation sim;
-    private long       before;
+    private final Simulation sim;
+    private       long       before;
     private boolean running = false;
 
     private int  frames;
@@ -23,7 +23,7 @@ public class SimTimer extends AnimationTimer {
     public void handle(final long now) {
         //measureAndPrintFPS();
 
-        long elapsed = now - before;
+        final long elapsed = now - before;
         before = now;
         sim.handle(elapsed);
     }

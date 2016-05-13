@@ -11,12 +11,12 @@ import javafx.scene.shape.Circle;
  */
 public class Student extends SimElement {
 
-    public static int      deathAnimMax = 150;
-    public        boolean  disabled     = false;
-    private       Vector2D direction    = new Vector2D(0, 0);
+    public static final int      deathAnimMax = 150;
+    public              boolean  disabled     = false;
+    private             Vector2D direction    = new Vector2D(0, 0);
     private int condition;
-    private boolean         moving = true;
-    private BooleanProperty failed = new SimpleBooleanProperty(false);
+    private       boolean         moving = true;
+    private final BooleanProperty failed = new SimpleBooleanProperty(false);
     private String forename, surname, enrolmentNumber, course;
     private Circle    m_circle;
     private ImageView deathImg;
@@ -33,7 +33,7 @@ public class Student extends SimElement {
     }
 
     public void setDirection(double x, double y) {
-        Vector2D v = getDirection();
+        final Vector2D v = getDirection();
         v.mX = x;
         v.mY = y;
         setDirection(v);
@@ -42,7 +42,7 @@ public class Student extends SimElement {
     @Override
     public void setPosition(final Vector2D pos) {
         super.setPosition(pos);
-        Circle c = getCircle();
+        final Circle c = getCircle();
         if (c != null) {
             getCircle().setLayoutX(pos.mX);
             getCircle().setLayoutY(pos.mY);

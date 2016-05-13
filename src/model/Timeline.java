@@ -8,9 +8,9 @@ import java.util.List;
  */
 public class Timeline {
 
-    private List<TimelineEvent> events;
+    private final List<TimelineEvent> events;
 
-    private double beforeRangeInHours = 1.0;
+    private final double beforeRangeInHours = 1.0;
 
     public Timeline() {
         this.events = new LinkedList<>();
@@ -29,7 +29,7 @@ public class Timeline {
     }
 
     public Status getStatus(double now) {
-        for (TimelineEvent event : events) {
+        for (final TimelineEvent event : events) {
             if (event.start < event.end) {
                 if (event.start <= now && now <= event.end) {
                     // if the event is running
@@ -57,7 +57,7 @@ public class Timeline {
     }
 
     public TimelineEvent getCurrentEvent(double now) {
-        for (TimelineEvent event : events) {
+        for (final TimelineEvent event : events) {
             if (event.start < event.end) {
                 if (event.start <= now && now <= event.end) {
                     // if the event is running

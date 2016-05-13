@@ -21,7 +21,7 @@ public class Vector2D {
     //adds a vector2D (v) to this Vector2D and returns a new Vector2D
     //this does not change any of the vectors being added
     public Vector2D add(Vector2D v) {
-        Vector2D result = new Vector2D();
+        final Vector2D result = new Vector2D();
         result.mX = this.mX + v.mX;
         result.mY = this.mY + v.mY;
         return result;
@@ -37,7 +37,7 @@ public class Vector2D {
     //substract a vector2D (v) from this Vector2D and return a new Vector2D
     //this does not change any of the vectors being used
     public Vector2D subtract(Vector2D v) {
-        Vector2D result = new Vector2D();
+        final Vector2D result = new Vector2D();
         result.mX = this.mX - v.mX;
         result.mY = this.mY - v.mY;
         return result;
@@ -111,7 +111,7 @@ public class Vector2D {
     //multiplies the Vector2D with a constant factor and returns the result as a new Vector
     //the Vector2D is not changed
     public Vector2D scalarMultiplication(double factor) {
-        Vector2D result = new Vector2D();
+        final Vector2D result = new Vector2D();
         result.mX = this.mX * factor;
         result.mY = this.mY * factor;
         return result;

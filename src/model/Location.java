@@ -8,7 +8,7 @@ import javafx.scene.image.ImageView;
  */
 public class Location extends SimElement {
 
-    public static String[] names = {"Disco", "Universität", "Bibliothek", "Zuhause"};
+    public static final String[] names = {"Disco", "Universität", "Bibliothek", "Zuhause"};
 
     private Timeline timeline;
 
@@ -25,7 +25,7 @@ public class Location extends SimElement {
 
 
     private ImageView image;
-    private int notificationcntMAX = 300;
+    private final int notificationcntMAX = 300;
 
     public void setNotificationcnt(int notificationcnt) {
         this.notificationcnt = notificationcnt;
@@ -77,7 +77,7 @@ public class Location extends SimElement {
     }
 
     private void adjustScaling() {
-        double factor = ((double) 1) + ((double) (studentsinside)) / ((double) 20);
+        final double factor = ((double) 1) + ((double) (studentsinside)) / ((double) 20);
         image.setScaleX(factor);
         image.setScaleY(factor);
         image.setScaleZ(factor);
@@ -114,8 +114,8 @@ public class Location extends SimElement {
     }
 
     public Vector2D getCenterPosition() {
-        Vector2D pos = super.getPosition();
-        Vector2D n = new Vector2D(pos.mX, pos.mY);
+        final Vector2D pos = super.getPosition();
+        final Vector2D n = new Vector2D(pos.mX, pos.mY);
         n.mX += 20;
         n.mY += 20;
         return n;
@@ -145,7 +145,7 @@ public class Location extends SimElement {
 
     public void resetNotification() {
         notificationlabel.setVisible(false);
-        Vector2D v = getPosition();
+        final Vector2D v = getPosition();
         notificationlabel.setLayoutX(v.mX - 20);
         notificationlabel.setLayoutY(v.mY - 30);
         setNotificationcnt(0);

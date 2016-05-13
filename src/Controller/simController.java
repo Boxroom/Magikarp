@@ -1,6 +1,5 @@
-package Controller;
+package controller;
 
-import Dhimulate.Dhimulate;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -9,6 +8,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import main.Dhimulate;
 
 /**
  * Created by mlg on 24.04.2016.

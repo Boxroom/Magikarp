@@ -6,13 +6,13 @@ package model;
 public abstract class SimElement {
 
     public static final int    ATTR_COUNT = 5;
-    public static       int    LEADERSHIP = 1;
-    public static       int    TEAM       = 2;
-    public static       int    LEARNING   = 3;
-    public static       int    ALCOHOL    = 4;
-    public static       int    PARTY      = 0;
-    public static       double dangerMAX  = 200;
-    int id;
+    public static final int    LEADERSHIP = 1;
+    public static final int    TEAM       = 2;
+    public static final int    LEARNING   = 3;
+    public static final int    ALCOHOL    = 4;
+    public static final int    PARTY      = 0;
+    public static final double dangerMAX  = 200;
+    final int id;
     private Vector2D position = new Vector2D(0, 0);
     private double priority;
     private double[] attributes = new double[ATTR_COUNT];

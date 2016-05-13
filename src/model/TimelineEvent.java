@@ -4,8 +4,9 @@ package model;
  * @author nilsw
  */
 public class TimelineEvent {
-    public String name;
-    public double start, end;
+    public final String name;
+    public final double start;
+    public final double end;
 
     public TimelineEvent(final String name, double start, double end) {
         this.start = start;

@@ -9,13 +9,13 @@ import javafx.scene.layout.GridPane;
 
 public class Window {
 
-    private BorderPane root;
+    private final BorderPane root;
 
     public Window(String title, boolean topButtons, boolean leftButtons, String fxmlRessource) {
         root = new BorderPane();
 
         try {
-            GridPane center;
+            final GridPane center;
             center = (GridPane) FXMLLoader.load(getClass().getResource(fxmlRessource));
             center.getStyleClass().add("center");
             center.setPadding(new Insets(10, 10, 10, 10));
@@ -23,12 +23,12 @@ public class Window {
             center.setHgap(4);
             center.setPrefSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-            ImageView img = new ImageView("bg.png");
+            final ImageView img = new ImageView("bg.png");
             img.fitWidthProperty().bind(center.widthProperty());
 
             root.setCenter(center);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             e.printStackTrace();
         }
     }
