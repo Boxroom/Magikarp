@@ -15,7 +15,7 @@ public class Window {
         root = new BorderPane();
 
         try {
-            GridPane center = new GridPane();
+            GridPane center;
             center = (GridPane) FXMLLoader.load(getClass().getResource(fxmlRessource));
             center.getStyleClass().add("center");
             center.setPadding(new Insets(10, 10, 10, 10));
@@ -24,7 +24,7 @@ public class Window {
             center.setPrefSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
             ImageView img = new ImageView("bg.png");
-            img.fitWidthProperty().bind(center.widthProperty()); //muss so eingebaut werden, dass das bild an richtiger Stelle (unter Timeline) erscheint.
+            img.fitWidthProperty().bind(center.widthProperty());
 
             root.setCenter(center);
         }

@@ -21,19 +21,19 @@ public class Simulation {
     public int    daysPerSemester                      = 3;
     private List<Student>  students;
     private List<Location> locations;
-    private BooleanProperty minutePassed                      = new SimpleBooleanProperty(false);
-    private DoubleProperty  semesterProgress                  = new SimpleDoubleProperty(0.0);
-    private IntegerProperty day                               = new SimpleIntegerProperty(1);
-    private int             semesterCount                     = 1;
-    private double[]        time                              = new double[3];
-    private boolean         klausurenTime                     = false;
-    private double          attributesInfluence               = 1.0;
-    private double          directionInfluence                = 0.1;
-    private double          studentsPrioMAX                   = 0.0;
-    private double          locationsPrioMAX                  = 0.0;
-    private double          studentsVMAX                      = 0.7;
-    private double          attributesInfluenceByStudents     = 0.000000001;
-    private double          attributesInfluenceByLocations    = 0.00001;
+    private BooleanProperty minutePassed                   = new SimpleBooleanProperty(false);
+    private DoubleProperty  semesterProgress               = new SimpleDoubleProperty(0.0);
+    private IntegerProperty day                            = new SimpleIntegerProperty(1);
+    private int             semesterCount                  = 1;
+    private double[]        time                           = {0.0, 0.0, 0.0};
+    private boolean         klausurenTime                  = false;
+    private double          attributesInfluence            = 1.0;
+    private double          directionInfluence             = 0.1;
+    private double          studentsPrioMAX                = 0.0;
+    private double          locationsPrioMAX               = 0.0;
+    private double          studentsVMAX                   = 0.7;
+    private double          attributesInfluenceByStudents  = 0.000000001;
+    private double          attributesInfluenceByLocations = 0.00001;
     private double          minGapBetweenStudents             = 1.0;
     private double          discoLethality                    = 10.0;
     private double          restMending                       = 3.0;
@@ -48,9 +48,6 @@ public class Simulation {
     public Simulation(List<Student> students, List<Location> locations) {
         this.students = students;
         this.locations = locations;
-        time[0] = 0;
-        time[1] = 0;
-        time[2] = 0;
     }
 
     public void handle(long elapsed) {

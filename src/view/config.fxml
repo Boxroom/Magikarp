@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- @author Nils Wende -->
+<!-- @author Nils Wende, Jendrik -->
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
@@ -85,7 +85,7 @@
                         <GridPane>
                             <children>
                                 <Label text="Tage pro Semester"/>
-                                <Label text="Prozente des Alkohols" GridPane.rowIndex="1">
+                                <Label text="Alkoholeinfluss" GridPane.rowIndex="1">
                                     <GridPane.margin>
                                         <Insets/>
                                     </GridPane.margin>

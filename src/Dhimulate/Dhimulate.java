@@ -20,7 +20,7 @@ import simulation.Simulation;
  * @author Jendrik, nilsw
  */
 public class Dhimulate extends Application {
-    public static        int                MaxStudentCount = 200;
+    public static final  int                MaxStudentCount = 200;
     private static final Map<String, Scene> m_ScenesMap     = new HashMap<>();
     private static Stage      m_PrimaryStage;
     private static SimTimer   m_Timer;
@@ -29,8 +29,8 @@ public class Dhimulate extends Application {
     private static Rectangle      darkness;
     private        List<Student>  m_students;
     private        List<Location> m_locations;
-    private int      studentStartCount    = 100;
-    private int      currentStudentCount  = 0;
+    private        int            studentStartCount;
+    private        int            currentStudentCount;
     private double[] referenceAttributes  = new double[SimElement.ATTR_COUNT];
     private double[] startAttributes      = new double[SimElement.ATTR_COUNT];
     private double[] currentAttributes    = new double[SimElement.ATTR_COUNT];
@@ -58,7 +58,7 @@ public class Dhimulate extends Application {
         primaryStage.setScene(getScene("config"));
 
         primaryStage.setTitle("Magikarp Dhimulate");
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         primaryStage.show();
 
 
@@ -103,6 +103,7 @@ public class Dhimulate extends Application {
         initGame();
         m_Timer = new SimTimer(m_Simulation);
         m_PrimaryStage.setScene(getScene(MainGameSceneName));
+        toggleStageIfMaximized();
 
         klausurenpane.toFront();
         intermediateResults.toFront();
@@ -115,6 +116,13 @@ public class Dhimulate extends Application {
         topPane.toFront();
 
         m_Timer.start();
+    }
+
+    private void toggleStageIfMaximized() {
+        if (m_PrimaryStage.isMaximized()) {
+            m_PrimaryStage.setMaximized(false);
+            m_PrimaryStage.setMaximized(true);
+        }
     }
 
     private void handlePause(Button b) {
@@ -212,7 +220,7 @@ public class Dhimulate extends Application {
             final double semesterProgress = newValue.doubleValue();
             semesterProgressBar.setProgress(semesterProgress);
             if (semesterProgress >= 0.9) {
-                handleKlausuren();
+                klausurenpane.setVisible(true);
             }
         }));
         m_Simulation.dayProperty().addListener(((observable, oldValue, newValue) -> {
@@ -451,6 +459,7 @@ public class Dhimulate extends Application {
         alkoholBarn.setProgress(currentAttributes[SimElement.ALCOHOL] / 100);
 
         m_PrimaryStage.setScene(getScene("report2"));
+        toggleStageIfMaximized();
     }
 
     //switch to the scene with the title (name)
@@ -490,9 +499,5 @@ public class Dhimulate extends Application {
         handleZwischenstand(true);
         semesterEnded = true;
         klausurenpane.setVisible(false);
-    }
-
-    private void handleKlausuren() {
-        klausurenpane.setVisible(true);
     }
 }

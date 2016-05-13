@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- @author Nils Wende -->
+<!-- @author Nils Wende, Jendrik -->
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
@@ -68,7 +68,7 @@
                 <Image url="@uni.png"/>
             </image>
         </ImageView>
-        <Rectangle fx:id="darkness" arcHeight="5.0" arcWidth="5.0" fill="#0c082c" height="691.0" layoutY="53.0"
+        <Rectangle fx:id="darkness" arcHeight="5.0" arcWidth="5.0" fill="#0c082c" height="730.0" layoutY="53.0"
                    opacity="0.73" stroke="BLACK" strokeType="INSIDE" width="1300.0"/>
         <Label fx:id="lectureLabel" layoutX="620.0" layoutY="331.0" text="Vorlesungsbeginn!" textAlignment="CENTER"
                textFill="WHITE" visible="false">
@@ -103,7 +103,8 @@
         <Pane fx:id="klausurenpane" layoutX="1000.0" layoutY="320.0" AnchorPane.leftAnchor="0.0"
               AnchorPane.rightAnchor="-1044.0">
             <children>
-                <Rectangle fx:id="darkness1" arcHeight="5.0" arcWidth="5.0" fill="RED" height="96.0" opacity="0.39"
+                <Rectangle fx:id="klausurenPaneBackground" arcHeight="5.0" arcWidth="5.0" fill="RED" height="96.0"
+                           opacity="0.39"
                            stroke="BLACK" strokeType="INSIDE" width="1324.0"/>
                 <Label layoutX="500.0" layoutY="10.0" text="KLAUSUREN" textFill="WHITE">
                     <font>
