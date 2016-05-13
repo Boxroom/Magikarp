@@ -25,14 +25,14 @@ public class Simulation {
     private final double attributesInfluenceByStudents        = 0.000000001;
     private final double attributesInfluenceByLocations       = 0.00001;
     private final double minGapBetweenStudents                = 1.0;
-    private final double discoLethality                       = 10.0;
-    private final double restMending                          = 3.0;
+    private final double discoMultiplier                      = 6.0;
+    private final double restMultiplier                       = 2.5;
     private final double lockDistanceStudentLocation          = 50.0;
     private final double stayFactor                           = 0.1;
     private final double leadershipInfluence                  = 1.0;
     private final double attributesInfluenceInsideLocation    = 0.001;
-    private final double klausurDeath                         = 0.0015;
-    private final double simSpeed                             = 2;
+    private final double klausurDeath                         = 0.001;
+    private final int    simSpeed                             = 3;
     private List<Student>  students;
     private List<Location> locations;
     private BooleanProperty minutePassed     = new SimpleBooleanProperty(false);
@@ -52,7 +52,7 @@ public class Simulation {
 
     public void handle(long elapsed) {
         addTime(elapsed);
-        simAllStudents((long) (elapsed * simSpeed));
+        simAllStudents(elapsed * simSpeed);
         simEvents();
     }
 
@@ -201,7 +201,7 @@ public class Simulation {
                 student.setDist(distance);
 
                 if (distance < minGapBetweenStudents) {
-                    distance = distance + (minGapBetweenStudents - distance) * 4;
+                    distance += (minGapBetweenStudents - distance) * 4;
                 }
 
                 //compare Direction
@@ -290,17 +290,14 @@ public class Simulation {
     }
 
     private void adjustAttributesInsideLocation(Student student) {
-        double v1, v2, f;
+        double studentAttr, locationAttr, locationMultiplier;
+        Location loc;
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-            v1 = student.getAttribute(i);
-            v2 = student.getInsideLocation().getAttribute(i);
-            if (student.getInsideLocation().getName().equals("Disco")) {
-                f = discoLethality;
-            }
-            else {
-                f = restMending;
-            }
-            student.setAttributes(i, v1 + (v2 - v1) * attributesInfluenceInsideLocation * f);
+            studentAttr = student.getAttribute(i);
+            loc = student.getInsideLocation();
+            locationAttr = loc.getAttribute(i);
+            locationMultiplier = loc.getName().equals("Disco") ? discoMultiplier : restMultiplier;
+            student.setAttributes(i, studentAttr + (locationAttr - studentAttr) * attributesInfluenceInsideLocation * locationMultiplier);
         }
     }
 

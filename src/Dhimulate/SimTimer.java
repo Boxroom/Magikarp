@@ -9,8 +9,11 @@ import simulation.Simulation;
 public class SimTimer extends AnimationTimer {
 
     private Simulation sim;
-    private long    before  = 0;
+    private long       before;
     private boolean running = false;
+
+    private int  frames;
+    private long firstFrame, currentFrame;
 
     SimTimer(final Simulation sim) {
         this.sim = sim;
@@ -18,15 +21,29 @@ public class SimTimer extends AnimationTimer {
 
     @Override
     public void handle(final long now) {
+        //measureAndPrintFPS();
+
         long elapsed = now - before;
         before = now;
         sim.handle(elapsed);
     }
 
+    private void measureAndPrintFPS() {
+        ++frames;
+        currentFrame = System.currentTimeMillis();
+        if (currentFrame >= firstFrame + 1000) {
+            System.out.println(frames + " FPS");
+            firstFrame = currentFrame;
+            frames = 0;
+        }
+    }
+
     @Override
     public void start() {
-        super.start();
+        firstFrame = System.currentTimeMillis();
+
         before = System.nanoTime();
+        super.start();
         running = true;
     }
 
