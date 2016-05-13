@@ -10,7 +10,7 @@ public class Timeline {
 
     private List<TimelineEvent> events;
 
-    private double beforeRange = 1.0;
+    private double beforeRangeInHours = 1.0;
 
     public Timeline() {
         this.events = new LinkedList<>();
@@ -35,18 +35,18 @@ public class Timeline {
                     // if the event is running
                     return Status.IN_EVENT;
                 }
-                else if (event.start - beforeRange <= now && now < event.start) {
+                else if (event.start - beforeRangeInHours <= now && now < event.start) {
                     // if we're right before the event
                     return Status.BEFORE_EVENT;
 
                 }
             }
-            else if (event.start > event.end) {
+            else if (event.start > event.end) { //runs until next day
                 if (event.start <= now || now <= event.end) {
                     // if the event is running
                     return Status.IN_EVENT;
                 }
-                else if (event.start - beforeRange <= now && now < event.start) {
+                else if (event.start - beforeRangeInHours <= now && now < event.start) {
                     // if we're right before the event
                     return Status.BEFORE_EVENT;
 
@@ -63,17 +63,17 @@ public class Timeline {
                     // if the event is running
                     return event;
                 }
-                else if (event.start - beforeRange <= now && now < event.start) {
+                else if (event.start - beforeRangeInHours <= now && now < event.start) {
                     // if we're right before the event
                     return event;
                 }
             }
-            else if (event.start > event.end) {
+            else if (event.start > event.end) { //runs until next day
                 if (event.start <= now || now <= event.end) {
                     // if the event is running
                     return event;
                 }
-                else if (event.start - beforeRange <= now && now < event.start) {
+                else if (event.start - beforeRangeInHours <= now && now < event.start) {
                     // if we're right before the event
                     return event;
                 }

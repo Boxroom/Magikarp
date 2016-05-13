@@ -31,18 +31,18 @@ public class Dhimulate extends Application {
     private        List<Location> m_locations;
     private int      studentStartCount    = 100;
     private int      currentStudentCount  = 0;
-    private double[] referenceattributes  = new double[SimElement.ATTR_COUNT];
+    private double[] referenceAttributes  = new double[SimElement.ATTR_COUNT];
     private double[] startAttributes      = new double[SimElement.ATTR_COUNT];
     private double[] currentAttributes    = new double[SimElement.ATTR_COUNT];
     private boolean  semesterEnded        = false;
     private double   adjustingToReference = 0.5;
     private String   MainGameSceneName    = "sim3";
-    private StackPane   toppane;
+    private StackPane   topPane;
     private ProgressBar semesterProgressBar;
-    private Button      m_pausebutton;
+    private Button      m_pauseButton;
     private Pane        klausurenpane;
     private Label       semestercntLabel;
-    private TitledPane  zwischenstand;
+    private TitledPane  intermediateResults;
     private ProgressBar studentenBar, teamBar, partyBar, lernenBar, fuhrungBar, alkoholBar;
     private ProgressBar studentenBarv, teamBarv, partyBarv, lernenBarv, fuhrungBarv, alkoholBarv;
     private ProgressBar studentenBarn, teamBarn, partyBarn, lernenBarn, fuhrungBarn, alkoholBarn;
@@ -57,18 +57,17 @@ public class Dhimulate extends Application {
         loadScenes();
         primaryStage.setScene(getScene("config"));
 
-        primaryStage.setTitle("Magikarp DHBW Simulation");
+        primaryStage.setTitle("Magikarp Dhimulate");
         primaryStage.setResizable(false);
         primaryStage.show();
 
 
         ((Button) getScene("config").lookup("#startButton")).setOnAction(event -> {
-            referenceattributes[SimElement.ALCOHOL] = ((Slider) getScene("config").lookup("#alcSlider")).getValue();
-
-            referenceattributes[SimElement.PARTY] = ((Slider) getScene("config").lookup("#partySlider")).getValue();
-            referenceattributes[SimElement.LEADERSHIP] = ((Slider) getScene("config").lookup("#leaderSlider")).getValue();
-            referenceattributes[SimElement.TEAM] = ((Slider) getScene("config").lookup("#teamSlider")).getValue();
-            referenceattributes[SimElement.LEARNING] = ((Slider) getScene("config").lookup("#learnSlider")).getValue();
+            referenceAttributes[SimElement.ALCOHOL] = ((Slider) getScene("config").lookup("#alcSlider")).getValue();
+            referenceAttributes[SimElement.PARTY] = ((Slider) getScene("config").lookup("#partySlider")).getValue();
+            referenceAttributes[SimElement.LEADERSHIP] = ((Slider) getScene("config").lookup("#leaderSlider")).getValue();
+            referenceAttributes[SimElement.TEAM] = ((Slider) getScene("config").lookup("#teamSlider")).getValue();
+            referenceAttributes[SimElement.LEARNING] = ((Slider) getScene("config").lookup("#learnSlider")).getValue();
             studentStartCount = (int) ((Slider) getScene("config").lookup("#countSlider")).getValue();
             currentStudentCount = studentStartCount;
             configAndStartSim();
@@ -81,36 +80,7 @@ public class Dhimulate extends Application {
             m_PrimaryStage.close();
         });
 
-        timelabel = ((Label) getScene(MainGameSceneName).lookup("#timeLabel"));
-        studentslabel = ((Label) getScene(MainGameSceneName).lookup("#studentenLabel"));
-        darkness = ((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
-        semesterProgressBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
-        toppane = ((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
-        m_pausebutton = (Button) getScene(getMainGameSceneName()).lookup("#pauseButton");
-        klausurenpane = (Pane) getScene(getMainGameSceneName()).lookup("#klausurenpane");
-        zwischenstand = (TitledPane) getScene(getMainGameSceneName()).lookup("#semesterbericht");
-        semestercntLabel = ((Label) getScene(MainGameSceneName).lookup("#semestercnt"));
-
-        studentenBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#studentenBar"));
-        teamBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#teamBar"));
-        partyBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#partyBar"));
-        lernenBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#lernenBar"));
-        fuhrungBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#fuhrungBar"));
-        alkoholBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#alkoholBar"));
-
-        studentenBarv = ((ProgressBar) getScene("report2").lookup("#studentenBarv"));
-        teamBarv = ((ProgressBar) getScene("report2").lookup("#teamBarv"));
-        partyBarv = ((ProgressBar) getScene("report2").lookup("#partyBarv"));
-        lernenBarv = ((ProgressBar) getScene("report2").lookup("#lernenBarv"));
-        fuhrungBarv = ((ProgressBar) getScene("report2").lookup("#fuhrungBarv"));
-        alkoholBarv = ((ProgressBar) getScene("report2").lookup("#alkoholBarv"));
-
-        studentenBarn = ((ProgressBar) getScene("report2").lookup("#studentenBarn"));
-        teamBarn = ((ProgressBar) getScene("report2").lookup("#teamBarn"));
-        partyBarn = ((ProgressBar) getScene("report2").lookup("#partyBarn"));
-        lernenBarn = ((ProgressBar) getScene("report2").lookup("#lernenBarn"));
-        fuhrungBarn = ((ProgressBar) getScene("report2").lookup("#fuhrungBarn"));
-        alkoholBarn = ((ProgressBar) getScene("report2").lookup("#alkoholBarn"));
+        lookupNodes();
     }
 
     //load all scenes from the view folder
@@ -133,17 +103,17 @@ public class Dhimulate extends Application {
         initGame();
         m_Timer = new SimTimer(m_Simulation);
         m_PrimaryStage.setScene(getScene(MainGameSceneName));
-        klausurenpane.toFront();
-        zwischenstand.toFront();
 
+        klausurenpane.toFront();
+        intermediateResults.toFront();
         lernenBar.toFront();
         studentenBar.toFront();
         partyBar.toFront();
         alkoholBar.toFront();
         fuhrungBar.toFront();
         teamBar.toFront();
+        topPane.toFront();
 
-        toppane.toFront();
         m_Timer.start();
     }
 
@@ -171,6 +141,39 @@ public class Dhimulate extends Application {
         before[0] = studentStartCount;
         after[0] = currentStudentCount;
         Save.save(before, after);
+    }
+
+    private void lookupNodes() {
+        timelabel = ((Label) getScene(MainGameSceneName).lookup("#timeLabel"));
+        studentslabel = ((Label) getScene(MainGameSceneName).lookup("#studentenLabel"));
+        darkness = ((Rectangle) getScene(MainGameSceneName).lookup("#darkness"));
+        semesterProgressBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#semesterprogress"));
+        topPane = ((StackPane) getScene(MainGameSceneName).lookup("#stackpane"));
+        m_pauseButton = (Button) getScene(getMainGameSceneName()).lookup("#pauseButton");
+        klausurenpane = (Pane) getScene(getMainGameSceneName()).lookup("#klausurenpane");
+        intermediateResults = (TitledPane) getScene(getMainGameSceneName()).lookup("#semesterbericht");
+        semestercntLabel = ((Label) getScene(MainGameSceneName).lookup("#semestercnt"));
+
+        studentenBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#studentenBar"));
+        teamBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#teamBar"));
+        partyBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#partyBar"));
+        lernenBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#lernenBar"));
+        fuhrungBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#fuhrungBar"));
+        alkoholBar = ((ProgressBar) getScene(MainGameSceneName).lookup("#alkoholBar"));
+
+        studentenBarv = ((ProgressBar) getScene("report2").lookup("#studentenBarv"));
+        teamBarv = ((ProgressBar) getScene("report2").lookup("#teamBarv"));
+        partyBarv = ((ProgressBar) getScene("report2").lookup("#partyBarv"));
+        lernenBarv = ((ProgressBar) getScene("report2").lookup("#lernenBarv"));
+        fuhrungBarv = ((ProgressBar) getScene("report2").lookup("#fuhrungBarv"));
+        alkoholBarv = ((ProgressBar) getScene("report2").lookup("#alkoholBarv"));
+
+        studentenBarn = ((ProgressBar) getScene("report2").lookup("#studentenBarn"));
+        teamBarn = ((ProgressBar) getScene("report2").lookup("#teamBarn"));
+        partyBarn = ((ProgressBar) getScene("report2").lookup("#partyBarn"));
+        lernenBarn = ((ProgressBar) getScene("report2").lookup("#lernenBarn"));
+        fuhrungBarn = ((ProgressBar) getScene("report2").lookup("#fuhrungBarn"));
+        alkoholBarn = ((ProgressBar) getScene("report2").lookup("#alkoholBarn"));
     }
 
     private String getMainGameSceneName() {
@@ -207,7 +210,7 @@ public class Dhimulate extends Application {
         });
         m_Simulation.semesterProgressProperty().addListener(((observable, oldValue, newValue) -> {
             final double semesterProgress = newValue.doubleValue();
-            setSemesterProgress(semesterProgress);
+            semesterProgressBar.setProgress(semesterProgress);
             if (semesterProgress >= 0.9) {
                 handleKlausuren();
             }
@@ -341,7 +344,7 @@ public class Dhimulate extends Application {
             //adjust attributes according to reference attributes
             double dif;
             for (int p = 0; p < SimElement.ATTR_COUNT; p++) {
-                dif = referenceattributes[p] - s.getAttribute(p);
+                dif = referenceAttributes[p] - s.getAttribute(p);
                 s.setAttributes(p, s.getAttribute(p) + dif * Math.random() * adjustingToReference);
             }
 
@@ -357,9 +360,9 @@ public class Dhimulate extends Application {
 
     private void getConstants() {
         m_Simulation.daysPerSemester = (int) ((Slider) getScene("config").lookup("#onesemesterisxdaysSlider")).getValue();
-        m_Simulation.healthdecreaseondanger = ((Slider) getScene("config").lookup("#healthdecreaseondangerSlider")).getValue();
-        m_Simulation.adjustattributesInfluenceByStudents = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByStudentsSlider")).getValue();
-        m_Simulation.adjustattributesInfluenceByLocations = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByLocationsSlider")).getValue();
+        m_Simulation.healthDecreaseOnDanger = ((Slider) getScene("config").lookup("#healthdecreaseondangerSlider")).getValue();
+        m_Simulation.adjustAttributesInfluenceByStudents = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByStudentsSlider")).getValue();
+        m_Simulation.adjustAttributesInfluenceByLocations = ((Slider) getScene("config").lookup("#adjustattributesInfluenceByLocationsSlider")).getValue();
         m_Simulation.directionInfluenceByStudents = ((Slider) getScene("config").lookup("#directionInfluenceByStudentsSlider")).getValue();
         m_Simulation.directionInfluenceByLocations = ((Slider) getScene("config").lookup("#directionInfluenceByLocationsSlider")).getValue();
         m_Simulation.timelineInfluence = ((Slider) getScene("config").lookup("#timelineInfluenceSlider")).getValue();
@@ -369,7 +372,7 @@ public class Dhimulate extends Application {
 
     private void handleZwischenstand(boolean b) {
         klausurenpane.setVisible(b);
-        zwischenstand.setVisible(b);
+        intermediateResults.setVisible(b);
         lernenBar.setVisible(b);
         studentenBar.setVisible(b);
         partyBar.setVisible(b);
@@ -430,7 +433,7 @@ public class Dhimulate extends Application {
     }
 
     private void handleSimulationEnd() {
-        handlePause(m_pausebutton);
+        handlePause(m_pauseButton);
         calcAttributesTotal(currentAttributes);
 
         studentenBarv.setProgress((double) studentStartCount / (double) studentStartCount);
@@ -472,12 +475,8 @@ public class Dhimulate extends Application {
         return m_locations;
     }
 
-    private void setSemesterProgress(double p) {
-        semesterProgressBar.setProgress(p);
-    }
-
     private void handleSemesterEnd() {
-        handlePause(m_pausebutton);
+        handlePause(m_pauseButton);
         klausurenpane.setVisible(false);
         calcAttributesTotal(currentAttributes);
 

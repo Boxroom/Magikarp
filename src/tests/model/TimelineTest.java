@@ -13,7 +13,7 @@ public class TimelineTest {
     @Before
     public void setUp() throws Exception {
         timeline = new Timeline();
-        TimelineEvent evt = new TimelineEvent("evt", 10000, 20000);
+        TimelineEvent evt = new TimelineEvent("evt", 15, 20);
         timeline.addEvent(evt);
     }
 
@@ -22,13 +22,13 @@ public class TimelineTest {
         result = timeline.getStatus(0);
         Assert.assertEquals(Status.NO_EVENT, result);
 
-        result = timeline.getStatus(9500);
+        result = timeline.getStatus(14);
         Assert.assertEquals(Status.BEFORE_EVENT, result);
 
-        result = timeline.getStatus(15000);
+        result = timeline.getStatus(16);
         Assert.assertEquals(Status.IN_EVENT, result);
 
-        result = timeline.getStatus(20001);
+        result = timeline.getStatus(20.01);
         Assert.assertEquals(Status.NO_EVENT, result);
     }
 }

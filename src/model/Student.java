@@ -23,8 +23,8 @@ public class Student extends SimElement {
     private boolean   alive;
     private int    deathAnimCnt = 0;
     private double health       = 100;
-    private Location insidelocation;
-    private int inlocationcnt = 0;
+    private Location insideLocation;
+    private int inLocationCnt = 0;
 
     public Student(int id) {
         super(id);
@@ -47,12 +47,41 @@ public class Student extends SimElement {
         if (c != null) {
             getCircle().setLayoutX(pos.mX);
             getCircle().setLayoutY(pos.mY);
-            //if(id==1){System.out.println("[moved] id:"+id+" to x:"+pos.mX+" y:"+pos.mY +" direction:"+getDirection().mX);}
-        }
-        else {
-            //System.out.println("student [id:"+id+"] was null");
         }
     }
+
+    @Override
+    public void setPosition(double x, double y) {
+        super.setPosition(x, y);
+        setPosition(getPosition());
+    }
+
+    public void move(long elapsed) {
+        setPosition(getPosition().mX + getDirection().mX * (elapsed / 10000000), getPosition().mY + getDirection().mY * (elapsed / 10000000));
+    }
+
+    public void die() {
+        getCircle().setVisible(false);
+        deathImg.setVisible(true);
+        deathImg.setLayoutX(getCircle().getLayoutX() - deathImg.getFitWidth() / 2 - 100);
+        deathImg.setLayoutY(getCircle().getLayoutY() - deathImg.getFitHeight() / 2 - 100);
+        alive = false;
+    }
+
+    public void vanish() {
+        deathImg.setVisible(false);
+        disabled = true;
+    }
+
+    public void simDeath() {
+        setDeathAnimCnt(getDeathAnimCnt() + 1);
+        deathImg.setOpacity(deathImg.getOpacity() - 0.005);
+        deathImg.setScaleX(deathImg.getScaleX() * 1.005);
+        deathImg.setScaleY(deathImg.getScaleX() * 1.005);
+    }
+
+
+    /* following only basic getters and setters */
 
     public Vector2D getDirection() {
         return direction;
@@ -70,10 +99,12 @@ public class Student extends SimElement {
         this.direction = direction;
     }
 
-    @Override
-    public void setPosition(double x, double y) {
-        super.setPosition(x, y);
-        setPosition(getPosition());
+    public int getDeathAnimCnt() {
+        return deathAnimCnt;
+    }
+
+    private void setDeathAnimCnt(int deathanimcnt) {
+        this.deathAnimCnt = deathanimcnt;
     }
 
     public boolean getFailed() {
@@ -92,9 +123,6 @@ public class Student extends SimElement {
         return disabled;
     }
 
-
-    /* following only getters and setters */
-
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
     }
@@ -107,20 +135,20 @@ public class Student extends SimElement {
         this.health = health;
     }
 
-    public void setInlocationcnt(int inlocationcnt) {
-        this.inlocationcnt = inlocationcnt;
-    }
-
     public int getInLocationCnt() {
-        return inlocationcnt;
+        return inLocationCnt;
     }
 
-    public Location getInsidelocation() {
-        return insidelocation;
+    public void setInLocationCnt(int inLocationCnt) {
+        this.inLocationCnt = inLocationCnt;
     }
 
-    public void setInsidelocation(Location insidelocation) {
-        this.insidelocation = insidelocation;
+    public Location getInsideLocation() {
+        return insideLocation;
+    }
+
+    public void setInsideLocation(Location insideLocation) {
+        this.insideLocation = insideLocation;
     }
 
     public int getId() {
@@ -175,43 +203,11 @@ public class Student extends SimElement {
         this.course = course;
     }
 
-    public void move(long elapsed) {
-        setPosition(getPosition().mX + getDirection().mX * (elapsed / 10000000), getPosition().mY + getDirection().mY * (elapsed / 10000000));
-    }
-
-    public void die() {
-        getCircle().setVisible(false);
-        deathImg.setVisible(true);
-        deathImg.setLayoutX(getCircle().getLayoutX() - deathImg.getFitWidth() / 2 - 100);
-        deathImg.setLayoutY(getCircle().getLayoutY() - deathImg.getFitHeight() / 2 - 100);
-        alive = false;
-    }
-
     public boolean isAlive() {
         return alive;
     }
 
     public void setDeathImg(ImageView deathImg) {
         this.deathImg = deathImg;
-    }
-
-    public void vanish() {
-        deathImg.setVisible(false);
-        disabled = true;
-    }
-
-    public void simDeath() {
-        setdeathanimcnt(getdeathanimcnt() + 1);
-        deathImg.setOpacity(deathImg.getOpacity() - 0.005);
-        deathImg.setScaleX(deathImg.getScaleX() * 1.005);
-        deathImg.setScaleY(deathImg.getScaleX() * 1.005);
-    }
-
-    private void setdeathanimcnt(int deathanimcnt) {
-        this.deathAnimCnt = deathanimcnt;
-    }
-
-    public int getdeathanimcnt() {
-        return deathAnimCnt;
     }
 }

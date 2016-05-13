@@ -15,9 +15,9 @@ public class Simulation {
     public double timelineInfluence                    = 1;
     public double directionInfluenceByStudents         = 0.0002;
     public double directionInfluenceByLocations        = 0.0007;
-    public double adjustattributesInfluenceByStudents  = 0.000001;
-    public double adjustattributesInfluenceByLocations = 0.00000000001;
-    public double healthdecreaseondanger               = 0.004;
+    public double adjustAttributesInfluenceByStudents  = 0.000001;
+    public double adjustAttributesInfluenceByLocations = 0.00000000001;
+    public double healthDecreaseOnDanger               = 0.004;
     public int    daysPerSemester                      = 3;
     private List<Student>  students;
     private List<Location> locations;
@@ -65,10 +65,10 @@ public class Simulation {
         time[2] += secondsElapsed;
         if (time[2] >= 60) {
             time[1]++;
-            time[2] = time[2] - 60;
+            time[2] -= 60;
             if (time[1] >= 60) {
                 time[0]++;
-                time[1] = time[1] - 60;
+                time[1] -= 60;
                 if (time[0] == 24) {
                     incDay();
                     time[0] = 0;
@@ -133,7 +133,7 @@ public class Simulation {
         this.setDangerColor(student);
 
         if (student.getDanger() > (SimElement.dangerMAX / 1.7)) {
-            student.setHealth(student.getHealth() - (student.getDanger() / (SimElement.dangerMAX / 1.7)) * healthdecreaseondanger);
+            student.setHealth(student.getHealth() - (student.getDanger() / (SimElement.dangerMAX / 1.7)) * healthDecreaseOnDanger);
         }
 
         if (klausurenTime) {
@@ -156,24 +156,24 @@ public class Simulation {
             student.move(elapsed);
 
             if (student.getInLocationCnt() > 0) {
-                student.setInlocationcnt(student.getInLocationCnt() - 1);
+                student.setInLocationCnt(student.getInLocationCnt() - 1);
             }
         }
         else {
             this.adjustAttributesInsideLocation(student);
 
-            student.setInlocationcnt(student.getInLocationCnt() + 4);
+            student.setInLocationCnt(student.getInLocationCnt() + 4);
 
-            if (student.getInsidelocation().getPriority() > locationsPrioMAX * 0.8) {
-                leaveLocation(student, student.getInsidelocation());
+            if (student.getInsideLocation().getPriority() > locationsPrioMAX * 0.8) {
+                leaveLocation(student, student.getInsideLocation());
             }
         }
     }
 
-    private void simDeath(Student element) {
-        element.simDeath();
-        if (element.getdeathanimcnt() > Student.deathAnimMax) {
-            element.vanish();
+    private void simDeath(Student student) {
+        student.simDeath();
+        if (student.getDeathAnimCnt() > Student.deathAnimMax) {
+            student.vanish();
         }
     }
 
@@ -185,13 +185,7 @@ public class Simulation {
         studentsPrioMAX = 0.0;
         double[] refAttr = referenceStudent.getAttributes();
         for (Student student : students) {
-            if (student.isAlive()) {
-                //exit if its the student we are comparing to
-                if (student.getId() == referenceStudent.getId() && student.isMoving()) {
-                    student.setPriority(-1);
-                    continue;
-                }
-
+            if (student.isAlive() && (student.getId() != referenceStudent.getId() || !student.isMoving())) {
                 //compare attributes
                 attributesDifference = 0.0;
 
@@ -225,6 +219,9 @@ public class Simulation {
                     studentsPrioMAX = student.getPriority();
                 }
             }
+            else {
+                student.setPriority(-1);
+            }
         }
     }
 
@@ -244,74 +241,63 @@ public class Simulation {
         double[] csAttr = currentStudent.getAttributes();
         for (Student student : students) {
             if (student.isAlive() && student.getPriority() > 0) {
-                csAttr = compareToOtherElement(csAttr, student, studentsPrioMAX, adjustattributesInfluenceByStudents);
+                csAttr = compareToOtherElement(csAttr, student, studentsPrioMAX, adjustAttributesInfluenceByStudents);
             }
         }
 
         for (Location location : locations) {
-            csAttr = compareToOtherElement(csAttr, location, locationsPrioMAX, adjustattributesInfluenceByLocations);
+            csAttr = compareToOtherElement(csAttr, location, locationsPrioMAX, adjustAttributesInfluenceByLocations);
         }
         currentStudent.setAttributes(csAttr);
     }
 
     //adjusting direction
     private void adjustDirection(Student referenceStudent) {
-        //iterate through all students and locations
-        double factor;
         Vector2D refPos = referenceStudent.getPosition();
         Vector2D pos2;
         Vector2D delta;
         Vector2D studentsDir = new Vector2D(0, 0);
         Vector2D locationsDir = new Vector2D(0, 0);
 
-        //students
         for (Student student : students) {
             if (student.getID() != referenceStudent.getID() && student.getPriority() > 0 && student.isAlive()) {
                 pos2 = student.getPosition();
                 delta = refPos.subtract(pos2);
+                delta.normalize2();
 
-                factor = 1 / delta.length();
-                delta.scalarMultiplication2(factor);
-
-                studentsDir.mX += delta.mX * (1 - (student.getPriority() / studentsPrioMAX));
-                studentsDir.mY += delta.mY * (1 - (student.getPriority() / studentsPrioMAX));
+                delta.scalarMultiplication2(1 - (student.getPriority() / studentsPrioMAX));
+                studentsDir.add2(delta);
             }
         }
 
-        //locations
         for (Location location : locations) {
             pos2 = location.getCenterPosition();
             delta = refPos.subtract(pos2);
+            delta.normalize2();
 
-            factor = 1 / delta.length();
-            delta.scalarMultiplication2(factor);
-
-            locationsDir.mX += delta.mX * (1 - (location.getPriority() / locationsPrioMAX));
-            locationsDir.mY += delta.mY * (1 - (location.getPriority() / locationsPrioMAX));
+            delta.scalarMultiplication2(1 - (location.getPriority() / locationsPrioMAX));
+            locationsDir.add2(delta);
         }
 
-        locationsDir.mX *= (students.size() / locations.size());
-        locationsDir.mY *= (students.size() / locations.size());
-
+        locationsDir.scalarMultiplication2(students.size() / locations.size());
 
         Vector2D refDir = referenceStudent.getDirection();
-        double dX = refDir.mX - studentsDir.mX * directionInfluenceByStudents - locationsDir.mX * directionInfluenceByLocations;
-        double dY = refDir.mY - studentsDir.mY * directionInfluenceByStudents - locationsDir.mY * directionInfluenceByLocations;
+        studentsDir.scalarMultiplication2(directionInfluenceByStudents);
+        locationsDir.scalarMultiplication2(directionInfluenceByLocations);
+        refDir.subtract2(studentsDir);
+        refDir.subtract2(locationsDir);
 
-
-        Vector2D newDir = new Vector2D(dX, dY);
-        factor = studentsVMAX / newDir.length();
-
-        newDir.scalarMultiplication2(factor);
-        referenceStudent.setDirection(newDir);
+        refDir.normalize2();
+        refDir.scalarMultiplication2(studentsVMAX);
+        referenceStudent.setDirection(refDir);
     }
 
     private void adjustAttributesInsideLocation(Student student) {
         double v1, v2, f;
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
             v1 = student.getAttribute(i);
-            v2 = student.getInsidelocation().getAttribute(i);
-            if (student.getInsidelocation().getName().equals("Disco")) {
+            v2 = student.getInsideLocation().getAttribute(i);
+            if (student.getInsideLocation().getName().equals("Disco")) {
                 f = discoLethality;
             }
             else {
@@ -347,22 +333,20 @@ public class Simulation {
         double distance = refPos.getDistanceTo(lPos);
         location.setDist(distance);
 
-        if (distance < lockDistanceStudentLocation) {
+        if (distance < lockDistanceStudentLocation && referenceStudent.isMoving()) {
             //lock on to location
-            if (referenceStudent.isMoving()) {
-                if (referenceStudent.getInLocationCnt() > 0) {
-                    if (referenceStudent.getInsidelocation().getID() != location.getID()) {
-                        enterLocation(referenceStudent, location);
-                    }
-                }
-                else {
+            if (referenceStudent.getInLocationCnt() > 0) {
+                if (referenceStudent.getInsideLocation().getID() != location.getID()) {
                     enterLocation(referenceStudent, location);
                 }
             }
+            else {
+                enterLocation(referenceStudent, location);
+            }
         }
         double stay = 0;
-        if (referenceStudent.getInsidelocation() != null) {
-            if (location.getID() == referenceStudent.getInsidelocation().getID()) {
+        if (referenceStudent.getInsideLocation() != null) {
+            if (location.getID() == referenceStudent.getInsideLocation().getID()) {
                 stay = referenceStudent.getInLocationCnt();
             }
         }
@@ -385,8 +369,8 @@ public class Simulation {
         if (l.grow()) {
             s.getCircle().setVisible(false);
             s.setMoving(false);
-            s.setInsidelocation(l);
-            s.setInlocationcnt(0);
+            s.setInsideLocation(l);
+            s.setInLocationCnt(0);
         }
     }
 
