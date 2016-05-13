@@ -10,39 +10,39 @@ import model.*;
  */
 public class Simulation {
 
-    public double distanceStudentInfluence             = 1;
-    public double distanceLocationInfluence            = 0.05;
-    public double timelineInfluence                    = 1;
-    public double directionInfluenceByStudents         = 0.0002;
-    public double directionInfluenceByLocations        = 0.0007;
-    public double adjustAttributesInfluenceByStudents  = 0.000001;
-    public double adjustAttributesInfluenceByLocations = 0.00000000001;
-    public double healthDecreaseOnDanger               = 0.004;
-    public int    daysPerSemester                      = 3;
+    public        double distanceStudentInfluence             = 1;
+    public        double distanceLocationInfluence            = 0.05;
+    public        double timelineInfluence                    = 1;
+    public        double directionInfluenceByStudents         = 0.0002;
+    public        double directionInfluenceByLocations        = 0.0007;
+    public        double adjustAttributesInfluenceByStudents  = 0.000001;
+    public        double adjustAttributesInfluenceByLocations = 0.00000000001;
+    public        double healthDecreaseOnDanger               = 0.004;
+    public        int    daysPerSemester                      = 3;
+    private final double attributesInfluence                  = 1.0;
+    private final double directionInfluence                   = 0.1;
+    private final double studentsVMAX                         = 0.7;
+    private final double attributesInfluenceByStudents        = 0.000000001;
+    private final double attributesInfluenceByLocations       = 0.00001;
+    private final double minGapBetweenStudents                = 1.0;
+    private final double discoLethality                       = 10.0;
+    private final double restMending                          = 3.0;
+    private final double lockDistanceStudentLocation          = 50.0;
+    private final double stayFactor                           = 0.1;
+    private final double leadershipInfluence                  = 1.0;
+    private final double attributesInfluenceInsideLocation    = 0.001;
+    private final double klausurDeath                         = 0.0015;
+    private final double simSpeed                             = 2;
     private List<Student>  students;
     private List<Location> locations;
-    private BooleanProperty minutePassed                   = new SimpleBooleanProperty(false);
-    private DoubleProperty  semesterProgress               = new SimpleDoubleProperty(0.0);
-    private IntegerProperty day                            = new SimpleIntegerProperty(1);
-    private int             semesterCount                  = 1;
-    private double[]        time                           = {0.0, 0.0, 0.0};
-    private boolean         klausurenTime                  = false;
-    private double          attributesInfluence            = 1.0;
-    private double          directionInfluence             = 0.1;
-    private double          studentsPrioMAX                = 0.0;
-    private double          locationsPrioMAX               = 0.0;
-    private double          studentsVMAX                   = 0.7;
-    private double          attributesInfluenceByStudents  = 0.000000001;
-    private double          attributesInfluenceByLocations = 0.00001;
-    private double          minGapBetweenStudents             = 1.0;
-    private double          discoLethality                    = 10.0;
-    private double          restMending                       = 3.0;
-    private double          lockDistanceStudentLocation       = 50.0;
-    private double          stayFactor                        = 0.1;
-    private double          leadershipInfluence               = 1.0;
-    private double          attributesInfluenceInsideLocation = 0.001;
-    private double          klausurDeath                      = 0.0015;
-    private double          simSpeed                          = 2;
+    private BooleanProperty minutePassed     = new SimpleBooleanProperty(false);
+    private DoubleProperty  semesterProgress = new SimpleDoubleProperty(0.0);
+    private IntegerProperty day              = new SimpleIntegerProperty(1);
+    private boolean         klausurenTime    = false;
+    private double[]        time             = {0.0, 0.0, 0.0};
+    private double          studentsPrioMAX  = 0.0;
+    private double          locationsPrioMAX = 0.0;
+    private int             semesterCount    = 1;
 
 
     public Simulation(List<Student> students, List<Location> locations) {
@@ -58,7 +58,7 @@ public class Simulation {
 
     //time0 hours, time1 minutes, time2 seconds
     private void addTime(long elapsed) {
-        double secondsElapsed = ((double) elapsed) / (1000000000.0 / 2000);
+        final double secondsElapsed = ((double) elapsed) / (1000000000.0 / 2000);
         time[2] += secondsElapsed;
         if (time[2] >= 60) {
             time[1]++;

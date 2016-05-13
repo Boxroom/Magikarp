@@ -20,15 +20,14 @@ public class Student extends SimElement {
     private String forename, surname, enrolmentNumber, course;
     private Circle    m_circle;
     private ImageView deathImg;
-    private boolean   alive;
-    private int    deathAnimCnt = 0;
-    private double health       = 100;
+    private boolean alive        = true;
+    private int     deathAnimCnt = 0;
+    private double  health       = 100;
     private Location insideLocation;
     private int inLocationCnt = 0;
 
     public Student(int id) {
         super(id);
-        alive = true;
         setPosition(Math.random() * 1280, 50 + Math.random() * 700);
         setDirection(Math.random(), Math.random());
     }

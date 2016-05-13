@@ -87,11 +87,8 @@ public class Dhimulate extends Application {
     private void loadScenes() {
         List<String> files = new LinkedList<>();
         files.add("config.fxml");
-        files.add("report.fxml");
-        files.add("report2.fxml");
-        files.add("sim.fxml");
-        files.add("sim2.fxml");
         files.add("sim3.fxml");
+        files.add("report2.fxml");
         fillScenesMap(files);
     }
 
@@ -407,10 +404,6 @@ public class Dhimulate extends Application {
         studentslabel.setText("Studenten: " + currentStudentCount + "/" + studentStartCount);
     }
 
-    @Override
-    public void stop() {
-    }
-
     private void updateTime(int day, double[] time) {
         timelabel.setText(day + ". Tag" + "  " + padTime(time[0]) + ":" + padTime(time[1]) + "Uhr");
         if (time[0] > 12) {
@@ -470,18 +463,6 @@ public class Dhimulate extends Application {
         }
         m_PrimaryStage.setScene(scene);
         return true;
-    }
-
-    private Stage getPrimaryStage() {
-        return m_PrimaryStage;
-    }
-
-    public List<Student> getStudents() {
-        return m_students;
-    }
-
-    public List<Location> getLocations() {
-        return m_locations;
     }
 
     private void handleSemesterEnd() {
