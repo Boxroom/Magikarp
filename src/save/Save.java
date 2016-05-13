@@ -17,11 +17,11 @@ import javax.xml.transform.stream.StreamResult;
 
 public class Save {
 
-    private File dir = new File("./reports");
+    private final File dir = new File("./reports");
 
     // starting the saving process
     public static void save(double[] statsbef, double[] statsaft) {
-        Save savi = new Save();
+        final Save savi = new Save();
         savi.createDir();
         savi.export(statsbef, statsaft);
     }
@@ -40,28 +40,28 @@ public class Save {
     // exporting the xml
     private void export(double[] statsbef, double[] statsaft) {
         //creating timestamp as the name
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-        String tmstamp = dateFormat.format(new Date());
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        final String tmstamp = dateFormat.format(new Date());
 
         //creating the xml structure
         try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
             // root elements
-            Document doc = docBuilder.newDocument();
-            Element rootElement = doc.createElement("Dhimulate");
+            final Document doc = docBuilder.newDocument();
+            final Element rootElement = doc.createElement("Dhimulate");
             doc.appendChild(rootElement);
 
             // staff elements
-            Element report = doc.createElement("Report");
+            final Element report = doc.createElement("Report");
             rootElement.appendChild(report);
 
-            Attr attr = doc.createAttribute("time");
+            final Attr attr = doc.createAttribute("time");
             attr.setValue(tmstamp);
             report.setAttributeNode(attr);
 
-            String[] tags = {"CountBefore", "CountAfter", "PartyBefore", "PartyAfter", "LeadershipBefore", "LeadershipAfter", "TeamBefore", "TeamAfter", "LearningBefore", "LearningAfter", "AlcoholBefore", "AlcoholAfter"};
+            final String[] tags = {"CountBefore", "CountAfter", "PartyBefore", "PartyAfter", "LeadershipBefore", "LeadershipAfter", "TeamBefore", "TeamAfter", "LearningBefore", "LearningAfter", "AlcoholBefore", "AlcoholAfter"};
 
             Element element;
             for (int i = 0; i < tags.length; ++i) {
@@ -76,12 +76,11 @@ public class Save {
             }
 
             // write the content into xml file
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
+            final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            final Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File(dir.getAbsolutePath() + "/" + tmstamp + ".xml"));
-
+            final DOMSource source = new DOMSource(doc);
+            final StreamResult result = new StreamResult(new File(dir.getAbsolutePath() + "/" + tmstamp + ".xml"));
 
             transformer.transform(source, result);
         }
