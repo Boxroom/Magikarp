@@ -15,7 +15,7 @@ public class Location extends SimElement {
     private int     notificationCnt     = 0;
     private boolean showingNotification = false;
     private int     studentsInside      = 0;
-    private Label notificationlabel;
+    private Label notificationLabel;
 
     public Location(int id, String name) {
         super(id);
@@ -27,27 +27,27 @@ public class Location extends SimElement {
         return showingNotification;
     }
 
-    public Label getNotificationlabel() {
-        return notificationlabel;
+    public Label getNotificationLabel() {
+        return notificationLabel;
     }
 
-    public void setNotificationlabel(Label notificationlabel) {
-        this.notificationlabel = notificationlabel;
+    public void setNotificationLabel(Label notificationLabel) {
+        this.notificationLabel = notificationLabel;
 
         resetNotification();
     }
 
-    public void resetNotification() {
-        notificationlabel.setVisible(false);
+    private void resetNotification() {
+        notificationLabel.setVisible(false);
         final Vector2D v = getPosition();
-        notificationlabel.setLayoutX(v.mX - 20);
-        notificationlabel.setLayoutY(v.mY - 30);
+        notificationLabel.setLayoutX(v.mX - 20);
+        notificationLabel.setLayoutY(v.mY - 30);
         setNotificationCnt(0);
-        notificationlabel.setOpacity(1);
+        notificationLabel.setOpacity(1);
         setShowingNotification(false);
     }
 
-    public void setShowingNotification(boolean showingNotification) {
+    private void setShowingNotification(boolean showingNotification) {
         this.showingNotification = showingNotification;
     }
 
@@ -123,11 +123,11 @@ public class Location extends SimElement {
     }
 
     public void animNotification() {
-        setNotificationCnt(getNotificationCnt() + 1);
-        notificationlabel.setOpacity(notificationlabel.getOpacity() - 0.002);
-        notificationlabel.setLayoutY(notificationlabel.getLayoutY() - 0.1);
-        if (getNotificationCnt() > notificationCntMax) {
-            hideNotification();
+        ++notificationCnt;
+        notificationLabel.setOpacity(notificationLabel.getOpacity() - 0.002);
+        notificationLabel.setLayoutY(notificationLabel.getLayoutY() - 0.1);
+        if (notificationCnt > notificationCntMax) {
+            resetNotification();
         }
     }
 
@@ -139,14 +139,10 @@ public class Location extends SimElement {
         this.notificationCnt = notificationCnt;
     }
 
-    public void hideNotification() {
-        resetNotification();
-    }
-
     public void showNotification(String txt) {
         resetNotification();
-        notificationlabel.setText(txt);
-        notificationlabel.setVisible(true);
+        notificationLabel.setText(txt);
+        notificationLabel.setVisible(true);
         setShowingNotification(true);
     }
 

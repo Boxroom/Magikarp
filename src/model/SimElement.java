@@ -43,7 +43,7 @@ public abstract class SimElement {
         return danger;
     }
 
-    public void setDanger(double danger) {
+    private void setDanger(double danger) {
         this.danger = danger;
     }
 

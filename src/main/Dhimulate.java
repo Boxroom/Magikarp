@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -26,18 +25,17 @@ public class Dhimulate extends Application {
     private SimTimer   m_Timer;
     private Simulation m_Simulation;
     private Label      timeLabel, studentsLabel;
-    private        Rectangle      darkness;
-    private        List<Student>  m_students;
-    private        List<Location> m_locations;
-    private        int            studentStartCount;
-    private        int            currentStudentCount;
+    private Rectangle      darkness;
+    private List<Student>  m_students;
+    private List<Location> m_locations;
+    private int            studentStartCount;
+    private int            currentStudentCount;
     private final double[] referenceAttributes  = new double[SimElement.ATTR_COUNT];
     private final double[] startAttributes      = new double[SimElement.ATTR_COUNT];
     private final double[] currentAttributes    = new double[SimElement.ATTR_COUNT];
     private final double   adjustingToReference = 0.5;
-    private final String   mainSceneName        = "sim3";
     private       boolean  semesterEnded        = false;
-    private StackPane   topPane;
+    private boolean     saved;
     private ProgressBar semesterProgressBar;
     private Button      m_pauseButton;
     private Pane        klausurenPane;
@@ -75,11 +73,18 @@ public class Dhimulate extends Application {
             configAndStartSim();
         });
 
-        ((Button) getScene(mainSceneName).lookup("#pauseButton")).setOnAction(event -> handlePause((Button) event.getSource()));
+        ((Button) getScene("sim3").lookup("#pauseButton")).setOnAction(event -> handlePause((Button) event.getSource()));
 
-        ((Button) getScene("report2").lookup("#save")).setOnAction(event -> {
-            save();
-            m_PrimaryStage.close();
+        ((Button) getScene("report2").lookup("#saveBtn")).setOnAction(event -> {
+            if (!saved) {
+                save();
+                saved = true;
+            }
+        });
+        ((Button) getScene("report2").lookup("#closeBtn")).setOnAction(event -> m_PrimaryStage.close());
+        ((Button) getScene("report2").lookup("#restartBtn")).setOnAction(event -> {
+            semesterCntLabel.setText("1. Sem.");
+            primaryStage.setScene(getScene("config"));
         });
     }
 
@@ -98,9 +103,6 @@ public class Dhimulate extends Application {
 
     private void configAndStartSim() {
         initGame();
-        m_Timer = new SimTimer(m_Simulation);
-        m_PrimaryStage.setScene(getScene(mainSceneName));
-        toggleStageIfMaximized();
 
         klausurenPane.toFront();
         intermediateResults.toFront();
@@ -110,8 +112,11 @@ public class Dhimulate extends Application {
         alkoholBar.toFront();
         fuhrungBar.toFront();
         teamBar.toFront();
-        topPane.toFront();
 
+        final Scene mainScene = getScene("sim3");
+        m_Timer = new SimTimer(m_Simulation);
+        m_PrimaryStage.setScene(mainScene);
+        toggleStageIfMaximized();
         m_Timer.start();
     }
 
@@ -145,18 +150,18 @@ public class Dhimulate extends Application {
         }
         before[0] = studentStartCount;
         after[0] = currentStudentCount;
+        saved = true;
         Save.save(before, after);
     }
 
     private void lookupNodes() {
-        final Scene mainScene = getScene(mainSceneName);
+        final Scene mainScene = getScene("sim3");
         final Scene reportScene = getScene("report2");
 
         timeLabel = ((Label) mainScene.lookup("#timeLabel"));
         studentsLabel = ((Label) mainScene.lookup("#studentenLabel"));
         darkness = ((Rectangle) mainScene.lookup("#darkness"));
         semesterProgressBar = ((ProgressBar) mainScene.lookup("#semesterprogress"));
-        topPane = ((StackPane) mainScene.lookup("#stackpane"));
         m_pauseButton = (Button) mainScene.lookup("#pauseButton");
         klausurenPane = (Pane) mainScene.lookup("#klausurenpane");
         intermediateResults = (TitledPane) mainScene.lookup("#semesterbericht");
@@ -238,15 +243,13 @@ public class Dhimulate extends Application {
     private void startNextSemester() {
         m_Simulation.setDay(1);
         semesterCntLabel.setText(m_Simulation.getSemesterCount() + ". Sem.");
-        for (final Student student : m_students) {
-            if (!student.isDisabled()) {
-                if (student.getDeathAnimCnt() > 0) {
-                    student.vanish();
-                }
-                student.setPosition(Math.random() * 1280, 53 + Math.random() * 720);
-                student.setHealth(100);
+        m_students.stream().filter(student -> !student.isDisabled()).forEach(student -> {
+            if (student.getDeathAnimCnt() > 0) {
+                student.vanish();
             }
-        }
+            student.setPosition(Math.random() * 1280, 53 + Math.random() * 720);
+            student.setHealth(100);
+        });
         showIntermediateResults(false);
         semesterEnded = false;
     }
@@ -263,8 +266,8 @@ public class Dhimulate extends Application {
 
             switch (l.getName()) {
                 case "Universität":
-                    l.setImage((ImageView) getScene(mainSceneName).lookup("#uni"));
-                    l.setNotificationlabel((Label) getScene(mainSceneName).lookup("#lectureLabel"));
+                    l.setImage((ImageView) getScene("sim3").lookup("#uni"));
+                    l.setNotificationLabel((Label) getScene("sim3").lookup("#lectureLabel"));
                     l.setAttributes(SimElement.ALCOHOL, 0);
                     l.setAttributes(SimElement.LEADERSHIP, 100);
                     l.setAttributes(SimElement.LEARNING, 100);
@@ -276,8 +279,8 @@ public class Dhimulate extends Application {
                     l.getTimeline().addEvent(new TimelineEvent("Vorlesungsbeginn!", 13, 16));
                     break;
                 case "Disco":
-                    l.setImage((ImageView) getScene(mainSceneName).lookup("#disco"));
-                    l.setNotificationlabel((Label) getScene(mainSceneName).lookup("#partyLabel"));
+                    l.setImage((ImageView) getScene("sim3").lookup("#disco"));
+                    l.setNotificationLabel((Label) getScene("sim3").lookup("#partyLabel"));
                     l.setAttributes(SimElement.ALCOHOL, 100);
                     l.setAttributes(SimElement.LEADERSHIP, 0);
                     l.setAttributes(SimElement.LEARNING, 0);
@@ -288,8 +291,8 @@ public class Dhimulate extends Application {
                     l.getTimeline().addEvent(new TimelineEvent("Party!", 21, 5));
                     break;
                 case "Bibliothek":
-                    l.setImage((ImageView) getScene(mainSceneName).lookup("#bib"));
-                    l.setNotificationlabel((Label) getScene(mainSceneName).lookup("#learningLabel"));
+                    l.setImage((ImageView) getScene("sim3").lookup("#bib"));
+                    l.setNotificationLabel((Label) getScene("sim3").lookup("#learningLabel"));
                     l.setAttributes(SimElement.ALCOHOL, 0);
                     l.setAttributes(SimElement.LEADERSHIP, 0);
                     l.setAttributes(SimElement.LEARNING, 100);
@@ -300,8 +303,8 @@ public class Dhimulate extends Application {
                     l.getTimeline().addEvent(new TimelineEvent("Endlich lernen!", 15, 20));
                     break;
                 case "Zuhause":
-                    l.setImage((ImageView) getScene(mainSceneName).lookup("#home"));
-                    l.setNotificationlabel((Label) getScene(mainSceneName).lookup("#sleepingLabel"));
+                    l.setImage((ImageView) getScene("sim3").lookup("#home"));
+                    l.setNotificationLabel((Label) getScene("sim3").lookup("#sleepingLabel"));
                     l.setAttributes(SimElement.ALCOHOL, 100);
                     l.setAttributes(SimElement.LEADERSHIP, 0);
                     l.setAttributes(SimElement.LEARNING, 100);
@@ -333,10 +336,10 @@ public class Dhimulate extends Application {
             });
 
             //get circle object
-            c = (Circle) getScene(mainSceneName).lookup("#student" + i);
+            c = (Circle) getScene("sim3").lookup("#student" + i);
 
             //get death object
-            img = (ImageView) getScene(mainSceneName).lookup("#death" + i);
+            img = (ImageView) getScene("sim3").lookup("#death" + i);
 
             //add circle to student
             s.setCircle(c);
@@ -360,7 +363,7 @@ public class Dhimulate extends Application {
             m_students.add(s);
         }
         for (int i = cnt; i < MaxStudentCount; i++) {
-            c = (Circle) getScene(mainSceneName).lookup("#student" + i);
+            c = (Circle) getScene("sim3").lookup("#student" + i);
             c.setVisible(false);
         }
         updateStudentsLabel();
@@ -454,18 +457,9 @@ public class Dhimulate extends Application {
         fuhrungBarn.setProgress(currentAttributes[SimElement.LEADERSHIP] / 100);
         alkoholBarn.setProgress(currentAttributes[SimElement.ALCOHOL] / 100);
 
+        saved = false;
         m_PrimaryStage.setScene(getScene("report2"));
         toggleStageIfMaximized();
-    }
-
-    //switch to the scene with the title (name)
-    private boolean setScene(String name) {
-        final Scene scene = getScene(name);
-        if (scene == null) {
-            return false;
-        }
-        m_PrimaryStage.setScene(scene);
-        return true;
     }
 
     private void handleSemesterEnd() {

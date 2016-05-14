@@ -87,16 +87,14 @@ public class Simulation {
     private void simAllStudents(long elapsed) {
         locationsPrioMAX = 0;
         studentsPrioMAX = 0;
-        for (final Student student : students) {
-            if (!student.isDisabled()) {
-                if (student.isAlive()) {
-                    simStudent(student, elapsed);
-                }
-                else {
-                    simDeath(student);
-                }
+        students.stream().filter(student -> !student.isDisabled()).forEach(student -> {
+            if (student.isAlive()) {
+                simStudent(student, elapsed);
             }
-        }
+            else {
+                simDeath(student);
+            }
+        });
     }
 
     private void simEvents() {
