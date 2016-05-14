@@ -40,10 +40,10 @@ public class Simulation {
     private final BooleanProperty minutePassed     = new SimpleBooleanProperty(false);
     private final DoubleProperty  semesterProgress = new SimpleDoubleProperty(0.0);
     private final IntegerProperty day              = new SimpleIntegerProperty(1);
-    private final Vector2D        top              = new Vector2D(0, 53);
-    private final Vector2D        bottom           = new Vector2D(0, 773);
-    private final Vector2D        right            = new Vector2D(1280, 0);
-    private final Vector2D        left             = new Vector2D(0, 0);
+    private final int             topBound         = 53;
+    private final int             bottomBound      = 773;
+    private final int             rightBound       = 1280;
+    private final int             leftBound        = 0;
     private       boolean         klausurenTime    = false;
     private       double          studentsPrioMAX  = 0.0;
     private       double          locationsPrioMAX = 0.0;
@@ -191,7 +191,7 @@ public class Simulation {
     }
 
     private boolean isOutOfBounds(Vector2D position) {
-        return position.mY < top.mY || position.mY > bottom.mY || position.mX < left.mX || position.mX > right.mX;
+        return position.mY < topBound || position.mY > bottomBound || position.mX < leftBound || position.mX > rightBound;
     }
 
     private void simDeath(Student student) {
