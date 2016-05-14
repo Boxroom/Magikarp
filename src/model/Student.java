@@ -11,13 +11,11 @@ import javafx.scene.shape.Circle;
  */
 public class Student extends SimElement {
 
-    public static final int      deathAnimMax = 150;
-    public              boolean  disabled     = false;
-    private             Vector2D direction    = new Vector2D(0, 0);
-    private int condition;
-    private       boolean         moving = true;
-    private final BooleanProperty failed = new SimpleBooleanProperty(false);
-    private String forename, surname, enrolmentNumber, course;
+    public static final int             deathAnimMax = 150;
+    private             boolean         disabled     = false;
+    private             Vector2D        direction    = new Vector2D(0, 0);
+    private             boolean         moving       = true;
+    private final       BooleanProperty failed       = new SimpleBooleanProperty(false);
     private Circle    m_circle;
     private ImageView deathImg;
     private boolean alive        = true;
@@ -28,7 +26,7 @@ public class Student extends SimElement {
 
     public Student(int id) {
         super(id);
-        setPosition(Math.random() * 1280, 50 + Math.random() * 700);
+        setPosition(Math.random() * 1280, 53 + Math.random() * 720);
         setDirection(Math.random(), Math.random());
     }
 
@@ -44,26 +42,29 @@ public class Student extends SimElement {
         super.setPosition(pos);
         final Circle c = getCircle();
         if (c != null) {
-            getCircle().setLayoutX(pos.mX);
-            getCircle().setLayoutY(pos.mY);
+            m_circle.setLayoutX(pos.mX);
+            m_circle.setLayoutY(pos.mY);
         }
     }
 
     @Override
     public void setPosition(double x, double y) {
         super.setPosition(x, y);
-        setPosition(getPosition());
+        setPosition(position);
     }
 
     public void move(long elapsed) {
-        setPosition(getPosition().mX + getDirection().mX * (elapsed / 10000000), getPosition().mY + getDirection().mY * (elapsed / 10000000));
+        setPosition(position.mX + direction.mX * (elapsed / 10000000), position.mY + direction.mY * (elapsed / 10000000));
     }
 
     public void die() {
-        getCircle().setVisible(false);
-        deathImg.setVisible(true);
-        deathImg.setLayoutX(getCircle().getLayoutX() - deathImg.getFitWidth() / 2 - 100);
-        deathImg.setLayoutY(getCircle().getLayoutY() - deathImg.getFitHeight() / 2 - 100);
+        moving = false;
+        if (m_circle.isVisible()) {
+            m_circle.setVisible(false);
+            deathImg.setVisible(true);
+            deathImg.setLayoutX(m_circle.getLayoutX() - deathImg.getFitWidth() / 2 - 100);
+            deathImg.setLayoutY(m_circle.getLayoutY() - deathImg.getFitHeight() / 2 - 100);
+        }
         alive = false;
     }
 
@@ -73,7 +74,7 @@ public class Student extends SimElement {
     }
 
     public void simDeath() {
-        setDeathAnimCnt(getDeathAnimCnt() + 1);
+        ++deathAnimCnt;
         deathImg.setOpacity(deathImg.getOpacity() - 0.005);
         deathImg.setScaleX(deathImg.getScaleX() * 1.005);
         deathImg.setScaleY(deathImg.getScaleX() * 1.005);
@@ -160,46 +161,6 @@ public class Student extends SimElement {
 
     public void setMoving(final boolean moving) {
         this.moving = moving;
-    }
-
-    public int getCondition() {
-        return condition;
-    }
-
-    public void setCondition(final int condition) {
-        this.condition = condition;
-    }
-
-    public String getForename() {
-        return forename;
-    }
-
-    public void setForename(final String forename) {
-        this.forename = forename;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(final String surname) {
-        this.surname = surname;
-    }
-
-    public String getEnrolmentNumber() {
-        return enrolmentNumber;
-    }
-
-    public void setEnrolmentNumber(final String enrolmentNumber) {
-        this.enrolmentNumber = enrolmentNumber;
-    }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(final String course) {
-        this.course = course;
     }
 
     public boolean isAlive() {

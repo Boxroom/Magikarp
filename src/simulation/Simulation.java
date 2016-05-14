@@ -3,6 +3,7 @@ package simulation;
 import java.util.List;
 import javafx.beans.property.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import model.*;
 
 /**
@@ -39,6 +40,10 @@ public class Simulation {
     private final BooleanProperty minutePassed     = new SimpleBooleanProperty(false);
     private final DoubleProperty  semesterProgress = new SimpleDoubleProperty(0.0);
     private final IntegerProperty day              = new SimpleIntegerProperty(1);
+    private final Vector2D        top              = new Vector2D(0, 53);
+    private final Vector2D        bottom           = new Vector2D(0, 773);
+    private final Vector2D        right            = new Vector2D(1280, 0);
+    private final Vector2D        left             = new Vector2D(0, 0);
     private       boolean         klausurenTime    = false;
     private       double          studentsPrioMAX  = 0.0;
     private       double          locationsPrioMAX = 0.0;
@@ -121,13 +126,13 @@ public class Simulation {
 
     private void simStudent(Student student, long elapsed) {
         //analyse students
-        this.prioritizeStudents(student);
+        prioritizeStudents(student);
 
         //analyse locations
-        this.prioritizeLocations(student);
+        prioritizeLocations(student);
 
         student.calcDanger();
-        this.setDangerColor(student);
+        setDangerColor(student);
 
         if (student.getDanger() > (SimElement.dangerMAX / 1.7)) {
             student.setHealth(student.getHealth() - (student.getDanger() / (SimElement.dangerMAX / 1.7)) * healthDecreaseOnDanger);
@@ -140,10 +145,11 @@ public class Simulation {
         //check the status flag
         if (student.isMoving()) {
             //adjust attributes
-            this.adjustAttributes(student);
+            adjustAttributes(student);
 
             if (student.getHealth() <= 0) {
                 student.setFailed(true);
+                return;
             }
 
             //adjust direction according to students and locations
@@ -151,13 +157,15 @@ public class Simulation {
 
             //move the Student
             student.move(elapsed);
+            setVisibilityByBounds(student);
 
             if (student.getInLocationCnt() > 0) {
                 student.setInLocationCnt(student.getInLocationCnt() - 1);
             }
         }
-        else {
-            this.adjustAttributesInsideLocation(student);
+        else { //he's inside a location
+            adjustAttributesInsideLocation(student);
+            adjustDirection(student);
 
             student.setInLocationCnt(student.getInLocationCnt() + 4);
 
@@ -167,6 +175,25 @@ public class Simulation {
         }
     }
 
+    private void setVisibilityByBounds(Student student) {
+        final Vector2D position = student.getPosition();
+        final boolean oob = isOutOfBounds(position);
+        final Circle circle = student.getCircle();
+
+        if (circle.isVisible()) {
+            if (oob) {
+                circle.setVisible(false);
+            }
+        }
+        else if (!oob) {
+            circle.setVisible(true);
+        }
+    }
+
+    private boolean isOutOfBounds(Vector2D position) {
+        return position.mY < top.mY || position.mY > bottom.mY || position.mX < left.mX || position.mX > right.mX;
+    }
+
     private void simDeath(Student student) {
         student.simDeath();
         if (student.getDeathAnimCnt() > Student.deathAnimMax) {
@@ -174,28 +201,28 @@ public class Simulation {
         }
     }
 
-    private void prioritizeStudents(Student referenceStudent) {
+    private void prioritizeStudents(Student currentStudent) {
         //iterate through all students and compare attributes
         double attributesDifference;
         double distance;
         double direction;
         studentsPrioMAX = 0.0;
-        final double[] refAttr = referenceStudent.getAttributes();
+        final double[] currentAttr = currentStudent.getAttributes();
         for (final Student student : students) {
-            if (student.isAlive() && (student.getId() != referenceStudent.getId() || !student.isMoving())) {
+            if (student.isAlive() && (student.getId() != currentStudent.getId() || !student.isMoving())) {
                 //compare attributes
                 attributesDifference = 0.0;
 
                 final double[] sAttr = student.getAttributes();
                 double pot;
                 for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-                    pot = Math.abs(sAttr[i] - refAttr[i]);
+                    pot = Math.abs(sAttr[i] - currentAttr[i]);
                     attributesDifference += pot * pot * pot;
                 }
-                attributesDifference = attributesDifference + (Math.abs(referenceStudent.getDanger() - student.getDanger()) * Math.abs(referenceStudent.getDanger() - student.getDanger()));
+                attributesDifference = attributesDifference + (Math.abs(currentStudent.getDanger() - student.getDanger()) * Math.abs(currentStudent.getDanger() - student.getDanger()));
 
                 //compare position
-                final Vector2D refPos = referenceStudent.getPosition();
+                final Vector2D refPos = currentStudent.getPosition();
                 final Vector2D sPos = student.getPosition();
                 distance = refPos.getDistanceTo(sPos);
                 student.setDist(distance);
@@ -205,7 +232,7 @@ public class Simulation {
                 }
 
                 //compare Direction
-                final Vector2D refDir = referenceStudent.getDirection();
+                final Vector2D refDir = currentStudent.getDirection();
                 final Vector2D sDir = student.getDirection();
                 direction = refDir.getDistanceTo(sDir);
 
@@ -222,10 +249,10 @@ public class Simulation {
         }
     }
 
-    private void prioritizeLocations(Student referenceStudent) {
+    private void prioritizeLocations(Student currentStudent) {
         locationsPrioMAX = 0;
         for (final Location location : locations) {
-            prioritizeLocation(referenceStudent, location);
+            prioritizeLocation(currentStudent, location);
         }
     }
 
@@ -249,17 +276,17 @@ public class Simulation {
     }
 
     //adjusting direction
-    private void adjustDirection(Student referenceStudent) {
-        final Vector2D refPos = referenceStudent.getPosition();
+    private void adjustDirection(Student currentStudent) {
+        final Vector2D currentPos = currentStudent.getPosition();
         Vector2D pos2;
         Vector2D delta;
         final Vector2D studentsDir = new Vector2D(0, 0);
         final Vector2D locationsDir = new Vector2D(0, 0);
 
         for (final Student student : students) {
-            if (student.getID() != referenceStudent.getID() && student.getPriority() > 0 && student.isAlive()) {
+            if (student.getID() != currentStudent.getID() && student.getPriority() > 0 && student.isAlive()) {
                 pos2 = student.getPosition();
-                delta = refPos.subtract(pos2);
+                delta = currentPos.subtract(pos2);
                 delta.normalize2();
 
                 delta.scalarMultiplication2(1 - (student.getPriority() / studentsPrioMAX));
@@ -269,7 +296,7 @@ public class Simulation {
 
         for (final Location location : locations) {
             pos2 = location.getCenterPosition();
-            delta = refPos.subtract(pos2);
+            delta = currentPos.subtract(pos2);
             delta.normalize2();
 
             delta.scalarMultiplication2(1 - (location.getPriority() / locationsPrioMAX));
@@ -278,15 +305,15 @@ public class Simulation {
 
         locationsDir.scalarMultiplication2(students.size() / locations.size());
 
-        final Vector2D refDir = referenceStudent.getDirection();
+        final Vector2D newDir = currentStudent.getDirection();
         studentsDir.scalarMultiplication2(directionInfluenceByStudents);
         locationsDir.scalarMultiplication2(directionInfluenceByLocations);
-        refDir.subtract2(studentsDir);
-        refDir.subtract2(locationsDir);
+        newDir.subtract2(studentsDir);
+        newDir.subtract2(locationsDir);
 
-        refDir.normalize2();
-        refDir.scalarMultiplication2(studentsVMAX);
-        referenceStudent.setDirection(refDir);
+        newDir.normalize2();
+        newDir.scalarMultiplication2(studentsVMAX);
+        currentStudent.setDirection(newDir);
     }
 
     private void adjustAttributesInsideLocation(Student student) {
@@ -309,39 +336,39 @@ public class Simulation {
         }
     }
 
-    private void prioritizeLocation(Student referenceStudent, Location location) {
+    private void prioritizeLocation(Student currentStudent, Location location) {
         //compare attributes
         double attributesDifference = 0.0;
         final double[] lAttr = location.getAttributes();
-        final double[] refAttr = referenceStudent.getAttributes();
+        final double[] currentAttr = currentStudent.getAttributes();
         double pot;
         for (int i = 0; i < SimElement.ATTR_COUNT; ++i) {
-            pot = Math.abs(lAttr[i] - refAttr[i]);
+            pot = Math.abs(lAttr[i] - currentAttr[i]);
             attributesDifference += pot;
         }
-        attributesDifference = attributesDifference + (Math.abs(referenceStudent.getDanger() - location.getDanger()) * Math.abs(referenceStudent.getDanger() - location.getDanger()));
+        attributesDifference = attributesDifference + (Math.abs(currentStudent.getDanger() - location.getDanger()) * Math.abs(currentStudent.getDanger() - location.getDanger()));
 
         //compare position
-        final Vector2D refPos = referenceStudent.getPosition();
+        final Vector2D refPos = currentStudent.getPosition();
         final Vector2D lPos = location.getCenterPosition();
         final double distance = refPos.getDistanceTo(lPos);
         location.setDist(distance);
 
-        if (distance < lockDistanceStudentLocation && referenceStudent.isMoving()) {
+        if (distance < lockDistanceStudentLocation && currentStudent.isMoving()) {
             //lock on to location
-            if (referenceStudent.getInLocationCnt() > 0) {
-                if (referenceStudent.getInsideLocation().getID() != location.getID()) {
-                    enterLocation(referenceStudent, location);
+            if (currentStudent.getInLocationCnt() > 0) {
+                if (currentStudent.getInsideLocation().getID() != location.getID()) {
+                    enterLocation(currentStudent, location);
                 }
             }
             else {
-                enterLocation(referenceStudent, location);
+                enterLocation(currentStudent, location);
             }
         }
         double stay = 0;
-        if (referenceStudent.getInsideLocation() != null) {
-            if (location.getID() == referenceStudent.getInsideLocation().getID()) {
-                stay = referenceStudent.getInLocationCnt();
+        if (currentStudent.getInsideLocation() != null) {
+            if (location.getID() == currentStudent.getInsideLocation().getID()) {
+                stay = currentStudent.getInLocationCnt();
             }
         }
         final double prio = stay * stayFactor + distanceLocationInfluence * distance + Status.toInt(location.getTimeline().getStatus(getTime(0))) * timelineInfluence + attributesDifference * attributesInfluenceByLocations * attributesInfluence;
@@ -366,10 +393,6 @@ public class Simulation {
             s.setInsideLocation(l);
             s.setInLocationCnt(0);
         }
-    }
-
-    public double getSemesterProgress() {
-        return semesterProgress.get();
     }
 
     public DoubleProperty semesterProgressProperty() {

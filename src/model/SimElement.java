@@ -13,7 +13,7 @@ public abstract class SimElement {
     public static final int    PARTY      = 0;
     public static final double dangerMAX  = 200;
     final int id;
-    private Vector2D position = new Vector2D(0, 0);
+    Vector2D position = new Vector2D(0, 0);
     private double priority;
     private double[] attributes = new double[ATTR_COUNT];
     private double danger;

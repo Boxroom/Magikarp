@@ -8,35 +8,28 @@ import javafx.scene.image.ImageView;
  */
 public class Location extends SimElement {
 
-    public static final String[] names = {"Disco", "Universität", "Bibliothek", "Zuhause"};
+    private final int notificationCntMax = 300;
+    private Timeline  timeline;
+    private String    name;
+    private ImageView image;
+    private int     notificationCnt     = 0;
+    private boolean showingNotification = false;
+    private int     studentsInside      = 0;
+    private Label notificationlabel;
 
-    private Timeline timeline;
-
-    private String name = "default";
-
-
-    public void setShowingnotification(boolean shwoingnotification) {
-        this.showingnotification = shwoingnotification;
+    public Location(int id, String name) {
+        super(id);
+        this.name = name;
+        timeline = new Timeline();
     }
 
     public boolean isShowingNotification() {
-        return showingnotification;
+        return showingNotification;
     }
 
-
-    private ImageView image;
-    private final int notificationcntMAX = 300;
-
-    public void setNotificationcnt(int notificationcnt) {
-        this.notificationcnt = notificationcnt;
+    public Label getNotificationlabel() {
+        return notificationlabel;
     }
-
-    public int getNotificationcnt() {
-        return notificationcnt;
-    }
-
-    private int     notificationcnt     = 0;
-    private boolean showingnotification = false;
 
     public void setNotificationlabel(Label notificationlabel) {
         this.notificationlabel = notificationlabel;
@@ -44,57 +37,55 @@ public class Location extends SimElement {
         resetNotification();
     }
 
-    public Label getNotificationlabel() {
-        return notificationlabel;
+    public void resetNotification() {
+        notificationlabel.setVisible(false);
+        final Vector2D v = getPosition();
+        notificationlabel.setLayoutX(v.mX - 20);
+        notificationlabel.setLayoutY(v.mY - 30);
+        setNotificationCnt(0);
+        notificationlabel.setOpacity(1);
+        setShowingNotification(false);
     }
 
-    private Label notificationlabel;
-
-    public String getName() {
-        return name;
+    public void setShowingNotification(boolean showingNotification) {
+        this.showingNotification = showingNotification;
     }
 
     public Timeline getTimeline() {
         return timeline;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void setTimeline(final Timeline timeline) {
         this.timeline = timeline;
-    }
-
-    private int studentsinside = 0;
-
-    public void setImage(ImageView img) {
-        this.image = img;
     }
 
     public ImageView getImage() {
         return image;
     }
 
-    private void adjustScaling() {
-        final double factor = ((double) 1) + ((double) (studentsinside)) / ((double) 20);
-        image.setScaleX(factor);
-        image.setScaleY(factor);
-        image.setScaleZ(factor);
+    public void setImage(ImageView img) {
+        this.image = img;
     }
 
     public Boolean grow() {
         if (image != null) {
-            studentsinside++;
+            studentsInside++;
             adjustScaling();
             return true;
         }
         return false;
     }
 
+    private void adjustScaling() {
+        final double factor = ((double) 1) + ((double) (studentsInside)) / ((double) 20);
+        image.setScaleX(factor);
+        image.setScaleY(factor);
+        image.setScaleZ(factor);
+    }
+
     public Boolean shrink() {
-        if (image != null && studentsinside > 0) {
-            studentsinside--;
+        if (image != null && studentsInside > 0) {
+            studentsInside--;
             adjustScaling();
             return true;
         }
@@ -104,13 +95,23 @@ public class Location extends SimElement {
     @Override
     public void setPosition(final Vector2D pos) {
         super.setPosition(pos);
-        if (image != null) {
-            image.setLayoutX(pos.mX);
-            image.setLayoutY(pos.mY);
-        }
-        else {
-            System.out.println(getName() + " was null");
-        }
+        image.setLayoutX(pos.mX);
+        image.setLayoutY(pos.mY);
+    }
+
+    @Override
+    public void setPosition(double x, double y) {
+        super.setPosition(x, y);
+        image.setLayoutX(x);
+        image.setLayoutY(y);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Vector2D getCenterPosition() {
@@ -121,36 +122,21 @@ public class Location extends SimElement {
         return n;
     }
 
-
-    @Override
-    public void setPosition(double x, double y) {
-        super.setPosition(x, y);
-        if (image != null) {
-            image.setLayoutX(x);
-            image.setLayoutY(y);
-        }
-        else {
-            System.out.println(getName() + " was null");
-        }
-    }
-
     public void animNotification() {
-        setNotificationcnt(getNotificationcnt() + 1);
+        setNotificationCnt(getNotificationCnt() + 1);
         notificationlabel.setOpacity(notificationlabel.getOpacity() - 0.002);
         notificationlabel.setLayoutY(notificationlabel.getLayoutY() - 0.1);
-        if (getNotificationcnt() > notificationcntMAX) {
+        if (getNotificationCnt() > notificationCntMax) {
             hideNotification();
         }
     }
 
-    public void resetNotification() {
-        notificationlabel.setVisible(false);
-        final Vector2D v = getPosition();
-        notificationlabel.setLayoutX(v.mX - 20);
-        notificationlabel.setLayoutY(v.mY - 30);
-        setNotificationcnt(0);
-        notificationlabel.setOpacity(1);
-        setShowingnotification(false);
+    public int getNotificationCnt() {
+        return notificationCnt;
+    }
+
+    public void setNotificationCnt(int notificationCnt) {
+        this.notificationCnt = notificationCnt;
     }
 
     public void hideNotification() {
@@ -161,12 +147,7 @@ public class Location extends SimElement {
         resetNotification();
         notificationlabel.setText(txt);
         notificationlabel.setVisible(true);
-        setShowingnotification(true);
-    }
-
-    public Location(int id) {
-        super(id);
-        timeline = new Timeline();
+        setShowingNotification(true);
     }
 
 }
