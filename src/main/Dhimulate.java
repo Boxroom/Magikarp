@@ -226,7 +226,7 @@ public class Dhimulate extends Application {
         }));
         m_Simulation.dayProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue.intValue() > m_Simulation.daysPerSemester) {
-                if (m_Simulation.getSemesterCount() == 6) {
+                if (m_Simulation.getSemesterCount() == 1) {
                     handleSimulationEnd();
                 }
                 else {
@@ -443,19 +443,18 @@ public class Dhimulate extends Application {
         handlePause(m_pauseButton);
         calcAttributesTotal(currentAttributes);
 
-        studentenBarv.setProgress((double) studentStartCount / (double) studentStartCount);
-        teamBarv.setProgress(startAttributes[SimElement.TEAM] / 100);
-        partyBarv.setProgress(startAttributes[SimElement.PARTY] / 100);
-        lernenBarv.setProgress(startAttributes[SimElement.LEARNING] / 100);
-        fuhrungBarv.setProgress(startAttributes[SimElement.LEADERSHIP] / 100);
-        alkoholBarv.setProgress(startAttributes[SimElement.ALCOHOL] / 100);
+        teamBarv.setProgress(startAttributes[SimElement.TEAM] / 100.0);
+        partyBarv.setProgress(startAttributes[SimElement.PARTY] / 100.0);
+        lernenBarv.setProgress(startAttributes[SimElement.LEARNING] / 100.0);
+        fuhrungBarv.setProgress(startAttributes[SimElement.LEADERSHIP] / 100.0);
+        alkoholBarv.setProgress(startAttributes[SimElement.ALCOHOL] / 100.0);
 
-        studentenBarn.setProgress((double) currentStudentCount / (double) studentStartCount);
-        teamBarn.setProgress(currentAttributes[SimElement.TEAM] / 100);
-        partyBarn.setProgress(currentAttributes[SimElement.PARTY] / 100);
-        lernenBarn.setProgress(currentAttributes[SimElement.LEARNING] / 100);
-        fuhrungBarn.setProgress(currentAttributes[SimElement.LEADERSHIP] / 100);
-        alkoholBarn.setProgress(currentAttributes[SimElement.ALCOHOL] / 100);
+        studentenBarn.setProgress(currentStudentCount / (double) studentStartCount);
+        teamBarn.setProgress(currentAttributes[SimElement.TEAM] / 100.0);
+        partyBarn.setProgress(currentAttributes[SimElement.PARTY] / 100.0);
+        lernenBarn.setProgress(currentAttributes[SimElement.LEARNING] / 100.0);
+        fuhrungBarn.setProgress(currentAttributes[SimElement.LEADERSHIP] / 100.0);
+        alkoholBarn.setProgress(currentAttributes[SimElement.ALCOHOL] / 100.0);
 
         saved = false;
         m_PrimaryStage.setScene(getScene("report2"));
@@ -467,7 +466,7 @@ public class Dhimulate extends Application {
         klausurenPane.setVisible(false);
         calcAttributesTotal(currentAttributes);
 
-        studentenBar.setProgress((double) currentStudentCount / (double) studentStartCount);
+        studentenBar.setProgress(currentStudentCount / (double) studentStartCount);
         teamBar.setProgress(currentAttributes[SimElement.TEAM] / 100);
         partyBar.setProgress(currentAttributes[SimElement.PARTY] / 100);
         lernenBar.setProgress(currentAttributes[SimElement.LEARNING] / 100);

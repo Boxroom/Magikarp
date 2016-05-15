@@ -63,7 +63,7 @@ public class Simulation {
 
     //time0 hours, time1 minutes, time2 seconds
     private void addTime(long elapsed) {
-        final double secondsElapsed = ((double) elapsed) / (1000000000.0 / 2000);
+        final double secondsElapsed = elapsed / (1000000000.0 / 2000.0);
         time[2] += secondsElapsed;
         if (time[2] >= 60) {
             time[1]++;

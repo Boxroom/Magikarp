@@ -62,7 +62,7 @@
         <ProgressBar fx:id="alkoholBarv" layoutX="320.0" layoutY="408.0" prefWidth="200.0" progress="0.0"/>
         <ProgressBar fx:id="teamBarv" layoutX="320.0" layoutY="351.0" prefWidth="200.0" progress="0.0"/>
         <ProgressBar fx:id="lernenBarv" layoutX="320.0" layoutY="293.0" prefWidth="200.0" progress="0.0"/>
-        <ProgressBar fx:id="studentenBarv" layoutX="320.0" layoutY="236.0" prefWidth="200.0" progress="0.0"/>
+        <ProgressBar fx:id="studentenBarv" layoutX="320.0" layoutY="236.0" prefWidth="200.0" progress="1.0"/>
         <TitledPane fx:id="semesterbericht1" collapsible="false" layoutX="723.0" layoutY="174.0" prefHeight="400.0"
                     prefWidth="400.0" text="Endergebnis">
             <content>

@@ -77,7 +77,7 @@ public class Location extends SimElement {
     }
 
     private void adjustScaling() {
-        final double factor = ((double) 1) + ((double) (studentsInside)) / ((double) 20);
+        final double factor = 1.0 + studentsInside / 50.0;
         image.setScaleX(factor);
         image.setScaleY(factor);
         image.setScaleZ(factor);
