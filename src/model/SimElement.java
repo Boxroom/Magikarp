@@ -17,7 +17,7 @@ public abstract class SimElement {
     private double priority;
     private double[] attributes = new double[ATTR_COUNT];
     private double danger;
-    private double dist = 0;
+    private double distance = 0;
 
     SimElement(int id) {
         this.id = id;
@@ -47,15 +47,15 @@ public abstract class SimElement {
         this.danger = danger;
     }
 
-    public double getDist() {
-        return dist;
+    public double getDistance() {
+        return distance;
     }
 
-    public void setDist(double dist) {
-        if (dist == 0) {
-            dist = 0.00000000001;
+    public void setDistance(double distance) {
+        if (distance == 0) {
+            distance = 0.00000000001;
         }
-        this.dist = dist;
+        this.distance = distance;
     }
 
     public double getPriority() {

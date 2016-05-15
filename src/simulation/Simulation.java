@@ -223,7 +223,7 @@ public class Simulation {
                 final Vector2D refPos = currentStudent.getPosition();
                 final Vector2D sPos = student.getPosition();
                 distance = refPos.getDistanceTo(sPos);
-                student.setDist(distance);
+                student.setDistance(distance);
 
                 if (distance < minGapBetweenStudents) {
                     distance += (minGapBetweenStudents - distance) * 4;
@@ -350,7 +350,7 @@ public class Simulation {
         final Vector2D refPos = currentStudent.getPosition();
         final Vector2D lPos = location.getCenterPosition();
         final double distance = refPos.getDistanceTo(lPos);
-        location.setDist(distance);
+        location.setDistance(distance);
 
         if (distance < lockDistanceStudentLocation && currentStudent.isMoving()) {
             //lock on to location
