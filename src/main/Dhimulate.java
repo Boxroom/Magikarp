@@ -226,7 +226,7 @@ public class Dhimulate extends Application {
         }));
         m_Simulation.dayProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue.intValue() > m_Simulation.daysPerSemester) {
-                if (m_Simulation.getSemesterCount() == 1) {
+                if (m_Simulation.getSemesterCount() == 6) {
                     handleSimulationEnd();
                 }
                 else {
